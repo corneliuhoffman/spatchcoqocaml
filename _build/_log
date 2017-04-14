@@ -1,0 +1,14 @@
+### Starting build.
+# Target: smain.ml.depends, tags: { package(Str), package(Unix), package(lablgtk2), package(lambdasoup), extension:ml, file:smain.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -package lambdasoup -package lablgtk2 -package Unix -package Str -modules smain.ml > smain.ml.depends # cached
+# Target: smain.cmo, tags: { package(Str), package(Unix), package(lablgtk2), package(lambdasoup), byte, compile, extension:cmo, extension:ml, file:smain.cmo, file:smain.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -package lambdasoup -package lablgtk2 -package Unix -package Str -o smain.cmo smain.ml # cached
+# Target: smain.cmx, tags: { package(Str), package(Unix), package(lablgtk2), package(lambdasoup), compile, extension:cmx, extension:ml, file:smain.cmx, file:smain.ml, implem, native, ocaml, quiet, traverse }
+ocamlfind ocamlopt -c -package lambdasoup -package lablgtk2 -package Unix -package Str -o smain.cmx smain.ml # cached
+# Target: smain.native, tags: { package(Str), package(Unix), package(lablgtk2), package(lambdasoup), dont_link_with, extension:native, file:smain.native, link, native, ocaml, program, quiet, traverse }
+ocamlfind ocamlopt processresults.cmx -linkpkg -package lambdasoup -package lablgtk2 -package Unix -package Str smain.cmx -o smain.native
++ ocamlfind ocamlopt processresults.cmx -linkpkg -package lambdasoup -package lablgtk2 -package Unix -package Str smain.cmx -o smain.native
+File "_none_", line 1:
+Error: Cannot find file processresults.cmx
+Command exited with code 2.
+# Compilation unsuccessful.
