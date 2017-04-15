@@ -2,7 +2,7 @@ open GMain
 open GdkKeysyms
 open Str
 open String
-
+(* *)
 
 open Soup
 

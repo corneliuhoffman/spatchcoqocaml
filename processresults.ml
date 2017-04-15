@@ -1,7 +1,9 @@
 open Soup
 
 type statement ={ name: string; content: string};;
-type goal ={number: string; hyps : statement list; conclusion: statement};;
+type goal ={number: string; hyps : statement list; conclusion: statement; mutable state_id: int ; mutable leaving_tactic: string };;
+
+let emptygoal ={number="0"; hyps=[];conclusion ={name=""; content=""}; state_id=0; leaving_tactic =""} 
 let print_goal {name=b; content= c} = if b ="" 
 		then
 			Printf.sprintf "%s "  (String.trim c)
@@ -29,8 +31,8 @@ let get_texts x = String.concat "" (texts x);;
 let manage li =
  match li with
 h::hyp::t::[]-> 
-{number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = strToStatement (get_texts t)}
-|_ -> {number= "" ;hyps =[]; conclusion ={name=""; content =""}};;
+{emptygoal with number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = strToStatement (get_texts t)}
+|_ -> {emptygoal with number= "" ;hyps =[]; conclusion ={name=""; content =""}};;
 let goallist x = 
   to_list (x$$"goal");;
 

@@ -2,13 +2,18 @@ open Gobject.Data;;
 open GMain;;
 open GdkKeysyms;;
 
-
+(* this is the type of a tree, a tree is either a leaf or a tree with a top and children *)
 type 'a tree = LEAF of 'a 
 | TREE of  'a*('a tree list);; 
 
+
+(* this is a printout of a tree to a string *)
 let  rec print_tree  tree = match tree with 
 	LEAF x -> Printf.printf "%s" x
 	|TREE (x, list) -> Printf.printf "%s\n" x ; List.map print_tree list; ();;
+
+
+(* this takes a tree and gets a list of its leaves *)	
 let rec get_leaves tree = 
 match tree with 
 LEAF x -> [x]
@@ -16,7 +21,7 @@ LEAF x -> [x]
  List.concat (List.map get_leaves  list);;
 
 
-
+(*recusive map that adds tree 2 to the leaf of tree 1 that matches its head *)
 let rec addtree tree2 tree1 = 
 	match tree2 with 
 	LEAF x -> tree1
@@ -25,11 +30,7 @@ let rec addtree tree2 tree1 =
 	| TREE (a, list1) -> 
 	if a=x then TREE (a, (list1@list2))  else
 	TREE (a, List.map (fun x-> addtree tree2 x) list1);;
-(* let rec map_tree f tree =
-	match tree with 
-	|LEAF x -> LEAF f x
-	|TREE (a, list) -> TREE ((f a), List.map f list);;
- *)
+
 
 (* it takes a tree and a pair (x , list) and appends list as  leaves to the leaf that looks like x  *)
 let rec add_formated_list (x, list) tree = 
@@ -37,6 +38,13 @@ let rec add_formated_list (x, list) tree =
 	LEAF a -> if a != x  then tree else (TREE (a, List.map (fun b-> LEAF b) list))
 	|TREE (a, tails) -> 
 	TREE (a, List.map (fun a-> add_formated_list (x, list) a) tails );;
+
+(* takes a list and adds it to the tree as follows
+a) finds the one leaf that does not appear in list
+b) finds the elements of the list that are not leaves of tree 
+c) attaches the new elements to the deissapeared tree.
+d) if  nobody dissapears nothing is changed
+e) if no new elements then add a leaf called "done" *)
 
 let add_list list tree =
 	let leaves = (get_leaves tree) in
@@ -47,9 +55,13 @@ let add_list list tree =
 	if newleaves=[] then add_formated_list (List.hd deadleaves, ["done"]) tree else
 	add_formated_list (List.hd deadleaves, newleaves) tree;;
 
+(* makes a tree from a list as above *)
+
 let tree_from_list list=
 List.fold_left (fun x y -> add_list y x) (LEAF (List.hd (List.hd list))) (List.tl list);; 
 
+
+(* this adds a tree to a GTree model starting at the iter in the column x *)
 
 let rec add_tree (model:GTree.tree_store) col iter tree =
   match tree with
@@ -58,6 +70,8 @@ let rec add_tree (model:GTree.tree_store) col iter tree =
   |TREE (x, list) -> let newiter = model#append ~parent:iter () in 
                   model#set ~row:newiter ~column:col x;
                   List.map (fun a -> add_tree model col newiter a ) list; ();;                
+
+(* this makes the view of a tree *)
 
 let create_tree (t:string tree) =
   let cols = new GTree.column_list in
