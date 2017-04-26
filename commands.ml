@@ -1,3 +1,44 @@
+let load_file f =
+  let ic = open_in f in
+  let n = in_channel_length ic in
+  let s = Bytes.create n in
+  really_input ic s 0 n;
+  close_in ic;
+  (s)
+
+let to_str x =
+	match x with
+	| Sexplib.Sexp.Atom a -> a
+	| _ -> "" 
+
+let to_li x =
+	let to_list c =
+	match c with
+	| Sexplib.Sexp.List a -> a
+	| _ -> [] in
+	List.map (fun b -> List.map to_str (to_list b)) (to_list x);;
+
+let commands () =
+if Coqstuff.isMac () then
+ Unix.chdir "/Applications/spatchcoq.app/Contents/MacOS" else ();
+
+let s =load_file "commands.txt" in
+let t = Sexplib.Sexp.of_string s in
+let lii =  to_li t in
+let com =List.map (fun x -> List.map (fun a-> Str.global_replace (Str.regexp "'") "\"" a ) x) lii in
+let listofcommands= List.map (fun x -> List.map (fun a -> Printf.sprintf "%s" (Str.global_replace (Str.regexp "^\"\|\"$" ) "" a)) x) com in
+listofcommands;;
+
+
+
+(* 
+let s= Core.Std.In_channel.read_all "commands.txt" in 
+let t = Sexplib.Sexp.of_string s in
+let lii= Core.Std.List.t_of_sexp (fun x-> Core.Std.List.t_of_sexp Core.Std.String.t_of_sexp x) t in
+Core.Std.List.map lii (fun x-> Core.Std.List.map x (fun a-> Str.global_replace (Str.regexp "'") "\"" a ));;
+
+ *)
+(* 
 let commands=[(" We will prove the left hand side of @conc{} that is we need to prove @newconclusion{1}.@latex{1} We are done with @newconclusion{1} and so @conc{}.", " Tactic Notation \"Prove\" \"left\" \"hand\" \"side\" := left.");
 (" We will prove the right hand side of @conc{} that is we need to prove @newconclusion{1}.@latex{1} We are done with @newconclusion{1} and so @conc{}.", " Tactic Notation \"Prove\" \"right\" \"hand\" \"side\" := right.");
 (" We will prove @newconclusion{1}.@latex{1} We are done with @newconclusion{1} and so @conc{}.", " Tactic Notation \"Prove\" constr(a) \"in\" \"the\" \"disjuntion\" := match goal with |-(a \/ ?b) => left | |-(?a \/ a) => right end.");
@@ -24,3 +65,4 @@ let commands=[(" We will prove the left hand side of @conc{} that is we need to 
 ("Apply theorem @val{1} to get @newconclusion{1}.@latex{1}", " Tactic Notation \"Apply\" \"result\" constr(a) := apply a.");
 ("Now @conc{} follows trivially from the assumptions.", " Tactic Notation \"This\" \"follows\" \"from\" \"assumptions\" := assumption.");
 ("We denote @val{1} by @val{2}.@latex{1}.", " Tactic Notation \"Denote\" constr(a) \"by\" ident(b) := remember a as b.")];;
+ *)

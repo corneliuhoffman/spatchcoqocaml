@@ -1,19 +1,25 @@
 open Soup
-
 type statement ={ name: string; content: string};;
-type goal ={number: string; hyps : statement list; conclusion: statement; mutable state_id: int ; mutable leaving_tactic: string };;
 
-let emptygoal ={number="0"; hyps=[];conclusion ={name=""; content=""}; state_id=0; leaving_tactic =""} 
+ 
+type goal ={number: string; hyps : statement list; conclusion: statement; mutable state_id: int ; mutable leaving_tactic: string; mutable values:string array};;
+
+
+let emptygoal ={number="0"; hyps=[];conclusion ={name=""; content=""}; state_id=0; leaving_tactic =""; values =[||] } 
+
+
+
 let print_goal {name=b; content= c} = if b ="" 
 		then
 			Printf.sprintf "%s "  (String.trim c)
 		else
   			Printf.sprintf "%s : %s " (String.trim b) (String.trim c);;
-let print_goals {number=n; hyps=h; conclusion= c} = 
-  n^"\n--\n"^(String.concat "\n" (List.map print_goal h))^"\n================\n"^(print_goal c);;  
+let print_goals {number=n; hyps=h; conclusion= c; leaving_tactic=l; values = values} = 
+  n^"\n--\n"^(String.concat "\n" (List.map print_goal h))^"\n================\n"^(print_goal c)^"\n";;  
 
-let oc,ic,ec = Unix.open_process_full "/Applications/CoqIDE_8.6.app/Contents/Resources/bin/coqtop -ideslave -main-channel stdfds" (Unix.environment ());;
-let xmltostr str = 
+(* let oc,ic,ec = Unix.open_process_full "/Applications/CoqIDE_8.6.app/Contents/Resources/bin/coqtop -ideslave -main-channel stdfds" (Unix.environment ());;
+ *)
+ let xmltostr str = 
   Str.global_replace (Str.regexp "&nbsp;") " " str;;
 
 let cleanstr x = 
