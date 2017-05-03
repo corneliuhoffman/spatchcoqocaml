@@ -16,6 +16,13 @@ let oldid=ref "1";;
 type mainthing ={ mutable state_id: string; mutable goals :Processresults.goal list; mutable leaving_tactic: string; mutable values: string array };;
 let coqstr = ref "";;
 
+
+
+
+
+
+
+
 let checkforcoq () =
   if Coqstuff.isMac () then
     
@@ -119,6 +126,106 @@ let get_first_lines str =
   let l = (Str.split (Str.regexp "\n") str) in
   if l !=[] then String.concat "\n" (List.rev (List.tl (List.rev l)))
   else "";;
+
+  let addListToNotebook (notebook:GPack.notebook) list = 
+    remove_book notebook ();
+    List.map (fun x-> 
+        let text = x in
+        let label = GMisc.label ~text:("Goal " ) () in
+        let frame = GBin.frame ~label:"" ~width:100 ~height:75 ~border_width:10
+            ~packing:(fun x-> Printf.printf "%s" (string_of_int (notebook#append_page ~tab_label:label#coerce x))) () in
+        let view = GText.view ~editable:false  ~packing:frame#add () in
+        view#buffer#set_text text;
+        view#misc#modify_base [(`NORMAL, `NAME "lightgray")]) list;;
+
+
+
+let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listoftheorems (notebook:GPack.notebook)  = 
+      id:=Coqstuff.fstid ic oc  !id; 
+      let xx=(get_first_line (win10#buffer#get_text ())) in 
+      print_string ("the id is now "^(!id));
+
+      if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\|Proposition\|Axiom\|Definition") xx 0 )>=0  with _-> false) then 
+        mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
+      if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
+        (begin Coqstuff.writeToCoq ic   xx !id;
+          let x = Coqstuff.getmessages ic oc  [] in
+          List.map (fun a -> print_string (to_string a)) x;
+          let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
+          let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
+          if error <0 then 
+          (begin
+            if (try (Str.search_forward (Str.regexp "Axiom\|Definition") xx 0 )>=0  with _-> false) then
+        let latextac = (Processinputs.separate xx) in
+        (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
+              List.map (fun x->List.map (fun a -> print_string (Processresults.print_goal a)) (List.hd x.goals).hyps) !mainobj;flush_all ();
+                listoftheorems := !mainobj::!listoftheorems;
+
+
+               
+              mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
+              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
+              win11#buffer#set_text messages;)
+            else (if (try (Str.search_forward (Str.regexp "Qed") xx 0 )>=0  with _-> false) then
+              (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
+             
+              print_string (!id^"\n");
+              mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
+              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
+              win11#buffer#set_text messages;) 
+              else (completionindex:=0;
+              completionlist:=[];
+              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
+              win11#buffer#set_text messages;
+              let y = Coqstuff.soupgoal ic oc  () in
+              id:=Coqstuff.fstid ic oc  !id; 
+              let tac =  (Processinputs.get_tactic xx (listofcommands)) in
+              let latextac = if tac !=[] then  List.hd tac else ((Processinputs.separate xx)^"\n\n Proof: @latex{1}") in
+              let gls = Processresults.goallist y in 
+              let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
+              let oldmain = List.hd !mainobj in
+              
+              
+
+              mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
+              
+              
+              print_string  !id;  flush_all ();
+
+              (* mainobj.ids <- !id::mainobj.ids;
+                 mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
+              addListToNotebook notebook (Processresults.processoutput  y); () ))
+
+              (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) end )
+          else (win11#buffer#set_text messages; Coqstuff.movebackto  ic !id) end)
+      else  
+        GToolbox.message_box ~title:"error" ~ok:"hi" (xx^"is not an accepted tactic please check your text.")
+    ;;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let main () =
   let mainobj =  ref [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}] in
   let listoftheorems = ref [] in
@@ -184,15 +291,13 @@ let main () =
   
   let file_ok_sel filew () =
     let file=filew#filename in
-    let inp = open_in file in
     try 
-      let line = input_line inp in  (* read line from in_channel and discard \n *)
+      let line =  Commands.load_file file in  (* read line from in_channel and discard \n *)
       win10#buffer#set_text line; (* write on the underlying device now *)
-      close_in inp;
       filew#destroy ()                 (* close the input channel *) 
 
     with e ->                      (* some unexpected exception occurs *)
-      close_in_noerr inp;           (* emergency closing *)
+                (* emergency closing *)
       raise e;
   in
 
@@ -216,6 +321,36 @@ let main () =
 
     ));
 
+ ignore( factory#add_item "Save" ~key:_O ~callback: ( fun () ->
+      let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
+          ~filename:"yourfile.v" () in
+
+      (* Set a handler for destroy event that immediately exits GTK. *)
+      (* filew#connect#destroy ~callback:GMain.Main.quit;
+      *)
+      (* Connect the ok_button to file_ok_sel function *)
+      filew#ok_button#connect#clicked ~callback:(fun () ->
+    let file=filew#filename in
+    let out = open_out file in
+    let txt = win00#buffer#get_text () in 
+    let d=Processresults.emptygoal in
+    Printf.fprintf out "%s\n" txt;
+    close_out out; 
+    filew#destroy ()
+    );
+
+      (* Connect the cancel_button to destroy the widget *)
+      filew#cancel_button#connect#clicked ~callback:filew#destroy;
+
+      filew#show ()
+
+
+    )
+
+
+
+);
+
  ignore( factory#add_item "Save latex" ~key:_O ~callback: ( fun () ->
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
           ~filename:"yourfile.tex" () in
@@ -232,7 +367,7 @@ let main () =
     let newlist = !mainobj::!listoftheorems in
 
     let message = List.fold_left (fun   m thm ->
-      print_string m;
+      
       let totaltree = Treestuff.tree_from_list_of_mains (
         List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d in
       m^(Latexstuff.latex totaltree))  "" (List.rev newlist)   in
@@ -253,6 +388,11 @@ let main () =
 
 
 );
+
+
+
+
+
   let tacticsfactory = new GMenu.factory menubar in
   let tactics_group = tacticsfactory#accel_group in
   let tactics_menu = tacticsfactory#add_submenu "Tactics" in
@@ -288,42 +428,7 @@ let a2 : unit GToolbox.shortcut_specification ={name= "runs"; keys = [t2]; messa
 GToolbox.create_shortcuts 
   ~window:window ~shortcuts:[a2] 
   ~callback:(fun () -> 
-      let xx=(get_first_line (win10#buffer#get_text ())) in 
-      if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\|Proposition") xx 0 )>=0  with _-> false) then 
-        mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
-      if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
-        (begin Coqstuff.writeToCoq ic   xx !id;
-          let x = Coqstuff.getmessages ic oc  [] in
-          let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
-          let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
-          if error <0 then (begin
-              completionindex:=0;
-              completionlist:=[];
-              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
-              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
-              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
-              win11#buffer#set_text messages;
-              let y = Coqstuff.soupgoal ic oc  () in
-              id:=Coqstuff.fstid ic oc  !id; 
-              let tac =  (Processinputs.get_tactic xx (listofcommands)) in
-              let latextac = if tac !=[] then  List.hd tac else ((Processinputs.separate xx)^"\n\n Proof: @latex{1}") in
-              let gls = Processresults.goallist y in 
-              let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
-              let oldmain = List.hd !mainobj in
-              
-              mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
-              
-             
-              print_string  !id;  flush_all ();
-
-              (* mainobj.ids <- !id::mainobj.ids;
-                 mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
-              addListToNotebook  (Processresults.processoutput  y); ()
-              (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) end )
-          else (win11#buffer#set_text messages) end)
-      else  
-        GToolbox.message_box ~title:"error" ~ok:"hi" (xx^"is not an accepted tactic please check your text.")
-    );
+runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook; () );
 
 
   (*third row*)
@@ -352,59 +457,10 @@ let _ = window#event#connect#key_press ~callback:begin fun ev ->
   let buttonrun = GButton.button ~label:"run!"
       ~packing:row2#add () in
   ignore (buttonrun#connect#clicked ~callback:(fun () -> 
-      id:=Coqstuff.fstid ic oc  !id; 
-      let xx=(get_first_line (win10#buffer#get_text ())) in 
-      print_string ("the id is now "^(!id));
 
-      if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\|Proposition") xx 0 )>=0  with _-> false) then 
-        mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
-      if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
-        (begin Coqstuff.writeToCoq ic   xx !id;
-          let x = Coqstuff.getmessages ic oc  [] in
-          List.map (fun a -> print_string (to_string a)) x;
-          let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
-          let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
-          if error <0 then (begin
+runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook; () 
 
-            if (try (Str.search_forward (Str.regexp "Qed") xx 0 )>=0  with _-> false) then
-              (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
-              
-              print_string (!id^"\n");
-              mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
-              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
-              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
-              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
-              win11#buffer#set_text messages;) 
-              else (completionindex:=0;
-              completionlist:=[];
-              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
-              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
-              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
-              win11#buffer#set_text messages;
-              let y = Coqstuff.soupgoal ic oc  () in
-              id:=Coqstuff.fstid ic oc  !id; 
-              let tac =  (Processinputs.get_tactic xx (listofcommands)) in
-              let latextac = if tac !=[] then  List.hd tac else ((Processinputs.separate xx)^"\n\n Proof: @latex{1}") in
-              let gls = Processresults.goallist y in 
-              let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
-              let oldmain = List.hd !mainobj in
-              
-              
-
-              mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
-              
-              
-              print_string  !id;  flush_all ();
-
-              (* mainobj.ids <- !id::mainobj.ids;
-                 mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
-              addListToNotebook  (Processresults.processoutput  y); ())
-
-              (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) end )
-          else (win11#buffer#set_text messages; Coqstuff.movebackto  ic !id) end)
-      else  
-        GToolbox.message_box ~title:"error" ~ok:"hi" (xx^"is not an accepted tactic please check your text.")
-    ));
+));
   let buttonundo = GButton.button ~label:"undo!"
       ~packing:row2#add () in
   ignore(buttonundo#connect#clicked ~callback: (fun () ->
@@ -433,9 +489,9 @@ let _ = window#event#connect#key_press ~callback:begin fun ev ->
         (
           match h with 
         |hd::tl -> 
-        List.map Processresults.print_goals hd.goals;
+(*         List.map Processresults.print_goals hd.goals;
+ *)        
         Coqstuff.movebackto  ic  hd.state_id;
-        print_string ("\n"^hd.state_id^"\n");
         let y = Coqstuff.soupgoal ic oc  () in
         
         id:=hd.state_id;
@@ -454,15 +510,15 @@ let _ = window#event#connect#key_press ~callback:begin fun ev ->
       let d=Processresults.emptygoal in
       let newlist = !mainobj::!listoftheorems in
       List.map ( fun thm ->
-      let totaltree = Treestuff.tree_from_list_of_mains (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d in
-      (* Treestuff.print_tree (fun x -> print_string (Processresults.print_goals x)) totaltree;flush_all (); *)
-
-
+(*       List.map (fun x->  (List.map (fun a ->print_string (Processresults.print_goals a)) x.goals); print_string x.leaving_tactic) thm;flush_all (); 
+ *)      let totaltree = Treestuff.tree_from_list_of_mains (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d in
+   
       (* let listofstrings = (List.rev (List.map (fun x-> (List.map Processresults.print_goals x.goals)) !mainobj)) in
  *)
       (* let tree = Treestuff.tree_from_list listofstrings "done" in  *)
       let tree = Treestuff.maptree Processresults.print_goals totaltree in
-      (* print_string (Latexstuff.latex totaltree);flush_all (); *)
+         Treestuff.print_tree print_string tree;flush_all ();
+        print_string (Latexstuff.latex totaltree);
       Treestuff.create_tree tree
     ) newlist ; ()) );
 

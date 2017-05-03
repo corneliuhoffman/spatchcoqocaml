@@ -58,20 +58,24 @@ let header ="
 \\newtheorem{Theorem}{Theorem}
 \\newtheorem{Lemma}{Lemma}
 \\newtheorem{Proposition}{Proposition}
+\\newtheorem{Definition}{Definition}
+\\newtheorem{Axiom}{Axiom}
 
 \\title{Brief Article}
 \\author{The Author}
 \\date{}							% Activate to display a given date or no date
 
 \\begin{document}
-\\maketitle";;
+\\maketitle\n\n";;
 
 
 let rec latex (tree:Processresults.goal Treestuff.tree) =
 	match tree with
 	LEAF x ->
 	if x = Processresults.emptygoal then  "This is done"
-	else "\\red{THIS STILL NEEDS A PROOF}"
+	else (
+	if not (x.leaving_tactic = "") then  x.leaving_tactic 
+else "\\red{THIS STILL NEEDS A PROOF}")
 	|TREE (x, li)-> 
 	let leave = (x.leaving_tactic^"\n") in
 	let nohyps = change "@newhyp" leave (List.map (fun a -> 
@@ -82,9 +86,9 @@ let rec latex (tree:Processresults.goal Treestuff.tree) =
 	let nonewcon = change "@newconclusion" nodeadhyp (List.map (fun a -> 
 			  Processresults.print_goal (conclusion a)) li) in
 	let novals = change "@val" nonewcon (Array.to_list x.values) in
-	let uncleaned = change "@latex" novals (List.map latex li) in
+	let uncleaned = String.trim (change "@latex" novals (List.map latex li)) in
 	(changestrings uncleaned [ ("∨", "\\lor ");  ("→", "\\Rightarrow "); ("∀", "\\forall "); 
-	("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow ")])
+	("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow "); (" +", " ")])
 
 
 

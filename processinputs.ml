@@ -17,14 +17,14 @@ let makeregexp str =
 
 
 let checkinput str list = 
-if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Require|Axiom|Check|Print") str  then true
+if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Require|Axiom|Check|Print|Definition") str  then true
 else  (List.exists (fun x-> x) (List.map (fun a-> Pcre.pmatch ~rex:(makeregexp a) str) list));;
 
 let get_tactic str list =
 	List.map List.hd (List.filter (fun a -> Pcre.pmatch ~rex:(makeregexp (List.nth a 1)) str) list);;
 
 let get_values str list =
-	if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Require|Axiom|Check|Print") str  then [||]
+	if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Require|Axiom|Check|Print|Definition") str  then [||]
 	else
 	let tac =List.hd (List.filter (fun a -> Pcre.pmatch ~rex:(makeregexp (List.nth a 1)) str) list) in
 	
@@ -41,12 +41,20 @@ let prepareforprint str = replacelist
 
 let separate lemma =
 let lem = prepareforprint lemma in
-let firstbreak =Pcre.split ~rex:(Pcre.regexp "(\s*\(.*:.*\)\s*)*:") lem in
+
+let firstbreak = if (Pcre.pmatch ~rex:(Pcre.regexp "Definition") lem) then 
+Pcre.split ~rex:(Pcre.regexp "(\s*\(.*:.*\)\s*)*:=") lem
+else Pcre.split ~rex:(Pcre.regexp "(\s*\(.*:.*\)\s*)*:") lem in
 let cleaner = List.map (fun x-> String.trim (cleanstr x)) firstbreak in
-let clear = List.filter ( fun x -> not (x = "")) cleaner in 
-let cont = (String.concat ":" (List.tl clear)) in
+let clear = List.filter ( fun x -> not (x = "")) cleaner in
+let cont = 
+if (Pcre.pmatch ~rex:(Pcre.regexp "Definition") lem) then
+String.concat " " (List.tl (Str.split (Str.regexp " ") lem))
+else 
+(String.concat ":" (List.tl clear))
+ in
 let hd = Pcre.split (List.hd clear) in
-"\\begin{"^(List.hd hd)^"}["^(List.nth hd 1)^"] \n$"^cont^"$\n \\end{"^(List.hd hd)^"}\n";;
+"\\begin{"^(List.hd hd)^"}["^(List.nth hd 1)^"] \n$"^(Str.global_replace (Str.regexp " ") "\," cont)^"$\n \\end{"^(List.hd hd)^"}\n";;
 
 let addtext str i = "<call val='Add'><pair><pair><string>"^(prepareforxml str)^"</string>
 <int>0</int></pair><pair><state_id val='"^i^"'/><bool val='false'/></pair></pair></call>\n";;

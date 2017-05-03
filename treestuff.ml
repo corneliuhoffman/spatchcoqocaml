@@ -7,8 +7,8 @@ type 'a tree = LEAF of 'a
 
 
 let  rec print_tree f tree = match tree with 
-	LEAF x -> f x
-	|TREE (x, list) -> f x ; List.map (print_tree f) list; ();;
+	LEAF x -> print_string "LEAF\n :"; f x
+	|TREE (x, list) -> print_string "HEAD\n"; f x ; print_string "TAIL:\n"; List.map (print_tree f) list; ();;
 
 
 let rec get_leaves tree = 
@@ -64,9 +64,9 @@ let tree_from_list list d =
   |h::[] -> LEAF (List.hd (List.hd list))
   |_-> List.fold_left (fun x y -> add_list y x d) (LEAF (List.hd (List.hd list))) (List.tl list);; 
 
-let tree_from_list_of_mains list1 list2 d =
+let tree_from_list_of_mains (list1:Processresults.goal list  list) (list2:(string * string array) list ) d  =
   match list1 with
-  |h::[] -> LEAF (List.hd (List.hd list1))
+  |h::[] -> LEAF {(List.hd (List.hd list1)) with leaving_tactic = (fst (List.hd list2))}
   |_-> List.fold_left2 (fun x y z -> add_list_withlatex y x z d) (LEAF (List.hd (List.hd list1))) (List.tl list1) (List.tl list2);; 
 
 let rec maptree f tree =

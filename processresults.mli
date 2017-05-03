@@ -16,10 +16,19 @@ val emptygoal : goal
 (** this makes and emptygoal to be filled up later *)
 
 val print_goal : statement -> string
+(** makes a statement into a string*)
+
 val print_goals : goal -> string
+(** makes a goal into a string *)
+
 val xmltostr : string -> string
+(** changes the xml to string replacing &nbst;*)
+
 val cleanstr : string -> string
+
+(** changes the xml to replace the various stuff*)
 val strToStatement : string -> statement
+(** produces statements form strings , if concl the the name is ""*)
 val get_texts : 'a Soup.node -> string
 val manage : 'a Soup.node list -> goal
 val goallist : 'a Soup.node -> Soup.element Soup.node list
