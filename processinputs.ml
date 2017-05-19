@@ -17,14 +17,14 @@ let makeregexp str =
 
 
 let checkinput str list = 
-if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Require|Axiom|Check|Print|Definition") str  then true
+if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Fixpoint|Require|Axiom|Check|Print|Definition|Open|Variable|Notation") str  then true
 else  (List.exists (fun x-> x) (List.map (fun a-> Pcre.pmatch ~rex:(makeregexp a) str) list));;
 
 let get_tactic str list =
 	List.map List.hd (List.filter (fun a -> Pcre.pmatch ~rex:(makeregexp (List.nth a 1)) str) list);;
 
 let get_values str list =
-	if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Search|Require|Axiom|Check|Print|Definition") str  then [||]
+	if Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Qed|Theorem|Proposition|Fixpoint|Search|Require|Axiom|Check|Print|Definition|Open|Variable|Notation") str  then [||]
 	else
 	let tac =List.hd (List.filter (fun a -> Pcre.pmatch ~rex:(makeregexp (List.nth a 1)) str) list) in
 	

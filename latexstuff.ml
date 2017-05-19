@@ -60,7 +60,13 @@ let header ="
 \\newtheorem{Proposition}{Proposition}
 \\newtheorem{Definition}{Definition}
 \\newtheorem{Axiom}{Axiom}
+ \\usepackage{tcolorbox}
+ \\tcbuselibrary{skins}
+ \\tcbuselibrary{theorems}
+\\tcbuselibrary{breakable}
 
+
+\\newcommand{\\mybox}[1]{\\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \\end{tcolorbox}}
 \\title{Brief Article}
 \\author{The Author}
 \\date{}							% Activate to display a given date or no date
@@ -86,7 +92,7 @@ else "\\red{THIS STILL NEEDS A PROOF}")
 	let nonewcon = change "@newconclusion" nodeadhyp (List.map (fun a -> 
 			  Processresults.print_goal (conclusion a)) li) in
 	let novals = change "@val" nonewcon (Array.to_list x.values) in
-	let uncleaned = String.trim (change "@latex" novals (List.map latex li)) in
+	let uncleaned = String.trim (change "@latex" novals (List.map (fun a -> "\\mybox{"^(latex a)^"}" ) li)) in
 	(changestrings uncleaned [ ("∨", "\\lor ");  ("→", "\\Rightarrow "); ("∀", "\\forall "); 
 	("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow "); (" +", " ")])
 
