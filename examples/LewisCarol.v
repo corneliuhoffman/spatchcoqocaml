@@ -67,3 +67,31 @@ apply LCb.
 apply H0.
 unfold not in H3.
 apply (H3 H2).
+Qed.
+
+(* Propositional version of this proof.  *)
+
+
+Variable Babies2:Prop.
+Variable Illogical2:Prop.
+Variable Despised2:Prop.
+Variable ManageCroc2:Prop.
+Axiom LCa2: (Babies2 -> Illogical2).
+Axiom LCb2: (ManageCroc2 -> not(Despised2)).
+Axiom LCc2: (Illogical2 -> Despised2).
+Lemma BabyCroc2: (Babies2 -> not(ManageCroc2)).
+intros.
+unfold not.
+intros.
+assert Illogical2.
+apply LCa2.
+apply H.
+assert (Despised2).
+apply LCc2.
+apply H1.
+assert (not(Despised2)).
+apply LCb2.
+apply H0.
+unfold not in H3.
+apply (H3 H2).
+Qed.

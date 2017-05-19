@@ -2,9 +2,8 @@ open GMain
 open GdkKeysyms
 open Str
 open String
-
-
 open Soup
+
 let listofcommands = Commands.commands ();;
 
 (* List.map (fun x -> List.map print_string x; flush_all ()) listofcommands;; *)
@@ -15,12 +14,6 @@ let id=ref "1";;
 let oldid=ref "1";;
 type mainthing ={ mutable state_id: string; mutable goals :Processresults.goal list; mutable leaving_tactic: string; mutable values: string array };;
 let coqstr = ref "";;
-
-
-
-
-
-
 
 
 let checkforcoq () =
@@ -86,7 +79,6 @@ List.map (fun x->
           id:=Coqstuff.fstid ic oc  !id)
 
      imports;
-
 
 
 (* let imports =["Require Import  Bool."; "Require Import  Arith.";  "Require Import ZArith."; "Require Import Classical.";  "Require Import Utf8." ] in
@@ -162,7 +154,6 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
                 listoftheorems := !mainobj::!listoftheorems;
 
 
-               
               mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
               win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
               (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
@@ -170,7 +161,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
               win11#buffer#set_text messages;)
             else (if (try (Str.search_forward (Str.regexp "Qed") xx 0 )>=0  with _-> false) then
               (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
-             
+
               print_string (!id^"\n");
               mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
               win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
@@ -190,12 +181,9 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
               let gls = Processresults.goallist y in 
               let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
               let oldmain = List.hd !mainobj in
-              
-              
 
               mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
-              
-              
+
               print_string  !id;  flush_all ();
 
               (* mainobj.ids <- !id::mainobj.ids;
@@ -207,23 +195,6 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
       else  
         GToolbox.message_box ~title:"error" ~ok:"hi" (xx^"is not an accepted tactic please check your text.")
     ;;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 let main () =
@@ -300,7 +271,6 @@ let main () =
                 (* emergency closing *)
       raise e;
   in
-
 
 
   ignore( factory#add_item "Open" ~key:_O ~callback: ( fun () ->
