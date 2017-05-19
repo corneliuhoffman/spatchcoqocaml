@@ -17,4 +17,6 @@ Now install the packages.
     opam install lambdasoup
 
 ## Compile spatchcoq
+ocamlfind opt  -o spatchcoq -linkpkg -package str,pcre,lambdasoup,lablgtk2,pcre,sexplib  processinputs.mli processresults.mli coqstuff.mli treestuff.mli commands.mli latexstuff.mli spmain.mli
 
+ocamlfind opt  -o spatchcoq -linkpkg -package str,pcre,lambdasoup,lablgtk2,pcre,sexplib  processinputs.ml processresults.ml coqstuff.ml treestuff.ml commands.ml latexstuff.ml spmain.ml 
