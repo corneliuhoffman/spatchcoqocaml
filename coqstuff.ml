@@ -15,13 +15,13 @@ a != [];;
 
 let nonblockread ic oc =
 if readytoread ic oc then Some (readFromCoq oc ())
-else None;;
+else  (  None);;
 
 let rec repeatreading ic oc =
 let x = nonblockread ic oc in
 match x with
 Some a -> a 
-|None-> repeatreading ic oc;;
+|None-> ( repeatreading ic oc);;
 
 
 let get_opsys () =
@@ -49,7 +49,7 @@ if x!="" then try newparse x with _ -> sgoal ic oc () else sgoal ic oc () in
 
 let rec mygoal ic oc str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
 let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
-if str = x then x else mygoal ic oc x;;
+if str = x then x else ( mygoal ic oc x);;
 
 let rec soupgoal ic oc () = 
 let x = mygoal ic oc "" in

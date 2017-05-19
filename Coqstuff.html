@@ -1,0 +1,50 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<link rel="stylesheet" href="style.css" type="text/css">
+<meta content="text/html; charset=iso-8859-1" http-equiv="Content-Type">
+<link rel="Start" href="index.html">
+<link rel="previous" href="Processresults.html">
+<link rel="next" href="Treestuff.html">
+<link rel="Up" href="index.html">
+<link title="Index of types" rel=Appendix href="index_types.html">
+<link title="Index of values" rel=Appendix href="index_values.html">
+<link title="Index of modules" rel=Appendix href="index_modules.html">
+<link title="Commands" rel="Chapter" href="Commands.html">
+<link title="Processinputs" rel="Chapter" href="Processinputs.html">
+<link title="Processresults" rel="Chapter" href="Processresults.html">
+<link title="Coqstuff" rel="Chapter" href="Coqstuff.html">
+<link title="Treestuff" rel="Chapter" href="Treestuff.html">
+<link title="Spmain" rel="Chapter" href="Spmain.html"><title>Coqstuff</title>
+</head>
+<body>
+<div class="navbar"><a class="pre" href="Processresults.html" title="Processresults">Previous</a>
+&nbsp;<a class="up" href="index.html" title="Index">Up</a>
+&nbsp;<a class="post" href="Treestuff.html" title="Treestuff">Next</a>
+</div>
+<h1>Module <a href="type_Coqstuff.html">Coqstuff</a></h1>
+
+<pre><span class="keyword">module</span> Coqstuff: <code class="code">sig</code> <a href="Coqstuff.html">..</a> <code class="code">end</code></pre><hr width="100%">
+
+<pre><span id="VALnewparse"><span class="keyword">val</span> newparse</span> : <code class="type">string -> Soup.soup Soup.node</code></pre>
+<pre><span id="VALreadFromCoq"><span class="keyword">val</span> readFromCoq</span> : <code class="type">Pervasives.in_channel -> unit -> bytes</code></pre>
+<pre><span id="VALstringReadFromCoq"><span class="keyword">val</span> stringReadFromCoq</span> : <code class="type">Pervasives.in_channel -> unit -> bytes</code></pre>
+<pre><span id="VALreadytoread"><span class="keyword">val</span> readytoread</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> bool</code></pre>
+<pre><span id="VALnonblockread"><span class="keyword">val</span> nonblockread</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> bytes option</code></pre>
+<pre><span id="VALrepeatreading"><span class="keyword">val</span> repeatreading</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> bytes</code></pre>
+<pre><span id="VALget_opsys"><span class="keyword">val</span> get_opsys</span> : <code class="type">unit -> string</code></pre>
+<pre><span id="VALisMac"><span class="keyword">val</span> isMac</span> : <code class="type">unit -> bool</code></pre>
+<pre><span id="VALisLinux"><span class="keyword">val</span> isLinux</span> : <code class="type">unit -> bool</code></pre>
+<pre><span id="VALisWin"><span class="keyword">val</span> isWin</span> : <code class="type">unit -> bool</code></pre>
+<pre><span id="VALgetmessages"><span class="keyword">val</span> getmessages</span> : <code class="type">Pervasives.out_channel -><br>       Pervasives.in_channel -> Soup.soup Soup.node list -> Soup.soup Soup.node list</code></pre>
+<pre><span id="VALmygoal"><span class="keyword">val</span> mygoal</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> bytes -> bytes</code></pre>
+<pre><span id="VALsoupgoal"><span class="keyword">val</span> soupgoal</span> : <code class="type">Pervasives.out_channel -><br>       Pervasives.in_channel -> unit -> Soup.soup Soup.node</code></pre>
+<pre><span id="VALreadnow"><span class="keyword">val</span> readnow</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> string -> string</code></pre>
+<pre><span id="VALevars"><span class="keyword">val</span> evars</span> : <code class="type">Pervasives.out_channel -> unit -> unit</code></pre>
+<pre><span id="VALstatus"><span class="keyword">val</span> status</span> : <code class="type">Pervasives.out_channel -> unit -> unit</code></pre>
+<pre><span id="VALsoupstatus"><span class="keyword">val</span> soupstatus</span> : <code class="type">Pervasives.out_channel -><br>       Pervasives.in_channel -> unit -> Soup.soup Soup.node</code></pre>
+<pre><span id="VALwriteToCoq"><span class="keyword">val</span> writeToCoq</span> : <code class="type">Pervasives.out_channel -> string -> string -> unit</code></pre>
+<pre><span id="VALprintAST"><span class="keyword">val</span> printAST</span> : <code class="type">Pervasives.out_channel -> string -> unit</code></pre>
+<pre><span id="VALmovebackto"><span class="keyword">val</span> movebackto</span> : <code class="type">Pervasives.out_channel -> string -> unit</code></pre>
+<pre><span id="VALfindstateid"><span class="keyword">val</span> findstateid</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> string -> string</code></pre>
+<pre><span id="VALfstid"><span class="keyword">val</span> fstid</span> : <code class="type">Pervasives.out_channel -> Pervasives.in_channel -> string -> string</code></pre></body></html>

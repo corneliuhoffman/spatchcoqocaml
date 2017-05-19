@@ -1,4 +1,0 @@
-"Rule: ocaml dependencies ml (%=smain )": "^#6\233\182\209P2\212\231\175\159\241\238\202\166"
-"Resource: /Users/Hoff/Desktop/spatchcoq/smain.ml": "\139\155Wj\233O\144y\192\173x[F\208>L"
-"Rule: ocaml: ml & cmi -> cmx & o (%=smain )": "7\007nx\214\154W\128gd\157\225\223Q\186H"
-"Rule: ocaml: ml -> cmo & cmi (%=smain )": "\181\145\170n??\178\199\005y\231\\YG~\\"
