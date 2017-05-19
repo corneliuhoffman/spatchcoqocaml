@@ -86,8 +86,27 @@ List.map (fun x->
           id:=Coqstuff.fstid ic oc  !id)
 
      imports;
+let imports =["Require Import  ZArith." ] in
+List.map (fun x-> 
+          Coqstuff.writeToCoq ic   x !id;
+          for i = 1 to 100*repeat do
+           (List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
+         
+        done;
+          id:=Coqstuff.fstid ic oc  !id)
 
+     imports;
+    (*  let imports =["Local Open Scope Z_scope." ] in
+List.map (fun x-> 
+          Coqstuff.writeToCoq ic   x !id;
+          for i = 1 to 100*repeat do
+           (List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
+         
+        done;
+          id:=Coqstuff.fstid ic oc  !id)
 
+     imports;
+ *)
 
 (* let imports =["Require Import  Bool."; "Require Import  Arith.";  "Require Import ZArith."; "Require Import Classical.";  "Require Import Utf8." ] in
 List.map (fun x-> 
@@ -321,7 +340,7 @@ let main () =
 
     ));
 
- ignore( factory#add_item "Save" ~key:_O ~callback: ( fun () ->
+ ignore( factory#add_item "Save" ~key:_S ~callback: ( fun () ->
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
           ~filename:"yourfile.v" () in
 
@@ -351,7 +370,7 @@ let main () =
 
 );
 
- ignore( factory#add_item "Save latex" ~key:_O ~callback: ( fun () ->
+ ignore( factory#add_item "Save latex" ~key:_L ~callback: ( fun () ->
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
           ~filename:"yourfile.tex" () in
 
