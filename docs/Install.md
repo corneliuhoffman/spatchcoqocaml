@@ -15,8 +15,14 @@ Now install the packages.
 
     opam install lablgtk
     opam install lambdasoup
+    opam install pcre
+    opam install sexplib
+    
 
 ## Compile spatchcoq
-ocamlfind opt  -o spatchcoq -linkpkg -package str,pcre,lambdasoup,lablgtk2,pcre,sexplib  processinputs.mli processresults.mli coqstuff.mli treestuff.mli commands.mli latexstuff.mli spmain.mli
 
-ocamlfind opt  -o spatchcoq -linkpkg -package str,pcre,lambdasoup,lablgtk2,pcre,sexplib  processinputs.ml processresults.ml coqstuff.ml treestuff.ml commands.ml latexstuff.ml spmain.ml 
+To compule spatchcoq:
+
+    ocamlfind opt  -o spatchcoq -linkpkg -package str,lambdasoup,lablgtk2,pcre,sexplib  processinputs.mli processresults.mli coqstuff.mli treestuff.mli commands.mli latexstuff.mli spmain.mli
+
+    ocamlfind opt  -o spatchcoq -linkpkg -package str,lambdasoup,lablgtk2,pcre,sexplib  processinputs.ml processresults.ml coqstuff.ml treestuff.ml commands.ml latexstuff.ml spmain.ml 
