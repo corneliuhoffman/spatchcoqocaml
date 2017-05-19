@@ -1,6 +1,8 @@
 # How to install spatchcoq
 
-Spatcoq is written in Ocaml.  See https://ocaml.org/
+Spatchcoq is written in Ocaml.  See https://ocaml.org/
+
+Spatchcoq requires ocaml version 4.02 or later.
 
 To install ocaml see (http://www.ocaml.org/docs/install.html) and the opam package manager.  In debian, for example, type
 
