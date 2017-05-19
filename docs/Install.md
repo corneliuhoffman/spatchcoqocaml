@@ -15,3 +15,6 @@ Now install the packages.
 
     opam install lablgtk
     opam install lambdasoup
+
+## Compile spatchcoq
+
