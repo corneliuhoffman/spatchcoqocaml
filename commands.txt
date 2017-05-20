@@ -1,5 +1,6 @@
 
-(("  We will prove the left hand side of $@conc{}$.  That is we need to prove $@newconclusion{1}$.@latex{1} We have now proved  $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' 'left' 'hand' 'side' := left.") 
+(("  I am stuck and cannot prove this" " Tactic Notation 'I' 'cannot' 'prove' 'this' := admit.")
+("  We will prove the left hand side of $@conc{}$.  That is we need to prove $@newconclusion{1}$.@latex{1} We have now proved  $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' 'left' 'hand' 'side' := left.") 
 (" We will prove the right hand side of $@conc{}$. That is we need to prove $@newconclusion{1}$.@latex{1} We are done with $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' 'right' 'hand' 'side' := right.") 
 ("  We will prove $@newconclusion{1}$.@latex{1} We are done with $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' constr(a) 'in' 'the' 'disjunction' := match goal with |-(a \/ ?b) => left | |-(?a \/ a) => right end.") 
 (" Since we know $@deadhyp{}$ we also know $@newhyp{1}$.@latex{1} We are now done with $@conc{}$.\n\n" " Tactic Notation 'Eliminate' 'the' 'conjuction' 'in' 'hypothesis' hyp(a) :=match goal with| [a : (_ /\ _) |- _] => (let H1:=fresh 'Hyp' in let H2:= fresh 'Hyp' in destruct a as [H1 H2]) end.") 

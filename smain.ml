@@ -73,14 +73,15 @@ let movebackto i = Printf.fprintf ic "%s" ("<call val=\"Edit_at\"><state_id val=
 let rec findstateid id = match (attribute "val" ((soupstatus ()) $ "state_id")) with
    Some x -> if int_of_string x >= int_of_string id then x else findstateid id
   |_ -> findstateid id;;
-let rec fstid id = try (findstateid id) with any -> ignore (Printf.printf "%s" (Printexc.to_string any)); fstid id;;
+let rec fstid id = try (findstateid id) with any -> (* ignore (Printf.printf "%s" (Printexc.to_string any)); *)
+ fstid id;;
 
 
 List.map (fun x-> 
-  Printf.printf "command %s\n\n " (Processinputs.addtext (snd x) !id);
+  (* Printf.printf "command %s\n\n " (Processinputs.addtext (snd x) !id); *)
   Printf.printf "%s" !id;
   Printf.fprintf ic "%s"  (Processinputs.addtext (snd x) (Coqstuff.fstid ic oc  !id)) ;flush_all ();
-  Printf.printf "%s" (to_string (Coqstuff.soupgoal ic oc  ())); id:=Coqstuff.fstid ic oc  !id) Commands.commands;;
+  (* Printf.printf "%s" (to_string (Coqstuff.soupgoal ic oc  ())); id:=Coqstuff.fstid ic oc  !id) Commands.commands;; *)
 
 Printf.printf "the id is now %s" !id;;
 
@@ -236,9 +237,9 @@ let tacticsfactory = new GMenu.factory menubar in
        win00#buffer#insert ~iter:(win00#buffer#get_iter `END) xx;
        win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
       
-      Printf.printf "%s" messages;
+      (* Printf.printf "%s" messages;
       Printf.printf "%d" error;
-      Printf.printf "%s" (string_of_bool (Str.string_match (Str.regexp "rror") messages 0 ));
+      Printf.printf "%s" (string_of_bool (Str.string_match (Str.regexp "rror") messages 0 )); *)
       win11#buffer#set_text messages;
       let y = soupgoal () in
      
@@ -261,7 +262,7 @@ let buttonundo = GButton.button ~label:"undo!"
     h::t::l->
     movebackto t;
     let y = soupgoal () in
-    Printf.printf "%s \n\n\n %s \n\n %s" (to_string y) !oldid (fstid !oldid);
+   (*  Printf.printf "%s \n\n\n %s \n\n %s" (to_string y) !oldid (fstid !oldid); *)
     id:=t;
     mainobj.ids<-t::l;
     addListToNotebook  (Processresults.processoutput  y); ()
