@@ -1,0 +1,45 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+\usepackage{prfblock}
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Definition}[divides] 
+$divides\,(a\,b:nat)\,:=\,∃\,x:nat,\,b\,=\,a*x.
+$
+ \end{Definition}
+\begin{Theorem}[refldiv] 
+$\forall \,a\,b\,c,\,(a\,|\,b)\,\land (b\,|\,c)\,\Rightarrow \,(a\,|c).$
+ \end{Theorem}
+
+
+ Proof: \begin{subproof}In order to show $\forall a b c : nat, a | b \land b | c \Rightarrow a | c $ we pick an arbitrary $a$ and show $\forall b c : nat, a | b \land b | c \Rightarrow a | c $.
+
+ \begin{subproof}In order to show $\forall b c : nat, a | b \land b | c \Rightarrow a | c $ we pick an arbitrary $b$ and show $\forall c : nat, a | b \land b | c \Rightarrow a | c $.
+
+ \begin{subproof}In order to show $\forall c : nat, a | b \land b | c \Rightarrow a | c $ we pick an arbitrary $c$ and show $a | b \land b | c \Rightarrow a | c $.
+
+ \begin{subproof}We will assume $Hyp : a | b \land b | c $ and show $a | c $.\begin{subproof}Since we know $Hyp : a | b \land b | c $ we also know $Hyp0 : a | b 
+Hyp1 : b | c $.\begin{subproof}We use the definition of $divides$ in $Hyp0$ to obtain $Hyp0 : \exists x : nat, b = a * x $ \begin{subproof}We use the definition of $divides$ in $Hyp1$ to obtain $Hyp1 : \exists x : nat, c = b * x $ \begin{subproof}Rewriting the definition of $divides$ in our conclusion $a | c $, we now need to show $\exists x : nat, c = a * x $.\begin{subproof}We choose a variable $x$ in $Hyp1$ to obtain $x : nat 
+Hyp1 : c = b * x $.\begin{subproof}We rewrite the goal using $Hyp1$ to obtain $\exists x0 : nat, b * x = a * x0 $.\begin{subproof}We choose a variable $y$ in $Hyp0$ to obtain $a, b, c, y : nat 
+Hyp0 : b = a * y $.\begin{subproof}We rewrite the goal using $Hyp0$ to obtain $\exists x0 : nat, a * y * x = a * x0 $.\begin{subproof}We shall prove $\exists x0 : nat, a * y * x = a * x0 $ by showing $a * y * x = a * (y * x) $.\begin{subproof}This follows immediately from arithmetic.\begin{subproof}This is done\end{subproof}\end{subproof} Now $a * y * x = a * (y * x) $ means that $\exists x0 : nat, a * y * x = a * x0 $.\end{subproof} We have now proved $\exists x0 : nat, a * y * x = a * x0 $ and so $\exists x0 : nat, b * x = a * x0 $ follows.\end{subproof} and so we have proved $\exists x0 : nat, b * x = a * x0 $.\end{subproof} We have now proved $\exists x0 : nat, b * x = a * x0 $ and so $\exists x0 : nat, c = a * x0 $ follows.\end{subproof} and so we have proved $\exists x : nat, c = a * x $.\end{subproof} Therefore we have showed $\exists x : nat, c = a * x $ and so $a | c $.\end{subproof} therefore we have $a | c $.\end{subproof} therefore we have $a | c $.\end{subproof} We are now done with $a | c $.\end{subproof} We have now showed that if $Hyp : a | b \land b | c $ then $a | c $ a proof of $a | b \land b | c \Rightarrow a | c $.\end{subproof} Since $c$ was arbitrary this shows $\forall c : nat, a | b \land b | c \Rightarrow a | c $.\end{subproof} Since $b$ was arbitrary this shows $\forall b c : nat, a | b \land b | c \Rightarrow a | c $.\end{subproof} Since $a$ was arbitrary this shows $\forall a b c : nat, a | b \land b | c \Rightarrow a | c $.\end{subproof}This is done\end{document}

@@ -1,5 +1,5 @@
 
-(("  I am stuck and cannot prove this" " Tactic Notation 'I' 'cannot' 'prove' 'this' := admit.")
+(("  {\color{red} I am stuck and cannot prove this!!}" " Tactic Notation 'I' 'cannot' 'prove' 'this' := admit.")
 ("  We will prove the left hand side of $@conc{}$.  That is we need to prove $@newconclusion{1}$.@latex{1} We have now proved  $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' 'left' 'hand' 'side' := left.") 
 (" We will prove the right hand side of $@conc{}$. That is we need to prove $@newconclusion{1}$.@latex{1} We are done with $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' 'right' 'hand' 'side' := right.") 
 ("  We will prove $@newconclusion{1}$.@latex{1} We are done with $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" " Tactic Notation 'Prove' constr(a) 'in' 'the' 'disjunction' := match goal with |-(a \/ ?b) => left | |-(?a \/ a) => right end.") 
@@ -13,7 +13,7 @@
 (" We immediately show $@newhyp{1}$ by using $@val{2}$ in $@deadhyp{}$.@latex{1} This finishes $@conc{}$.\n\n" " Tactic Notation 'Obtain' constr(c) 'using' 'variable' constr(a) 'in' 'the' 'universally' 'quantified' 'hypothesis' hyp(b) :=match goal with |[b: forall _, _ |- _] => let H0:=fresh 'Hyp' in assert (H0:c) by apply (b a) end.") 
 (" We shall prove $@conc{}$ by showing $@newconclusion{1}$.@latex{1} Now $@newconclusion{1}$ means that $@conc{}$.\n\n" " Tactic Notation 'Prove' 'the' 'existential' 'claim' 'is' 'true' 'for' constr(a) := match goal with [|- exists _, _ ] => exists a end.") 
 (" We rewrite the goal using $@val{1}$ to obtain $@newconclusion{1}$.@latex{1} We have now proved $@newconclusion{1}$ and so $@conc{}$ follows.\n\n" "Tactic Notation 'Rewrite' 'the' 'goal' 'using' constr(b) := try rewrite b || rewrite <- b || apply b.") 
-(" This follows immediately from arithmetic.@latex{1} \n\n" " Tactic Notation 'True' 'by' 'arithmetic' 'properties' := match goal with |[|-_=_] => ring end.") 
+(" This follows immediately from arithmetic.@latex{1} \n\n" " Tactic Notation 'True' 'by' 'arithmetic' 'properties' := match goal with |[|-_=_] => repeat (try ring || auto with arith) end.") 
 ("  We rewrite $@val{2}$ using $@val{3}$ to obtain $@newhyp{1}$.@latex{1} Therefore we have @conc{}.\n\n" "Tactic Notation 'Claim' constr(a) 'by' 'rewriting' hyp(c) 'using' constr(b) := assert a by ((try (rewrite b in c) || (rewrite <- b in c));assumption).") 
 (" Claim $@newconclusion{1}$. Let us prove prove that. \n\n @latex{1} and therefore we have proved @newconclusion{1}.@latex{2}.\n\n" " Tactic Notation 'Claim' constr(a) := assert a.") 
 ("  We use the definition of $@val{2}$ in $@val{1}$ to obtain $@newhyp{1}$ @latex{1} therefore we have $@conc{}$.\n\n" " Tactic Notation 'Rewrite' 'hypothesis' ident(b) 'using' 'the' 'definition' 'of' reference(a) := unfold a in b.") 

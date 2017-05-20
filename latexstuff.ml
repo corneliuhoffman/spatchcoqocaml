@@ -51,9 +51,9 @@ else "\\red{THIS STILL NEEDS A PROOF}"
 let header ="
 \\documentclass[11pt, oneside]{article}   	
 
-
+\\usepackage{color}
 \\usepackage{graphicx}				
-
+\\usepackage{prfblock}
 \\usepackage{amssymb}
 \\newtheorem{Theorem}{Theorem}
 \\newtheorem{Lemma}{Lemma}
@@ -92,7 +92,7 @@ let rec latex (tree:Processresults.goal Treestuff.tree) =
     let nonewcon = change "@newconclusion" nodeadhyp (List.map (fun a -> 
         Processresults.print_goal (conclusion a)) li) in
     let novals = change "@val" nonewcon (Array.to_list x.values) in
-    let uncleaned = String.trim (change "@latex" novals (List.map (fun a -> "\\mybox{"^(latex a)^"}" ) li)) in
+    let uncleaned = String.trim (change "@latex" novals (List.map (fun a -> "\\begin{subproof}"^(latex a)^"\\end{subproof}" ) li)) in
     (changestrings uncleaned [ ("∨", "\\lor ");  ("→", "\\Rightarrow "); ("∀", "\\forall "); 
                                ("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow "); (" +", " ")])
 

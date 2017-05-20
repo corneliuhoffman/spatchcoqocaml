@@ -162,7 +162,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
   if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
     (begin Coqstuff.writeToCoq ic   xx !id;
       let x = Coqstuff.getmessages ic oc  [] in
-      List.map (fun a -> print_string (to_string a)) x;
+     (*  List.map (fun a -> print_string (to_string a)) x; *)
       let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
       let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
       if error <0 then 
@@ -179,7 +179,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
              win11#buffer#set_text messages;)
-          else (if (try (Str.search_forward (Str.regexp "Qed") xx 0 )>=0  with _-> false) then
+          else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
                (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
 
                 print_string (!id^"\n");

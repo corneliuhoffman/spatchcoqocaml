@@ -40,7 +40,13 @@ let manage li =
     {emptygoal with number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = strToStatement (get_texts t)}
   |_ -> {emptygoal with number= "" ;hyps =[]; conclusion ={name=""; content =""}};;
 let goallist x = 
-  to_list (x$$"goal");;
+  
+  print_string "the lists has length";
+  let gg = to_list ((List.hd (to_list (x$$"goals")))$$"list") in
+  List.map (fun a -> print_string (to_string a); print_string "\n\n") gg;
+  print_int (List.length gg);
+  let l = to_list ((List.hd gg)$$"goal") in
+  l;;
 
 let processoutput x = 
   let goals= goallist x in 

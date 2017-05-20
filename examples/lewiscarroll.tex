@@ -1,0 +1,59 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+
+\usepackage{graphicx}				
+\usepackage{prfblock}									
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Axiom}[LCa] 
+$∀\,x,\,Babies\,x\,→\,Illogical\,x.$
+ \end{Axiom}
+\begin{Axiom}[LCb] 
+$∀\,x,\,ManageCroc\,x\,→\,not\,(Despised\,x).$
+ \end{Axiom}
+\begin{Axiom}[LCc] 
+$∀\,x,\,Illogical\,x\,→Despised\,x.$
+ \end{Axiom}
+\begin{Lemma}[LcBabies] 
+$\forall \,x,\,Babies\,x\,\Rightarrow \,not\,(ManageCroc\,x).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}In order to show $\forall x : Beings, Babies x \Rightarrow ¬ ManageCroc x $ we pick an arbitrary $x$ and show $Babies x \Rightarrow ¬ ManageCroc x .$
+
+ 
+
+ \begin{subproof}We will assume $Hyp : Babies x $ and show $¬ ManageCroc x .$
+
+ \begin{subproof}Rewriting the definition of $not$ in our conclusion $¬ ManageCroc x $, we now need to show $ManageCroc x \Rightarrow False .$
+
+ \begin{subproof}We will assume $Hyp0 : ManageCroc x $ and show $False .$
+
+ \begin{subproof}Now $Hyp$ and $(LCa x)$ imply $H : Illogical x .$
+
+ \begin{subproof}Now $H$ and $(LCc x)$ imply $H0 : Despised x .$
+
+ \begin{subproof}Now $Hyp0$ and $(LCb x)$ imply $H1 : ¬ Despised x .$
+
+ \begin{subproof}Apply theorem (H1 H0) to get $ .$
+
+ \begin{subproof}This is done\end{subproof}\end{subproof} and so $False .$\end{subproof} and so $False .$\end{subproof} and so $False .$\end{subproof} We have now showed that if $Hyp0 : ManageCroc x $ then $False $ a proof of $ManageCroc x \Rightarrow False .$\end{subproof} Therefore we have showed $ManageCroc x \Rightarrow False $ and so $¬ ManageCroc x .$\end{subproof} We have now showed that if $Hyp : Babies x $ then $¬ ManageCroc x $ a proof of $Babies x \Rightarrow ¬ ManageCroc x .$\end{subproof} Since $x$ was arbitrary this shows $\forall x : Beings, Babies x \Rightarrow ¬ ManageCroc x .$\end{subproof}This is done\end{document}

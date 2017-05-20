@@ -1,0 +1,40 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+\usepackage{prfblock}
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Lemma}[a] 
+$(P\,Q:Prop):P\lor Q\Rightarrow Q\lor P.$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P \lor Q $ and show $Q \lor P $.\begin{subproof}Since we know $Hyp : P \lor Q $ we can consider two cases: 
+
+ Case 1 $Hyp0 : P $
+
+ \begin{subproof}{\color{red} I am stuck and cannot prove this!!}\end{subproof} 
+
+ Case 2 $Hyp1 : Q $
+
+ \begin{subproof}{\color{red} I am stuck and cannot prove this!!}\end{subproof} Since we proved both cases, we are now done with $Q \lor P $.\end{subproof} We have now showed that if $Hyp : P \lor Q $ then $Q \lor P $ a proof of $P \lor Q \Rightarrow Q \lor P $.\end{subproof}This is done\end{document}

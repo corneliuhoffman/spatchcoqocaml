@@ -43,6 +43,7 @@ let isWin ()=
 let rec getmessages ic oc l =
   let rec sgoal ic oc () = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
     let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
+    
     if x!="" then try newparse x with _ -> sgoal ic oc () else sgoal ic oc () in
   let x = sgoal ic oc () in 
   if (List.mem (to_string x) (List.map to_string l) ) then l else getmessages ic oc (l@[x]);;
