@@ -1,0 +1,78 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+\usepackage{prfblock}
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Lemma}[doubleneg2] 
+$(P:Prop):(not\,(not\,P))\Rightarrow \,P.$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : ¬ ¬ P $ and show $P $.\begin{subproof}Assume that $P $ is false, that is $H : ¬ P $ and prove a contradiction.\begin{subproof}We use the definition of $not$ in $Hyp$ to obtain $Hyp : (P \Rightarrow False) \Rightarrow False $ \begin{subproof}Apply theorem $(Hyp H)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} therefore we have $False $.\end{subproof}.The conclusion $P $ follows by contractiction.\end{subproof} We have now showed that if $Hyp : ¬ ¬ P $ then $P $ a proof of $¬ ¬ P \Rightarrow P $.\end{subproof}\begin{Lemma}[implies2] 
+$(P\,Q:Prop):(P\Rightarrow Q)\Rightarrow (not\,P\,\lor \,Q).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P \Rightarrow Q $ and show $¬ P \lor Q $.\begin{subproof}Assume that $¬ P \lor Q $ is false, that is $H : ¬ (¬ P \lor Q) $ and prove a contradiction.\begin{subproof}Claim $¬ ¬ P $. Let us prove prove that. 
+
+ \begin{subproof}Rewriting the definition of $not$ in our conclusion $¬ ¬ P $, we now need to show $(P \Rightarrow False) \Rightarrow False $.\begin{subproof}We will assume $Hyp0 : P \Rightarrow False $ and show $False $.\begin{subproof}We use the definition of $not$ in $H$ to obtain $H : (P \Rightarrow False) \lor Q \Rightarrow False $ \begin{subproof}Claim $(P \Rightarrow False) \lor Q $. Let us prove prove that. 
+
+ \begin{subproof}We will prove the left hand side of $(P \Rightarrow False) \lor Q $. That is we need to prove $P \Rightarrow False $.\begin{subproof}Now $P \Rightarrow False $ follows trivially from the assumptions.\end{subproof} We have now proved $P \Rightarrow False $ and so $(P \Rightarrow False) \lor Q $ follows.\end{subproof} and therefore we have proved (P \Rightarrow False) \lor Q .\begin{subproof}Apply theorem $(H H0)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof}.\end{subproof} therefore we have $False $.\end{subproof} We have now showed that if $Hyp0 : P \Rightarrow False $ then $False $ a proof of $(P \Rightarrow False) \Rightarrow False $.\end{subproof} Therefore we have showed $(P \Rightarrow False) \Rightarrow False $ and so $¬ ¬ P $.\end{subproof} and therefore we have proved ¬ ¬ P .\begin{subproof}We use the definition of $not$ in $H$ to obtain $H : (P \Rightarrow False) \lor Q \Rightarrow False $ \begin{subproof}Claim $P $. Let us prove prove that. 
+
+ \begin{subproof}Apply theorem $doubleneg2$ to get $¬ ¬ P $.\begin{subproof}Now $¬ ¬ P $ follows trivially from the assumptions.\end{subproof}\end{subproof} and therefore we have proved P .\begin{subproof}Claim $Q $. Let us prove prove that. 
+
+ \begin{subproof}Apply theorem $(Hyp H1)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} and therefore we have proved Q .\begin{subproof}Claim $(P \Rightarrow False) \lor Q $. Let us prove prove that. 
+
+ \begin{subproof}We will prove the right hand side of $(P \Rightarrow False) \lor Q $. That is we need to prove $Q $.\begin{subproof}Now $Q $ follows trivially from the assumptions.\end{subproof} We are done with $Q $ and so $(P \Rightarrow False) \lor Q $ follows.\end{subproof} and therefore we have proved (P \Rightarrow False) \lor Q .\begin{subproof}Apply theorem $(H H3)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof}.\end{subproof}.\end{subproof}.\end{subproof} therefore we have $False $.\end{subproof}.\end{subproof}.The conclusion $¬ P \lor Q $ follows by contractiction.\end{subproof} We have now showed that if $Hyp : P \Rightarrow Q $ then $¬ P \lor Q $ a proof of $(P \Rightarrow Q) \Rightarrow ¬ P \lor Q $.\end{subproof}\begin{Lemma}[demorgan3] 
+$(P\,Q:Prop):not\,(P\lor Q)\Rightarrow (not\,P\,\land not\,Q).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : ¬ (P \lor Q) $ and show $¬ P \land ¬ Q $.\begin{subproof}We use the definition of $not$ in $ Hyp$ to obtain $Hyp : P \lor Q \Rightarrow False $ \begin{subproof}In order to prove $¬ P \land ¬ Q $ will first prove $¬ P $ and then $¬ Q $.
+
+ First we show $¬ P $.\begin{subproof}Assume that $¬ P $ is false, that is $H : ¬ ¬ P $ and prove a contradiction.\begin{subproof}Claim $P $. Let us prove prove that. 
+
+ \begin{subproof}Apply theorem $doubleneg2$ to get $¬ ¬ P $.\begin{subproof}Now $¬ ¬ P $ follows trivially from the assumptions.\end{subproof}\end{subproof} and therefore we have proved P .\begin{subproof}Claim $P \lor Q $. Let us prove prove that. 
+
+ \begin{subproof}We will prove the left hand side of $P \lor Q $. That is we need to prove $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} We have now proved $P $ and so $P \lor Q $ follows.\end{subproof} and therefore we have proved P \lor Q .\begin{subproof}Apply theorem $(Hyp H1)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof}.\end{subproof}.\end{subproof}.The conclusion $¬ P $ follows by contractiction.\end{subproof} Next we show $¬ Q $.\begin{subproof}Assume that $¬ Q $ is false, that is $H : ¬ ¬ Q $ and prove a contradiction.\begin{subproof}Claim $Q $. Let us prove prove that. 
+
+ \begin{subproof}Apply theorem $doubleneg2$ to get $¬ ¬ Q $.\begin{subproof}Now $¬ ¬ Q $ follows trivially from the assumptions.\end{subproof}\end{subproof} and therefore we have proved Q .\begin{subproof}Claim $P \lor Q $. Let us prove prove that. 
+
+ \begin{subproof}We will prove the right hand side of $P \lor Q $. That is we need to prove $Q $.\begin{subproof}Now $Q $ follows trivially from the assumptions.\end{subproof} We are done with $Q $ and so $P \lor Q $ follows.\end{subproof} and therefore we have proved P \lor Q .\begin{subproof}Apply theorem $(Hyp H1)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof}.\end{subproof}.\end{subproof}.The conclusion $¬ Q $ follows by contractiction.\end{subproof} Since we showed $¬ P $ and $¬ Q $ we also have $¬ P \land ¬ Q $.\end{subproof} therefore we have $¬ P \land ¬ Q $.\end{subproof} We have now showed that if $Hyp : ¬ (P \lor Q) $ then $¬ P \land ¬ Q $ a proof of $¬ (P \lor Q) \Rightarrow ¬ P \land ¬ Q $.\end{subproof}\begin{Lemma}[demorgan4] 
+$(P\,Q:Prop):(not\,P\,\land not\,Q)\,\Rightarrow \,not\,(P\lor Q).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : ¬ P \land ¬ Q $ and show $¬ (P \lor Q) $.\begin{subproof}Assume that $¬ (P \lor Q) $ is false, that is $H : ¬ ¬ (P \lor Q) $ and prove a contradiction.\begin{subproof}Claim $P \lor Q $. Let us prove prove that. 
+
+ \begin{subproof}Apply theorem $doubleneg2$ to get $¬ ¬ (P \lor Q) $.\begin{subproof}Now $¬ ¬ (P \lor Q) $ follows trivially from the assumptions.\end{subproof}\end{subproof} and therefore we have proved P \lor Q .\begin{subproof}Since we know $Hyp : ¬ P \land ¬ Q $ we also know $Hyp0 : ¬ P 
+Hyp1 : ¬ Q $.\begin{subproof}Since we know $H0 : P \lor Q $ we can consider two cases: 
+
+ Case 1 $Hyp : P $
+
+ \begin{subproof}Apply theorem $(Hyp0 Hyp)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} 
+
+ Case 2 $Hyp2 : Q $
+
+ \begin{subproof}Apply theorem $(Hyp1 Hyp2)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} Since we proved both cases, we are now done with $False $.\end{subproof} We are now done with $False $.\end{subproof}.\end{subproof}.The conclusion $¬ (P \lor Q) $ follows by contractiction.\end{subproof} We have now showed that if $Hyp : ¬ P \land ¬ Q $ then $¬ (P \lor Q) $ a proof of $¬ P \land ¬ Q \Rightarrow ¬ (P \lor Q) $.\end{subproof}This is done\end{document}

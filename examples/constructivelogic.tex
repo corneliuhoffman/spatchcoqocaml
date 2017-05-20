@@ -1,0 +1,105 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+\usepackage{prfblock}
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Lemma}[assume] 
+$\forall \,P:Prop,\,P\Rightarrow P.$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}In order to show $\forall P : Prop, P \Rightarrow P $ we pick an arbitrary $P$ and show $P \Rightarrow P $.
+
+ \begin{subproof}We will assume $Hyp : P $ and show $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} We have now showed that if $Hyp : P $ then $P $ a proof of $P \Rightarrow P $.\end{subproof} Since $P$ was arbitrary this shows $\forall P : Prop, P \Rightarrow P $.\end{subproof}\begin{Lemma}[left] 
+$(\,P\,Q:Prop):P\Rightarrow P\lor Q.$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P $ and show $P \lor Q $.\begin{subproof}We will prove the left hand side of $P \lor Q $. That is we need to prove $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} We have now proved $P $ and so $P \lor Q $ follows.\end{subproof} We have now showed that if $Hyp : P $ then $P \lor Q $ a proof of $P \Rightarrow P \lor Q $.\end{subproof}\begin{Lemma}[right] 
+$\forall \,P\,Q:Prop,\,Q\Rightarrow P\lor Q.$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}In order to show $\forall P Q : Prop, Q \Rightarrow P \lor Q $ we pick an arbitrary $P$ and show $\forall Q : Prop, Q \Rightarrow P \lor Q $.
+
+ \begin{subproof}In order to show $\forall Q : Prop, Q \Rightarrow P \lor Q $ we pick an arbitrary $Q$ and show $Q \Rightarrow P \lor Q $.
+
+ \begin{subproof}We will assume $Hyp : Q $ and show $P \lor Q $.\begin{subproof}We will prove the right hand side of $P \lor Q $. That is we need to prove $Q $.\begin{subproof}Now $Q $ follows trivially from the assumptions.\end{subproof} We are done with $Q $ and so $P \lor Q $ follows.\end{subproof} We have now showed that if $Hyp : Q $ then $P \lor Q $ a proof of $Q \Rightarrow P \lor Q $.\end{subproof} Since $Q$ was arbitrary this shows $\forall Q : Prop, Q \Rightarrow P \lor Q $.\end{subproof} Since $P$ was arbitrary this shows $\forall P Q : Prop, Q \Rightarrow P \lor Q $.\end{subproof}\begin{Lemma}[comm1] 
+$(P\,Q:Prop):P\land Q\Rightarrow Q\land P.$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P \land Q $ and show $Q \land P $.\begin{subproof}Since we know $Hyp : P \land Q $ we also know $Hyp0 : P 
+Hyp1 : Q $.\begin{subproof}In order to prove $Q \land P $ will first prove $Q $ and then $P $.
+
+ First we show $Q $.\begin{subproof}Now $Q $ follows trivially from the assumptions.\end{subproof} Next we show $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} Since we showed $Q $ and $P $ we also have $Q \land P $.\end{subproof} We are now done with $Q \land P $.\end{subproof} We have now showed that if $Hyp : P \land Q $ then $Q \land P $ a proof of $P \land Q \Rightarrow Q \land P $.\end{subproof}\begin{Lemma}[distr1] 
+$(P\,Q\,R:Prop):P\land (Q\lor R)\Rightarrow ((P\land Q)\lor (P\land R)).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P \land (Q \lor R) $ and show $P \land Q \lor P \land R $.\begin{subproof}Since we know $Hyp : P \land (Q \lor R) $ we also know $Hyp0 : P 
+Hyp1 : Q \lor R $.\begin{subproof}Since we know $Hyp1 : Q \lor R $ we can consider two cases: 
+
+ Case 1 $Hyp : Q $
+
+ \begin{subproof}We will prove the left hand side of $P \land Q \lor P \land R $. That is we need to prove $P \land Q $.\begin{subproof}In order to prove $P \land Q $ will first prove $P $ and then $Q $.
+
+ First we show $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} Next we show $Q $.\begin{subproof}Now $Q $ follows trivially from the assumptions.\end{subproof} Since we showed $P $ and $Q $ we also have $P \land Q $.\end{subproof} We have now proved $P \land Q $ and so $P \land Q \lor P \land R $ follows.\end{subproof} 
+
+ Case 2 $Hyp2 : R $
+
+ \begin{subproof}We will prove the right hand side of $P \land Q \lor P \land R $. That is we need to prove $P \land R $.\begin{subproof}In order to prove $P \land R $ will first prove $P $ and then $R $.
+
+ First we show $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} Next we show $R $.\begin{subproof}Now $R $ follows trivially from the assumptions.\end{subproof} Since we showed $P $ and $R $ we also have $P \land R $.\end{subproof} We are done with $P \land R $ and so $P \land Q \lor P \land R $ follows.\end{subproof} Since we proved both cases, we are now done with $P \land Q \lor P \land R $.\end{subproof} We are now done with $P \land Q \lor P \land R $.\end{subproof} We have now showed that if $Hyp : P \land (Q \lor R) $ then $P \land Q \lor P \land R $ a proof of $P \land (Q \lor R) \Rightarrow P \land Q \lor P \land R $.\end{subproof}\begin{Lemma}[distr2] 
+$(P\,Q\,R:Prop):((P\land Q)\lor (P\land R))\,\Rightarrow P\land (Q\lor R).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P \land Q \lor P \land R $ and show $P \land (Q \lor R) $.\begin{subproof}Since we know $Hyp : P \land Q \lor P \land R $ we can consider two cases: 
+
+ Case 1 $Hyp0 : P \land Q $
+
+ \begin{subproof}Since we know $Hyp0 : P \land Q $ we also know $Hyp : P 
+Hyp1 : Q $.\begin{subproof}In order to prove $P \land (Q \lor R) $ will first prove $P $ and then $Q \lor R $.
+
+ First we show $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} Next we show $Q \lor R $.\begin{subproof}We will prove the left hand side of $Q \lor R $. That is we need to prove $Q $.\begin{subproof}Now $Q $ follows trivially from the assumptions.\end{subproof} We have now proved $Q $ and so $Q \lor R $ follows.\end{subproof} Since we showed $P $ and $Q \lor R $ we also have $P \land (Q \lor R) $.\end{subproof} We are now done with $P \land (Q \lor R) $.\end{subproof} 
+
+ Case 2 $Hyp1 : P \land R $
+
+ \begin{subproof}Since we know $Hyp1 : P \land R $ we also know $Hyp : P 
+Hyp0 : R $.\begin{subproof}In order to prove $P \land (Q \lor R) $ will first prove $P $ and then $Q \lor R $.
+
+ First we show $P $.\begin{subproof}Now $P $ follows trivially from the assumptions.\end{subproof} Next we show $Q \lor R $.\begin{subproof}We will prove the right hand side of $Q \lor R $. That is we need to prove $R $.\begin{subproof}Now $R $ follows trivially from the assumptions.\end{subproof} We are done with $R $ and so $Q \lor R $ follows.\end{subproof} Since we showed $P $ and $Q \lor R $ we also have $P \land (Q \lor R) $.\end{subproof} We are now done with $P \land (Q \lor R) $.\end{subproof} Since we proved both cases, we are now done with $P \land (Q \lor R) $.\end{subproof} We have now showed that if $Hyp : P \land Q \lor P \land R $ then $P \land (Q \lor R) $ a proof of $P \land Q \lor P \land R \Rightarrow P \land (Q \lor R) $.\end{subproof}\begin{Lemma}[doubleneg] 
+$(P:Prop):P\Rightarrow (not\,(not\,P)).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P $ and show $¬ ¬ P $.\begin{subproof}Rewriting the definition of $not$ in our conclusion $¬ ¬ P $, we now need to show $(P \Rightarrow False) \Rightarrow False $.\begin{subproof}We will assume $Hyp0 : P \Rightarrow False $ and show $False $.\begin{subproof}Apply theorem $(Hyp0 Hyp)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} We have now showed that if $Hyp0 : P \Rightarrow False $ then $False $ a proof of $(P \Rightarrow False) \Rightarrow False $.\end{subproof} Therefore we have showed $(P \Rightarrow False) \Rightarrow False $ and so $¬ ¬ P $.\end{subproof} We have now showed that if $Hyp : P $ then $¬ ¬ P $ a proof of $P \Rightarrow ¬ ¬ P $.\end{subproof}\begin{Lemma}[counterpos] 
+$(P\,Q:Prop):(P\Rightarrow Q)\Rightarrow (not\,Q\,\Rightarrow \,not\,P).$
+ \end{Lemma}
+
+
+ Proof: \begin{subproof}We will assume $Hyp : P \Rightarrow Q $ and show $¬ Q \Rightarrow ¬ P $.\begin{subproof}We will assume $Hyp0 : ¬ Q $ and show $¬ P $.\begin{subproof}Rewriting the definition of $not$ in our conclusion $¬ P $, we now need to show $P \Rightarrow False $.\begin{subproof}We will assume $Hyp1 : P $ and show $False $.\begin{subproof}Claim $Q $. Let us prove prove that. 
+
+ \begin{subproof}Apply theorem $(Hyp Hyp1)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} and therefore we have proved Q .\begin{subproof}Apply theorem $(Hyp0 H)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof}.\end{subproof} We have now showed that if $Hyp1 : P $ then $False $ a proof of $P \Rightarrow False $.\end{subproof} Therefore we have showed $P \Rightarrow False $ and so $¬ P $.\end{subproof} We have now showed that if $Hyp0 : ¬ Q $ then $¬ P $ a proof of $¬ Q \Rightarrow ¬ P $.\end{subproof} We have now showed that if $Hyp : P \Rightarrow Q $ then $¬ Q \Rightarrow ¬ P $ a proof of $(P \Rightarrow Q) \Rightarrow ¬ Q \Rightarrow ¬ P $.\end{subproof}This is done\end{document}

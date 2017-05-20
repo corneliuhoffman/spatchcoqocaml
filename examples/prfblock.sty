@@ -1,0 +1,48 @@
+% prfblock.sty
+
+\newbox\prfblock
+\newdimen\proofblockindent
+\proofblockindent=6pt
+\newcounter{prooflinenumber}
+\newdimen\prooflinea
+\newdimen\prooflineb
+\newdimen\prooflinec
+
+\newenvironment{subproof}%
+    {\advance\textwidth-\proofblockindent %
+     \advance\prooflinea-\proofblockindent %
+     \setbox\prfblock=\vbox\bgroup\hsize=\textwidth %
+    }%
+    {\egroup %
+     \vskip2pt %
+     \hbox{\vrule width 0.8pt \hskip -0.8pt %
+           \hskip\proofblockindent \vbox{\vskip 4pt \box\prfblock \vskip 4pt}}%
+    }
+
+\newenvironment{proofblock}%
+    {\ifvmode\noindent\fi %
+     \prooflinea\textwidth %
+     \prooflineb 30mm %
+     \prooflinec 10mm %
+     \advance\prooflinea-\prooflineb %
+     \advance\prooflinea-\prooflinec %
+     \advance\prooflinea-6pt %
+     \setcounter{prooflinenumber}{0}%
+     \setbox\prfblock=\vbox\bgroup\hsize=\textwidth %
+    }%
+    {\egroup %
+     \vskip2pt %
+     \hbox{\vbox{\vskip 4pt \box\prfblock \vskip 4pt}}%
+    }
+
+\newcommand\proofline[2]{%
+    \refstepcounter{prooflinenumber}%
+    \hbox{\hbox to \prooflinea{\strut{#1}\hfill}%
+    \hbox to \prooflinec{\hfill(\theprooflinenumber)}%
+    \hbox to \prooflineb{\quad#2\hfill}\\%
+         }%
+}
+
+\newcommand\proofcomment[1]{\vskip 4pt\hbox to \textwidth{#1\hfill}\vskip 4pt}
+
+\newcommand\explain[1]{\parbox[t]{\prooflineb}{#1}}
