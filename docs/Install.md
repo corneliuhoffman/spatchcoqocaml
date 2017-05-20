@@ -29,6 +29,7 @@ To compile spatchcoq:
 
     ocamlfind opt  -o spatchcoq -linkpkg -package str,lambdasoup,lablgtk2,pcre,sexplib  processinputs.ml processresults.ml coqstuff.ml treestuff.ml commands.ml latexstuff.ml spmain.ml 
 
-or shorter
+or shorter:
+    
     ocamlbuild -use-ocamlfind 'spmain.native'
     mv spmain.native spatchcoq
