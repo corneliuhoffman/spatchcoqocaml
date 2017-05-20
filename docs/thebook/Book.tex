@@ -1,0 +1,98 @@
+\documentclass[11pt]{book}
+\usepackage{geometry}        
+\geometry{letterpaper}    
+\usepackage[parfill]{parskip}  
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+
+\usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue, 
+            citecolor=blue, urlcolor=blue]{hyperref}
+
+%\includeonly{Chapter1}
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}    
+\usepackage{graphicx}
+  \usepackage{ams math}
+  \usepackage{tikz}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\usepackage{hyperref}   
+\usepackage{color}
+\newcommand{\VAR}{CTRL-r }
+%\usepackage[dvipsnames]{xcolor}
+         		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+
+%\author{The Author}
+%\date{}							% Activate to display a given date or no date
+%\newcommand{\inp}[1]{\texttt{\colorbox{yellow!25}{#1}}}
+\newcommand{\inp}[1]{\begin{tcolorbox}[colback=yellow!25!,colframe=black]\texttt{#1} \end{tcolorbox}}
+
+%\newcommand{\proc}[1]{\texttt{\colorbox{green!25}{#1}}}
+\newcommand{\proc}[1]{\begin{tcolorbox}[colback=green!35!white,colframe=black]#1 \end{tcolorbox}}
+ 
+ \newcommand{\coqtwo}[2]{
+ \begin{tcolorbox}[bicolor,righthand width=\linewidth/4,sidebyside,colback=green!35!white,colbacklower=gray!10!white] {\small \texttt{#1}}\tcblower
+$#2$ \end{tcolorbox}}
+ 
+\newcommand{\coq}[1]{\begin{tcolorbox}[colback=gray!10!white,colframe=black]$#1$ \end{tcolorbox}}
+\newcommand{\mess}[1]{\begin{tcolorbox}[colback=white,colframe=black] #1 \end{tcolorbox}}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Axiom}{Axiom}
+\tcbuselibrary{breakable}
+
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}
+\newtheorem{lemma}{Lemma}
+\newtheorem{exercise}{Exercise}
+\newtheorem{remark}{Remark}
+\newtheorem{example}{Example}
+\newtheorem{warning}{Warning}
+
+\def\grad{ \mbox{grad}}
+\def\curl{ \mbox{curl}}
+\def\div{ \mbox{div}}
+\def\U{\ensuremath {\cal U}}
+\def\S{\ensuremath {\cal S}}
+\def\V{\ensuremath {\cal V}}
+\def\R{\ensuremath {\cal R}}
+\def\tr{\ensuremath {\mbox{tr}}}
+
+
+
+
+% ------------------- Title and Author -----------------------------
+\title{Sample Book}
+\author{Author}
+\begin{document}
+
+
+\frontmatter
+\maketitle
+
+\tableofcontents
+\include{Installation/UserManual}
+
+
+\bibliographystyle{plain-annote}
+\bibliography{mybibliography}
+
+
+
+\end{document}
+\end
+
