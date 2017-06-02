@@ -19,6 +19,8 @@ Now install the packages.
     opam install lambdasoup
     opam install pcre
     opam install sexplib
+    opam install ppx_deriving
+    opam install ppx_sexp_conv
     
 
 ## Compile spatchcoq
