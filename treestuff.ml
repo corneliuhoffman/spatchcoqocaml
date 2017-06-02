@@ -1,22 +1,59 @@
 open Gobject.Data;;
 open GMain;;
 open GdkKeysyms;;
+open Sexplib;;
+open Sexplib.Std;;
 
 type 'a tree = LEAF of 'a 
-             | TREE of  'a*('a tree list);; 
+             | TREE of  'a*('a tree list) [@@deriving sexp];;
+
+          
 
 
 let  rec print_tree f tree = match tree with 
     LEAF x -> print_string "LEAF\n :"; f x
   |TREE (x, list) -> print_string "HEAD\n"; f x ; print_string "TAIL:\n"; List.map (print_tree f) list; ();;
 
+let to_sexp f tree = (sexp_of_tree f tree);;
 
 let rec get_leaves tree = 
   match tree with 
     LEAF x -> [x]
   |TREE (x, list) ->
     List.concat (List.map get_leaves  list);;
+let rec get_leaves_with_depth p tree = match tree with
+   
+    LEAF x -> [(x, p)]
+  |TREE (x, list) ->
+    List.concat (List.map (fun a-> get_leaves_with_depth (p+1) a)  list);;
 
+
+
+let get_title tree =
+  let init =
+match tree with
+LEAF a -> Printf.sprintf "%s" a
+| TREE (a, l) -> Printf.sprintf "%s" a in
+init;;
+
+let rec depth tree = match tree with
+  LEAF a -> 1
+  |TREE (a, l) -> 1 + (List.fold_left max 0 (List.map depth l)) ;; 
+
+let rec sum_list l = match l with
+  | [] -> 0
+  | h :: t -> h + sum_list t
+let rec countvertices tree=
+match tree with
+  LEAF x -> 1
+  | TREE (x, l) -> 1 + sum_list (List.map countvertices l)
+
+let rec findparents child bigtree = 
+  match bigtree with
+    LEAF a -> []
+    |TREE (a, l) -> if (List.mem child l) then 
+                    a::(List.concat (List.map (fun x-> findparents child x) l))
+                  else (List.concat (List.map (fun x-> findparents child x) l))
 
 let rec addtree tree2 tree1 = 
   match tree2 with 
@@ -48,13 +85,25 @@ let add_list  list tree d =
 
 let add_list_withlatex  (list: Processresults.goal list) (tree:Processresults.goal tree) latex  d =
   let leaves = (get_leaves tree) in
-  let deadleaves = List.filter (fun goal -> ((not (List.mem ((goal:Processresults.goal).number) (List.map (fun aa -> (aa:Processresults.goal).number) list))) && (not (goal = d)))) leaves in
+  
+  let deadleaves = List.filter (fun goal -> (  (not (List.mem ((goal:Processresults.goal).number) (List.map (fun aa -> (aa:Processresults.goal).number) list))) && (not (goal = d)) && (not (goal = {d with conclusion = {name="CHEAT"; content=""}})) )) leaves in
+  List.map (fun x -> Printf.printf "number %s \n"  (x:Processresults.goal).number) deadleaves;
   let newleaves = List.filter (fun a-> not (List.mem (a:Processresults.goal).number  (List.map (fun aa->(aa:Processresults.goal).number) leaves))) list in
   if deadleaves =[] then tree else
     let head = List.hd deadleaves in
     head.leaving_tactic <- fst latex;
     head.values <- snd latex;
-    if newleaves=[] then add_formated_list (head, [d]) tree else
+    if newleaves=[] then
+      (Printf.printf "the tactic si %s \n+++++++\n " head.leaving_tactic;
+      let re = Pcre.regexp "stuck" in
+      if (Pcre.pmatch ~rex:re head.leaving_tactic ) then
+
+            add_formated_list (head, [{d with conclusion = {name="CHEAT"; content=""}}]) tree 
+      else
+          add_formated_list (head, [d]) tree )
+
+
+    else
       add_formated_list (head, newleaves) tree;;
 
 

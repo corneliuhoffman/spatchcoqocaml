@@ -1,1 +1,1 @@
-true: package(str), package(lambdasoup), package(lablgtk2), package(sexplib), package(pcre)
+true: package(str), package(lambdasoup), package(lablgtk2), package(pcre), package(ppx_deriving), package(ppx_sexp_conv), package(sexplib)

@@ -3,9 +3,20 @@ type 'a tree = LEAF of 'a | TREE of 'a * 'a tree list
 
 val print_tree : ('a -> unit) -> 'a tree -> unit
 (** this is a printout of a tree to a string *)
+val tree_of_sexp : (Sexplib.Type.t -> 'a) -> Sexplib.Type.t -> 'a tree 
+val sexp_of_tree : ('a -> Sexplib.Type.t) -> 'a tree -> Sexplib.Type.t
 
+val to_sexp : ('a -> Sexplib.Sexp.t) -> 'a tree -> Sexplib.Sexp.t
+(** this ismakes a se-exp from tree  *)
 val get_leaves : 'a tree -> 'a list
 (** this takes a tree and gets a list of its leaves *)	
+val get_leaves_with_depth: int -> 'a tree -> ('a * int) list 
+val depth: 'a tree -> int  
+val get_title : string tree -> string
+
+val countvertices: 'a tree -> int
+
+val findparents : 'a tree -> 'a tree -> 'a list
 
 val addtree : 'a tree -> 'a tree -> 'a tree
 (**recursive map that adds tree 2 to the leaf of tree 1 that matches its head *)

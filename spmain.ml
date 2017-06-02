@@ -3,7 +3,9 @@ open GdkKeysyms
 open Str
 open String
 open Soup
-
+open Processresults
+open GToolbox
+open Treestuff
 let listofcommands = Commands.commands ();;
 
 (* List.map (fun x -> List.map print_string x; flush_all ()) listofcommands;; *)
@@ -15,6 +17,9 @@ let oldid=ref "1";;
 type mainthing ={ mutable state_id: string; mutable goals :Processresults.goal list; mutable leaving_tactic: string; mutable values: string array };;
 let coqstr = ref "";;
 
+let startingTime = Unix.gettimeofday ();;
+let logs:Logs.logs list ref = ref [];;
+let gettime () = int_of_float(Unix.gettimeofday ()-. startingTime)
 
 let checkforcoq () =
   if Coqstuff.isMac () then
@@ -30,19 +35,19 @@ let checkforcoq () =
       coqstr:= line )
   else   
     (
-      let locale = GtkMain.Main.init () in
+      let _ = GtkMain.Main.init () in
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10  
           ~filename:"" () in
-      filew#ok_button#connect#clicked ~callback:( 
+      ignore(filew#ok_button#connect#clicked ~callback:( 
         fun () -> 
           let file = filew#filename in 
           coqstr := file;
           let coqfile= open_out (Filename.current_dir_name^"/hello.txt") in 
           Printf.fprintf coqfile "%s\n" file; 
           close_out coqfile; 
-          Main.quit ());
+          Main.quit ()));
 
-      filew#cancel_button#connect#clicked ~callback:filew#destroy;
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
       filew#show ();
       Main.main ());;
 if (Coqstuff.isLinux ()) then (coqstr:="coqtop") else 
@@ -50,16 +55,16 @@ if (Coqstuff.isLinux ()) then (coqstr:="coqtop") else
 
 let oc,ic,ec  = Unix.open_process_full (!coqstr^" -ideslave -main-channel stdfds") (Unix.environment ());;
 if (not (Coqstuff.isWin ())) then (
-  set_binary_mode_in oc;
+  set_binary_mode_in oc true;
   Unix.set_nonblock (Unix.descr_of_in_channel oc))
 else ();;
 
 let repeat = if Coqstuff.isWin () then  30 else 1 in
 let imports =["Require Import Classical.";  "Require Import Utf8."; ] in
-List.map (fun x-> 
+ignore(List.map (fun x-> 
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to repeat do
-      (List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
+      ignore((List.map Processresults.printmessages  (Coqstuff.getmessages ic oc [])));
       print_int i;
 
     done;
@@ -67,28 +72,28 @@ List.map (fun x->
 
     Printf.printf "\n The id is %s \n" !id; flush_all ())
 
-  imports;
+  imports);
 
 let imports =["Require Import  Arith." ] in
-List.map (fun x-> 
+ignore(List.map (fun x-> 
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to 100*repeat do
-      (List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
+      ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
 
     done;
     id:=Coqstuff.fstid ic oc  !id)
 
-  imports;
+  imports);
 let imports =["Require Import  ZArith." ] in
-List.map (fun x-> 
+ignore(List.map (fun x-> 
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to 100*repeat do
-      (List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
+      ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
 
     done;
     id:=Coqstuff.fstid ic oc  !id)
 
-  imports;
+  imports);
 (*  let imports =["Local Open Scope Z_scope." ] in
     List.map (fun x-> 
       Coqstuff.writeToCoq ic   x !id;
@@ -158,7 +163,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
   print_string ("the id is now "^(!id));
 
   if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\|Proposition\|Axiom\|Definition") xx 0 )>=0  with _-> false) then 
-    mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
+    mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with  hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
   if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
     (begin Coqstuff.writeToCoq ic   xx !id;
       let x = Coqstuff.getmessages ic oc  [] in
@@ -169,8 +174,8 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
         (begin
           if (try (Str.search_forward (Str.regexp "Axiom\|Definition") xx 0 )>=0  with _-> false) then
             let latextac = (Processinputs.separate xx) in
-            (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
-             List.map (fun x->List.map (fun a -> print_string (Processresults.print_goal a)) (List.hd x.goals).hyps) !mainobj;flush_all ();
+            ignore(mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
+             ignore(List.map (fun x->ignore(List.map (fun a -> print_string (Processresults.print_goal a)) (List.hd x.goals).hyps)) !mainobj);flush_all ();
              listoftheorems := !mainobj::!listoftheorems;
 
 
@@ -178,7 +183,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
              win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
-             win11#buffer#set_text messages;)
+             win11#buffer#set_text messages);
           else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
                (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
 
@@ -200,7 +205,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
                    let latextac = if tac !=[] then  List.hd tac else ((Processinputs.separate xx)^"\n\n Proof: @latex{1}") in
                    let gls = Processresults.goallist y in 
                    let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
-                   let oldmain = List.hd !mainobj in
+                   let _ = List.hd !mainobj in
 
                    mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
 
@@ -208,14 +213,62 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
 
                    (* mainobj.ids <- !id::mainobj.ids;
                       mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
-                   addListToNotebook notebook (Processresults.processoutput  y); () ))
+                   ignore(addListToNotebook notebook (Processresults.processoutput  y)); () ))
 
           (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) end )
       else (win11#buffer#set_text messages; Coqstuff.movebackto  ic !id) end)
   else  
     GToolbox.message_box ~title:"error" ~ok:"hi" (xx^"is not an accepted tactic please check your text.")
 ;;
+let saveformarking file listoftheorems =
 
+ let out = open_out file in
+          let listoftrees=List.map ( fun thm ->
+            let totaltree = Treestuff.tree_from_list_of_mains (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) Processresults.emptygoal in
+            let rec newtree t = match t with
+              LEAF a -> Printf.printf "conc = %s" (print_goal  a.conclusion); LEAF (print_goal  a.conclusion)
+              
+              |TREE (a, [LEAF b]) -> TREE ((String.concat "\n" (List.map print_goal  a.hyps))^"\n ==== \n "^(print_goal a.conclusion), [LEAF (print_goal  b.conclusion)])
+              | TREE (a, l) -> TREE ((String.concat "\n" (List.map print_goal  a.hyps))^"\n ====\n"^(print_goal a.conclusion), List.map newtree l) in
+
+            let tree = newtree totaltree in
+
+            (* Treestuff.maptree (fun x->
+
+             (String.concat "\n" (List.map print_goals  x.hyps)))  totaltree in *)
+          tree
+          (* Treestuff.print_tree print_string tree;flush_all (); *)
+          (* print_string (Sexplib.Sexp.to_string (Treestuff.sexp_of_tree Sexplib.Std.sexp_of_string tree));flush_all (); *)
+          (* print_string (Latexstuff.latex totaltree); *)
+          (* Treestuff.create_tree tree *)
+        ) !listoftheorems in 
+
+
+          let sexp = Sexplib.Std.sexp_of_list (fun x -> Treestuff.sexp_of_tree Sexplib.Std.sexp_of_string x) listoftrees in 
+          let txt = Sexplib.Sexp.to_string sexp in 
+          let _=Processresults.emptygoal in
+          Printf.fprintf out "%s\n" txt;
+          close_out out;; 
+let savelogs file logs=
+   let out = open_out file in
+          let txt = Logs.text_of_list logs in
+          
+          Printf.fprintf out "%s\n" txt;
+          close_out out;; 
+let savelatex file mainobj listoftheorems=
+   let out = open_out file in
+          let d=Processresults.emptygoal in
+
+          let newlist = !mainobj::!listoftheorems in
+
+          let message = List.fold_left (fun   m thm ->
+
+              let totaltree = Treestuff.tree_from_list_of_mains (
+                  List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d in
+              m^(Latexstuff.latex totaltree))  "" (List.rev newlist)   in
+          let message = Latexstuff.header^message^"\\end{document}" in 
+          Printf.fprintf out "%s\n" message;
+          close_out out;; 
 
 let main () =
   let mainobj =  ref [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}] in
@@ -301,10 +354,10 @@ let main () =
       (* filew#connect#destroy ~callback:GMain.Main.quit;
       *)
       (* Connect the ok_button to file_ok_sel function *)
-      filew#ok_button#connect#clicked ~callback:(file_ok_sel filew);
+      ignore(filew#ok_button#connect#clicked ~callback:(file_ok_sel filew));
 
       (* Connect the cancel_button to destroy the widget *)
-      filew#cancel_button#connect#clicked ~callback:filew#destroy;
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
 
       filew#show ()
 
@@ -319,18 +372,18 @@ let main () =
       (* filew#connect#destroy ~callback:GMain.Main.quit;
       *)
       (* Connect the ok_button to file_ok_sel function *)
-      filew#ok_button#connect#clicked ~callback:(fun () ->
+      ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
           let file=filew#filename in
           let out = open_out file in
           let txt = win00#buffer#get_text () in 
-          let d=Processresults.emptygoal in
+          let _=Processresults.emptygoal in
           Printf.fprintf out "%s\n" txt;
           close_out out; 
           filew#destroy ()
-        );
+        ));
 
       (* Connect the cancel_button to destroy the widget *)
-      filew#cancel_button#connect#clicked ~callback:filew#destroy;
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
 
       filew#show ()
 
@@ -340,6 +393,33 @@ let main () =
 
 
     );
+
+ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
+      let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
+          ~filename:"yourname.mrk" () in
+
+      (* Set a handler for destroy event that immediately exits GTK. *)
+      (* filew#connect#destroy ~callback:GMain.Main.quit;
+      *)
+      (* Connect the ok_button to file_ok_sel function *)
+      ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
+          let file=filew#filename in
+         saveformarking file listoftheorems; 
+          filew#destroy ()
+        ));
+
+      (* Connect the cancel_button to destroy the widget *)
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
+
+      filew#show ()
+
+
+    )
+
+
+
+    );
+
 
   ignore( factory#add_item "Save latex" ~key:_L ~callback: ( fun () ->
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
@@ -349,26 +429,51 @@ let main () =
       (* filew#connect#destroy ~callback:GMain.Main.quit;
       *)
       (* Connect the ok_button to file_ok_sel function *)
-      filew#ok_button#connect#clicked ~callback:(fun () ->
+      ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
           let file=filew#filename in
-          let out = open_out file in
-          let d=Processresults.emptygoal in
-
-          let newlist = !mainobj::!listoftheorems in
-
-          let message = List.fold_left (fun   m thm ->
-
-              let totaltree = Treestuff.tree_from_list_of_mains (
-                  List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d in
-              m^(Latexstuff.latex totaltree))  "" (List.rev newlist)   in
-          let message = Latexstuff.header^message^"\\end{document}" in 
-          Printf.fprintf out "%s\n" message;
-          close_out out; 
+         savelatex file mainobj listoftheorems;
           filew#destroy ()
-        );
+        ));
 
       (* Connect the cancel_button to destroy the widget *)
-      filew#cancel_button#connect#clicked ~callback:filew#destroy;
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
+
+      filew#show ()
+
+
+    )
+
+
+
+    );
+
+
+  ignore( factory#add_item "Save all" ~key:_A~callback: ( fun () ->
+      let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
+          ~filename:"yourfile" () in
+
+      (* Set a handler for destroy event that immediately exits GTK. *)
+      (* filew#connect#destroy ~callback:GMain.Main.quit;
+      *)
+      (* Connect the ok_button to file_ok_sel function *)
+      ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
+          let f=filew#filename in
+          let file =f^string_of_int (int_of_float(Unix.gettimeofday ())) in
+          let out = open_out (file^".v") in
+          let txt = win00#buffer#get_text () in 
+          let _=Processresults.emptygoal in
+          Printf.fprintf out "%s\n" txt;
+          close_out out; 
+
+
+          saveformarking (file^".mrk") listoftheorems;
+         savelatex (file^".tex") mainobj listoftheorems;
+         savelogs (file^".log") (List.rev !logs);
+          filew#destroy ()
+        ));
+
+      (* Connect the cancel_button to destroy the widget *)
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
 
       filew#show ()
 
@@ -383,14 +488,16 @@ let main () =
 
 
 
+
   let tacticsfactory = new GMenu.factory menubar in
   let tactics_group = tacticsfactory#accel_group in
   let tactics_menu = tacticsfactory#add_submenu "Tactics" in
-  List.map (fun x -> let y = (Processinputs.makevar (List.hd (List.tl x))) in
+  ignore(List.map (fun x -> let y = (Processinputs.makevar (List.hd (List.tl x))) in
              let factory = new GMenu.factory tactics_menu ~accel_group:tactics_group in
-             ignore( factory#add_item y  ~callback: (fun () -> win10#buffer#set_text y)))
+             ignore( factory#add_item y  ~callback: (fun () -> win10#buffer#set_text y ;
+             logs :=  (DROP (gettime (), y))::!logs;   )))
 
-    (listofcommands);
+    (listofcommands));
 
 
   (*right window*)
@@ -406,7 +513,7 @@ let main () =
     ~window:window ~shortcuts:[aa] 
     ~callback:(fun () -> 
         ( let buffer = win10#buffer in
-          let xx= String.trim (get_first_line (buffer#get_text ())) in
+          let _= String.trim (get_first_line (buffer#get_text ())) in
           let a = buffer#start_iter#forward_search "VAR" in
           match a with
             Some (a, b) -> buffer#delete a b; 
@@ -418,14 +525,23 @@ let main () =
   GToolbox.create_shortcuts 
     ~window:window ~shortcuts:[a2] 
     ~callback:(fun () -> 
-        runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook; () );
+      let before = (win00#buffer#get_text ())^"\n++++++\n"^(win10#buffer#get_text ()) in
+       
+        runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
+      let after = (win00#buffer#get_text ())^"\n++++++\n"^(win10#buffer#get_text ()) in
+      let messages = (win11#buffer#get_text ()) in
+      logs :=  (CRUN (gettime (), before, after, messages ))::!logs;
+
+
+      ());
+
 
 
   (*third row*)
   let row2 = GPack.hbox ~height:20 ~homogeneous:true ~packing:vbox#pack () in
   (* run Button *)
   let _ = window#event#connect#key_press ~callback:begin fun ev ->
-      let m = GdkEvent.Key.state ev in
+      let _ = GdkEvent.Key.state ev in
       let k = GdkEvent.Key.keyval ev in
       if ( k = GdkKeysyms._Escape) then 
         (let xx= String.trim (get_first_line (win10#buffer#get_text ())) in
@@ -435,6 +551,8 @@ let main () =
            completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands 
          else (
            win10#buffer#set_text (List.nth !completionlist (!completionindex mod (List.length !completionlist))); 
+           let before = win10#buffer#get_text () in
+           logs :=  (ESC (gettime (), before))::!logs;
            completionindex:=(1 + !completionindex) mod  (List.length !completionlist)))
       else 
         completionlist:=[];
@@ -447,34 +565,43 @@ let main () =
   let buttonrun = GButton.button ~label:"run!"
       ~packing:row2#add () in
   ignore (buttonrun#connect#clicked ~callback:(fun () -> 
-
-      runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook; () 
-
-    ));
+      let before = (win00#buffer#get_text ())^"\n++++++\n"^(win10#buffer#get_text ()) in
+       
+        runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
+      let after = (win00#buffer#get_text ())^"\n++++++\n"^(win10#buffer#get_text ()) in
+      let messages = (win11#buffer#get_text ()) in
+      logs :=  (RUN (gettime (), before, after, messages ))::!logs;
+      ()););
   let buttonundo = GButton.button ~label:"undo!"
       ~packing:row2#add () in
   ignore(buttonundo#connect#clicked ~callback: (fun () ->
+    let before = (win00#buffer#get_text ())^"\n++++++\n"^(win10#buffer#get_text ()) in
+       
       completionindex:=0; 
       completionlist:=[];
       let last=get_last_line (win00#buffer#get_text ()) in 
       let first=get_first_lines (win00#buffer#get_text ()) in 
       win00#buffer#set_text first;
       win10#buffer#set_text (last^"\n"^(win10#buffer#get_text ()));
+      let after = (win00#buffer#get_text ())^"\n++++++\n"^(win10#buffer#get_text ()) in
+      let messages = (win11#buffer#get_text ()) in
+      logs :=  (UNDO (gettime (), before, after, messages ))::!logs;
+
       match !mainobj with
         h::t::l->
         Coqstuff.movebackto  ic  t.state_id;
         let y = Coqstuff.soupgoal ic oc  () in
-
+        
         id:=t.state_id;
         mainobj:=t::l;
-        addListToNotebook  (Processresults.processoutput  y); ();
+        ignore(addListToNotebook  (Processresults.processoutput  y)); ()
       |t::[] -> Coqstuff.movebackto  ic  t.state_id;
-        match !listoftheorems with
+        (match !listoftheorems with
           []->
           let y = Coqstuff.soupgoal ic oc  () in
 
           id:=t.state_id;
-          addListToNotebook  (Processresults.processoutput  y); ()
+          ignore(addListToNotebook  (Processresults.processoutput  y)); ()
         |h::t ->
           (
             match h with 
@@ -486,9 +613,13 @@ let main () =
 
               id:=hd.state_id;
               mainobj:=tl;
-              addListToNotebook  (Processresults.processoutput  y); ();
-              listoftheorems:= t; ())
-        |_-> ()
+              ignore(addListToNotebook  (Processresults.processoutput  y)); ();
+              listoftheorems:= t; ()
+              | _ -> ()))
+        | _ -> ();
+
+
+       
     ));
   (* undo Button *)
   (* tree Button *)
@@ -499,7 +630,7 @@ let main () =
   ignore (buttontree#connect#clicked ~callback:(fun () -> 
       let d=Processresults.emptygoal in
       let newlist = !mainobj::!listoftheorems in
-      List.map ( fun thm ->
+      ignore (List.map ( fun thm ->
           (*       List.map (fun x->  (List.map (fun a ->print_string (Processresults.print_goals a)) x.goals); print_string x.leaving_tactic) thm;flush_all (); 
           *)      let totaltree = Treestuff.tree_from_list_of_mains (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d in
 
@@ -507,10 +638,12 @@ let main () =
           *)
           (* let tree = Treestuff.tree_from_list listofstrings "done" in  *)
           let tree = Treestuff.maptree Processresults.print_goals totaltree in
-          Treestuff.print_tree print_string tree;flush_all ();
-          print_string (Latexstuff.latex totaltree);
+          
+          (* Treestuff.print_tree print_string tree;flush_all (); *)
+          print_string (Sexplib.Sexp.to_string (Treestuff.to_sexp Sexplib.Std.sexp_of_string tree));flush_all ();
+          (* print_string (Latexstuff.latex totaltree); *)
           Treestuff.create_tree tree
-        ) newlist ; ()) );
+        ) newlist ); ()) );
 
 
   (* Display the windows and enter Gtk+ main loop *)

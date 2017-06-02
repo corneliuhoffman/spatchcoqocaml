@@ -1,3 +1,5 @@
+open Treestuff
+open Processresults
 let rec removed l =
   match l with
     []->[]
