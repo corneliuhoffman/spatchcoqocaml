@@ -1,1 +1,1 @@
-/Applications/CoqIDE_8.6.app/Contents/Resources/bin/coqtop
+/Users/Hoff/spatchcoqocaml/commands.ml

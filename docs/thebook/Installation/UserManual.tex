@@ -21,7 +21,8 @@ move the spatchcoq.app to Applications and start it.
 and choose coqtop. See Figure~\ref{fig:macos}
 
 You only do this once.
-
+\item  You only have to do this once. You might also need to install gtk, the simplest way to do this is  via homebrew
+{\center brew install gtk+}
 \begin{figure}\label{fig:macos}
 \center
 \includegraphics[scale=0.5]{Installation/macos.png}
@@ -33,14 +34,9 @@ You only do this once.
 
 \subsection{Windows}
 \begin{enumerate}
-\item Download and install  the latest version of Coq (it needs to be at least 8.6) from :
 
-\href{https://coq.inria.fr/download}{https://coq.inria.fr/download}
-
-Remember where you installed it.
-\item  Download and unpack spatchocq.zip from canvas and  start the app.
-
-\item when prompted go to the Coq folder you just installed, find the subfolder called {\bf bin} and inside the application called {\bf coqtop}
+\item get the zipfile spatchcoq.zip,  unzip it in a folder on a usb stick and doubleclick the application file spatchcoq. 
+Note this version includes an instalation of Coq (not very extensively tested yet)
 
 \item enjoy
 \end{enumerate}
@@ -50,8 +46,8 @@ Remember where you installed it.
 \begin{enumerate}
 \item Download and install  the latest version of Coq it needs to be at least 8.6 so do not use 
 apt-get install coq
-\item  Download and unpack spatchocq01.tgz  from canvas and start the app.
-
+\item  go to https://github.com/corneliuhoffman/spatchcoqocaml/tree/master
+to build from scratch.
 \item when prompted go to the Coq folder you just installed with opam and find  the application called {\bf coqtop}
 
 \item enjoy

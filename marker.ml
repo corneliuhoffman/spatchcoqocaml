@@ -13,6 +13,25 @@ let load_file f =
   (s)
 ;;
 
+
+type cheat = {penalty:float; text:string}
+type listofresults ={title:string; cheats:cheat list}
+type student = {id:string; results:listofresults list }
+let firsttwo list = match list with
+[]->list
+|h::[]->list
+|h::tl -> h::[List.hd tl]
+let rec remove li = match li with
+[] -> li
+| x::tl -> if List.mem x tl then (remove tl) else x::(remove tl);;
+
+let get_lemas listofstudents =
+	let list_of_titles = List.concat (List.map (fun x -> List.map (fun s ->
+	let strings = Str.split (Str.regexp " \|(") (String.trim s.title) in
+	String.concat " "  (firsttwo (List.filter (fun x-> x!="") strings))
+) x.results) listofstudents) in
+	remove list_of_titles
+
 let clean init =
 	let re =(Str.regexp "\"") in
 	Scanf.unescaped (Str.global_replace re " " init)
@@ -35,14 +54,14 @@ let rec findcheats p tree =
 let printcheats tree=
 		let cheats = findcheats 0 tree in
 		let score = 100. -. (List.fold_left (fun x y -> x+. (100./. 2.0**float_of_int(snd y-1))) 0. cheats) in
-		if score =100. then "\n The total score is 100\n"
+		if score =100. then {title = Treestuff.get_title tree; cheats =[]}
 	else 
-
-		sprintf "\n The unsolved statements are \n %s\n The total score is %s  " 
-		(String.concat "\n" (List.map (fun x -> 
-			 (fst x)^"\n at a suggested penalty of: "^(string_of_float(100./. 2.0**float_of_int(snd x-1)))) cheats)) (string_of_float score)
+		 {title = Treestuff.get_title tree; cheats = List.map (fun x -> {penalty =100./. 2.0**float_of_int(snd x-1); text = fst x}) cheats}		
+		(* sprintf " %s" 
+		(String.concat ", " (List.map (fun x -> 
+			 (fst x)^"\n at a suggested penalty of: "^(string_of_float(100./. 2.0**float_of_int(snd x-1)))) cheats)) 
 		
-
+ *)
 
 
 	(* if (countcheats tree > 0) then
@@ -69,18 +88,37 @@ let rec print_mytree t = match t with
 | LEAF x -> LEAF (sprintf "%s" (clean x))
 | TREE (a, l) ->TREE ((sprintf "%s" (clean a)), (List.map print_mytree l))
 
-  let () =
-    	let dir= Sys.argv.(1) in
+  let readdir dir =
+    	(* let dir= Sys.argv.(1) in
+    	let index = Sys.argv.(2) in *)
     	let list = List.filter (fun x-> match Str.split (Str.regexp "\.") x with
     |[_;"mrk"] -> true
     |_ -> false )
     		(Array.to_list (Sys.readdir dir)) in
 
-    	List.map (fun text ->
+    	let strings=List.map (fun text ->
     	let treelist = List.map print_mytree (get_trees (dir^"/"^text)) in 
-    	printf " The file %s has %i statements:\n ------- \n" text (List.length treelist);
-      	List.map (fun x-> printf  " The statement \n %s\n\n whose total number of vertices is %i and maximum depth is %i and number of cheats is %i. %s \n--\n" (Treestuff.get_title x) (Treestuff.countvertices x) (Treestuff.depth x) (countcheats x) (printcheats x)) treelist; printf     "\n \n\n\n\n\n\n\n"; )
-    	list; ();;
+    	let students =
+    	{id= text ; results = List.map 
+    		(fun  tree -> 
+      		let cheats = findcheats 0 tree in
+			let score = 100. -. (List.fold_left (fun x y -> x+. (100./. 2.0**float_of_int(snd y-1))) 0. cheats) in
+	
+      		let tt = sprintf  " %s, %i, %i, %i, %s" text  (* (Treestuff.get_title tree) *) (Treestuff.countvertices tree) (Treestuff.depth tree) (countcheats tree) (string_of_float score)  in
+      		printcheats tree
+
+      	 ) treelist} in 
+    	students
+
+    	)
+    	list in
+    	(* print_string (String.concat "\n====\n"  (List.map (fun x-> String.concat "\n" (List.map (fun a-> a.text) x)) strings));
+ *)
+    	(* printf "%i\n" (List.length strings);
+    	List.map (fun x -> printf "%s, %s\n" x.id 
+    		(String.concat "\n" (List.map (fun a-> (a.title^(sprintf "number of cheats =%i" (List.length a.cheats)))) x.results) )) strings; *)
+    	List.map print_string (get_lemas strings);
+    	strings;;
 
 
 
