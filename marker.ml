@@ -15,7 +15,7 @@ let load_file f =
    
 
 
-   
+
 
 type cheat = {penalty:float; text:string}
 type listofresults ={title:string; cheats:cheat list}
@@ -29,11 +29,12 @@ let rec remove li = match li with
 | x::tl -> if List.mem x tl then (remove tl) else x::(remove tl);;
 
 let get_lemas listofstudents =
-	let list_of_titles = List.concat (List.map (fun x -> List.map (fun s ->
+	let list_of_titles = List.concat (List.map (fun x ->  List.map (fun a -> a.title) x.results) listofstudents) in
+	(* List.concat (List.map (fun x -> List.map (fun s ->
 	let strings = Str.split (Str.regexp " \|(") (String.trim s.title) in
 	String.concat " "  (firsttwo (List.filter (fun x-> x!="") strings))
-) x.results) listofstudents) in
-	remove list_of_titles
+) x.results) listofstudents) *) 
+	remove (List.filter (fun x-> Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Proposition|Theorem") x) list_of_titles)
 
 let clean init =
 	let re =(Str.regexp "\"") in
