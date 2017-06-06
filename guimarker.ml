@@ -48,6 +48,7 @@ let process thm strings =
 		let worstcheats = String.concat "\n" (List.map (fun x-> Printf.sprintf "\n %s \n Penalty = %f\n"  x.text x.penalty) listofcheats) in
 		 {students = List.length str; cheataverage =(float_of_int (List.fold_left (fun x y -> x + y) 0 (List.map List.length cheats)))/. (float_of_int (List.length str));worstcheat= {penalty=max; text =worstcheats} }
 let main () = 
+
 let strings = ref [] in
 let scores: score list ref = ref [] in
 let lemmas: lemma list ref = ref[] in
@@ -110,7 +111,7 @@ let list =List.map (fun lem ->
 	(lem ,Printf.sprintf "%i students tried it, the average number of cheats was %f and the worst cheats were \n%s"
 proc.students proc.cheataverage proc.worstcheat.text)) lems in 
 addListToNotebook list;
-let buttonrun = GButton.button ~label:"run!"
+let buttonrun = GButton.button ~label:"process marks"
       ~packing:vbox#pack () in
   ignore (buttonrun#connect#clicked ~callback:(fun () -> (* let lab = notebook#get_nth_page 0 in
   	
@@ -126,7 +127,25 @@ let buttonrun = GButton.button ~label:"run!"
   	let x2 = new GText.view obj2 in
   	print_string (x2#buffer#get_text ()) ; *)
   	scores:= computescores !strings !lemmas;
-  	List.map (fun x -> Printf.printf "\"%s\", %f\n" x.student x.totalscore) !scores;flush_all (); ()));
+	let filew = GWindow.file_selection ~title:"File selection" ~border_width:10  
+          ~filename:"exercise.cvs" () in
+      ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
+          let file=filew#filename in
+          let out = open_out file in
+           let printscores = String.concat "\n" (List.map (fun x -> Printf.sprintf "\"%s\", %f" x.student x.totalscore) !scores) in 
+
+          Printf.fprintf out "%s" printscores;
+          close_out out; 
+          filew#destroy ()
+        ));
+
+      ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
+      filew#show ();
+
+
+  	()));
+
+
 window#show ();
 
  Main.main ();;
