@@ -60,7 +60,7 @@ let printcheats tree=
 		let score = 100. -. (List.fold_left (fun x y -> x+. (100./. 2.0**float_of_int(snd y-1))) 0. cheats) in
 		if score =100. then {title = Treestuff.get_title tree; cheats =[]}
 	else 
-		 {title = Treestuff.get_title tree; cheats = List.map (fun x -> {penalty =100./. 2.0**float_of_int(snd x-1); text = fst x}) cheats}		
+		 {title = Treestuff.get_title tree; cheats = List.map (fun x -> {penalty =100./. float_of_int(snd x); text = fst x}) cheats}		
 		(* sprintf " %s" 
 		(String.concat ", " (List.map (fun x -> 
 			 (fst x)^"\n at a suggested penalty of: "^(string_of_float(100./. 2.0**float_of_int(snd x-1)))) cheats)) 

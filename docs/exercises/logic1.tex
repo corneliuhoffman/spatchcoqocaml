@@ -1,0 +1,104 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+\newtheorem{theorem}{Theorem}							% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+\title{First Logic set}
+\author{The Author}
+%\date{}							% Activate to display a given date or no date
+\newtheorem{axiom}{Axiom}
+\newtheorem{lemma}{Lemma}
+\newtheorem{puzzle}{Puzzle}
+
+\newtheorem{definition}{Definition}
+\begin{document}
+\maketitle
+%\section{}
+%\subsection{}
+
+\begin{lemma}
+Sow that the following are equivalent (here $P Q R$ are propositions)
+\begin{enumerate}	
+\item $(P \rightarrow Q) \land (P \rightarrow R)$ and $P \rightarrow (Q\land R)$
+\item $(P \rightarrow Q) \lor (P \rightarrow R)$ and $P \rightarrow (Q\lor R)$
+
+\item $R\rightarrow(Q\rightarrow R)$ and $(P\land Q) \rightarrow R$.
+\item $(P \rightarrow R) \land (Q \rightarrow R)$ and $(P \lor Q) \rightarrow R$
+\item $(P \rightarrow R) \lor (Q \rightarrow R)$ and $(P \land Q) \rightarrow R$
+\end{enumerate}
+
+
+\end{lemma}
+
+\begin{lemma}
+
+\begin{enumerate}
+\item $(P \lor Q) \land \neg  P \rightarrow Q$
+\item $\neg Q ? (P \rightarrow Q) \rightarrow  \neg P$
+\item $ C \land (A \rightarrow B) \land (C \rightarrow ( A \rightarrow \neg B)) \rightarrow \neg A$
+\item $ (P \lor  Q) \land (\neg P \lor R) \rightarrow Q \lor R$.
+\end{enumerate}
+
+\end{lemma}
+
+
+
+\begin{lemma} Prove or disprove
+\begin{enumerate}
+\item Either sales or expenses will go up. If sales go up then the boss will be happy. 
+If expenses go up then the boss will be unhappy. Therefore sales and expenses will not both go up.
+
+\item If the tax rate and unemployment rate go up, then there will be a recession. 
+If the GDP goes up then there will not be a recession, The GDP and taxes are both going up. 
+Therefore the unemployment is not going up.
+
+\item The warning light will come on if and only if the pressure is high and the relief valve is clogged. 
+The relief valve is not clogged. therefore, the warning light will come on if and only if the pressure is too high.
+\end{enumerate}
+\end{lemma}
+
+\begin{puzzle} What can you deduce from the following statements?
+\begin{enumerate}
+\item All babies are illogical.
+\item Nobody is despised who can manage a crocodile.
+\item Illogical persons are despised.
+\end{enumerate}
+\end{puzzle}
+
+
+\begin{puzzle} What can you deduce from the following statements?
+\begin{enumerate}
+\item No ducks waltz.
+\item No officers ever decline to waltz.
+\item All my poultry are ducks.
+\end{enumerate}
+\end{puzzle}
+
+
+
+\begin{puzzle} What can you deduce from the following statements?
+\begin{enumerate}
+\item Things sold in the street are of no great value.
+\item Nothing but rubbish can be had for a song.
+\item Eggs of the Great Auk are very valuable.
+\item It is only what is sold in the street that is really rubbish.
+
+\end{enumerate}
+\end{puzzle}
+\begin{puzzle} What can you deduce from the following statements?
+\begin{enumerate}
+\item All writers, who understand human nature, are clever.
+\item No one is a true poet unless he can stir the hearts of men.
+\item Shakespeare wrote ?Hamlet?.
+\item No writer, who does not understand human nature, can stir the hearts of men.
+\item None but a true poet could have written ?Hamlet?.
+
+\end{enumerate}
+\end{puzzle}
+
+
+\end{document}  

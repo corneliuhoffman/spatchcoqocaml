@@ -1,0 +1,52 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+\newtheorem{axiom}{Axiom}
+\newtheorem{lemma}{Lemma}
+\newtheorem{definition}{Definition}
+
+\title{Brief Article}
+\author{The Author}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+%\section{}
+%\subsection{}
+We will have a set of points and a set of lines. We also have a relation $p \in L$, some points belong to some lines
+\begin{definition}
+Two lines are parallel if they have no points in common.
+\end{definition}
+\begin{axiom}
+Any two points determine a line. that is if $p1\ne p2$ then there exists a unique line $L$ so that $p_{i} \in L$.
+\end{axiom}
+
+\begin{axiom}
+A line has exactly two points.
+\end{axiom}
+
+\begin{axiom}
+for any point $p$ and line $L$ with $p \not \in L$  there is exactly one line  through $p$ that is parallel to $L$.
+\end{axiom}
+
+\begin{axiom}
+There are at least three points
+\end{axiom}
+
+
+\begin{lemma}
+There exist at least 4 points.
+\end{lemma}
+\begin{lemma}
+ether exist at least six lines.
+\end{lemma}
+\begin{lemma}
+There exist at most 4 points.
+\end{lemma}
+
+\end{document}  

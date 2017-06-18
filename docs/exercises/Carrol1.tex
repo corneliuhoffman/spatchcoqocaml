@@ -1,0 +1,42 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+\newtheorem{theorem}{Theorem}							% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+\title{Brief Article}
+\author{The Author}
+%\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+%\section{}
+%\subsection{}
+\begin{theorem}
+$ C \land (A \rightarrow B) \land (C \rightarrow ( A \rightarrow \neg B)) \rightarrow \neg A$
+\end{theorem}
+
+
+\begin{theorem}
+ \begin{enumerate}
+ \item If some a are b and some not, some c are not d;
+ 
+ \item If some e are f and if some g are h, some j are k;
+ \item  If all l are m, no n are p
+\item If some c are d and some not, some g are h;
+\item If no e are f, and if some n are p, some j are not k; 
+\item If some e are not f and if some g are not h, some n are p; 
+\item If some c are not d, and if some j are k, no e are f;
+\item If some g are not h, and if some j are not k, some l are m
+\item  If some e are not f, and if some n are p, some a are not b; 
+\item  If some a are b, and if some c are d, some g are not h;
+\item  If some c are not d, and if some l are not m, some e are f
+ \end{enumerate}
+ Show that if some a are b and if some e are not f then no c are d.
+ \end{theorem}
+
+
+\end{document}  
