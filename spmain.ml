@@ -20,7 +20,11 @@ let coqstr = ref "";;
 let startingTime = Unix.gettimeofday ();;
 let logs:Logs.logs list ref = ref [];;
 let gettime () = int_of_float(Unix.gettimeofday ()-. startingTime)
-
+let uniq lst =
+  let seen = Hashtbl.create (List.length lst) in
+  List.filter (fun x -> let tmp = not (Hashtbl.mem seen x) in
+                        Hashtbl.replace seen x ();
+                        tmp) lst
 let checkforcoq () =
   if Coqstuff.isMac () then
 
@@ -44,7 +48,8 @@ let checkforcoq () =
           coqstr := file;
           let coqfile= open_out (Filename.current_dir_name^"/hello.txt") in 
           Printf.fprintf coqfile "%s\n" file; 
-          close_out coqfile; 
+          close_out coqfile;
+          filew#destroy (); 
           Main.quit ()));
 
       ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
@@ -65,7 +70,7 @@ ignore(List.map (fun x->
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to repeat do
       ignore((List.map Processresults.printmessages  (Coqstuff.getmessages ic oc [])));
-      print_int i;
+     
 
     done;
     id:=Coqstuff.fstid ic oc  !id; 
@@ -79,9 +84,10 @@ ignore(List.map (fun x->
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to 100*repeat do
       ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
-
+     
     done;
-    id:=Coqstuff.fstid ic oc  !id)
+    id:=Coqstuff.fstid ic oc  !id;
+    Printf.printf "\n The id is %s \n" !id; flush_all ())
 
   imports);
 let imports =["Require Import  ZArith." ] in
@@ -91,7 +97,8 @@ ignore(List.map (fun x->
       ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
 
     done;
-    id:=Coqstuff.fstid ic oc  !id)
+    id:=Coqstuff.fstid ic oc  !id;
+    Printf.printf "\n The id is %s \n" !id; flush_all ())
 
   imports);
 (*  let imports =["Local Open Scope Z_scope." ] in
@@ -111,11 +118,20 @@ ignore(List.map (fun x->
     Printf.fprintf ic "%s"  (Processinputs.addtext x(Coqstuff.fstid ic oc  !id)) ;flush_all ();
     Printf.printf "%s" (to_string (Coqstuff.soupgoal ic oc  ())); id:=Coqstuff.fstid ic oc  !id) imports;;
 *)
-List.map (fun x-> 
+let rec sendcommand ic oc  x anid =
+        Printf.fprintf ic "%s"  (Processinputs.addtext (List.nth x 1) anid) ;flush_all ();
+        if int_of_string anid >= int_of_string (Coqstuff.fstid ic oc  anid) then 
+         sendcommand ic oc  x anid
+       else id :=  (Coqstuff.fstid ic oc  anid);
 
-    Printf.fprintf ic "%s"  (Processinputs.addtext (List.hd (List.tl x)) (Coqstuff.fstid ic oc  !id)) ;flush_all ();
+       Printf.printf "  %s\n the id is %s" (List.nth x 1) !id; flush_all () in
+
+
+List.map (fun x-> sendcommand ic oc  x (Coqstuff.fstid ic oc  !id)
+(* 
+    Printf.fprintf ic "%s"  (Processinputs.addtext (List.nth x 1) (Coqstuff.fstid ic oc  !id)) ;flush_all ();
     id:=Coqstuff.fstid ic oc  !id;
-    Printf.printf " the id is %s" !id; flush_all ()) (listofcommands);;
+    Printf.printf " the id is %s" !id; flush_all () *)) (listofcommands);;
 
 
 let locale = GtkMain.Main.init ()
@@ -160,18 +176,30 @@ let addListToNotebook (notebook:GPack.notebook) list =
 let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listoftheorems (notebook:GPack.notebook)  = 
   id:=Coqstuff.fstid ic oc  !id; 
   let xx=(get_first_line (win10#buffer#get_text ())) in 
-  print_string ("the id is now "^(!id));
+  Printf.printf "the id is now %s \n " (!id); flush_all ();
 
-  if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\|Proposition\|Axiom\|Definition") xx 0 )>=0  with _-> false) then 
+  if (try (Str.search_forward (Str.regexp "Lemma \| Theorem \| Proposition \| Axiom \| Definition") xx 0 )>=0  with _-> false) then 
     mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with  hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
   if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
     (begin Coqstuff.writeToCoq ic   xx !id;
-      let x = Coqstuff.getmessages ic oc  [] in
+       
+      let x = Coqstuff.reallyread ic oc  !id in
+
+      let ids = List.map (fun a -> try (attribute "val" (a $ "state_id")) with _-> None) x in
+
+      let maxid =  List.fold_left (fun a b -> 
+      let z = (match b with
+      Some z -> int_of_string z
+      |None -> -1) in  max a z ) 0 ids in
+     
      (*  List.map (fun a -> print_string (to_string a)) x; *)
       let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
+
       let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
+
       if error <0 then 
         (begin
+
           if (try (Str.search_forward (Str.regexp "Axiom\|Definition") xx 0 )>=0  with _-> false) then
             let latextac = (Processinputs.separate xx) in
             ignore(mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
@@ -187,7 +215,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
           else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
                (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
 
-                print_string (!id^"\n");
+                
                 mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
                 win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
                 (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
@@ -195,12 +223,24 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
                 win11#buffer#set_text messages;) 
              else (completionindex:=0;
                    completionlist:=[];
+
                    win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
                    (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
                    win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
                    win11#buffer#set_text messages;
-                   let y = Coqstuff.soupgoal ic oc  () in
-                   id:=Coqstuff.fstid ic oc  !id; 
+                   Printf.printf "here is atry for is %s\n" (Coqstuff.fstid ic oc  !id);
+                   let rems = List.filter (fun a -> try (attribute "val" (a $ "state_id") = Some (string_of_int maxid))  with _-> false  ) x in 
+                 Printf.printf "The uniques are %i\n" (List.length rems);
+                 let strings = List.map (fun a -> Processresults.processoutput a ) rems in
+                 Printf.printf "%s\n\n" (String.concat "\n\n======\n\n" (List.map (fun a ->String.concat "\n\n\n" a) strings)); flush_all ();
+                   let possible_goal = Processresults.get_a_goal x in
+                   let y =  match  (Processresults.goallist possible_goal) with
+                   [] -> Coqstuff.soupgoal ic oc ()
+                   |_ -> possible_goal
+                  in
+                     
+                   id:=string_of_int maxid; 
+                   Printf.printf "\n the id is %s\n" !id;
                    let tac =  (Processinputs.get_tactic xx (listofcommands)) in
                    let latextac = if tac !=[] then  List.hd tac else ((Processinputs.separate xx)^"\n\n Proof: @latex{1}") in
                    let gls = Processresults.goallist y in 
@@ -209,11 +249,11 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
 
                    mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
 
-                   print_string  !id;  flush_all ();
+                  
 
                    (* mainobj.ids <- !id::mainobj.ids;
                       mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
-                   ignore(addListToNotebook notebook (Processresults.processoutput  y)); () ))
+                   ignore(addListToNotebook notebook (Processresults.processoutput y)); () ))
 
           (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) end )
       else (win11#buffer#set_text messages; Coqstuff.movebackto  ic !id) end)
@@ -337,6 +377,7 @@ let main () =
     let file=filew#filename in
     try 
       let line =  Commands.load_file file in  (* read line from in_channel and discard \n *)
+   
       win10#buffer#set_text line; (* write on the underlying device now *)
       filew#destroy ()                 (* close the input channel *) 
 
@@ -545,6 +586,7 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
       let k = GdkEvent.Key.keyval ev in
       if ( k = GdkKeysyms._Escape) then 
         (let xx= String.trim (get_first_line (win10#buffer#get_text ())) in
+
          let justcommands = List.map (fun x ->  
              (Processinputs.makevar (List.hd (List.tl x)))) listofcommands in
          if !completionlist = [] then

@@ -46,5 +46,7 @@ val findstateid : out_channel -> in_channel -> string -> string
 (** helper function*)
 val fstid : out_channel -> in_channel -> string -> string
 (**finds the state id after the string *)
-
+val reallyread :
+  out_channel ->
+  in_channel -> string -> Soup.soup Soup.node list
 

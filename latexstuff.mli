@@ -12,5 +12,4 @@ val deadhyp :
   Processresults.goal Treestuff.tree -> Processresults.statement list
 val change : string -> string -> string list -> string
 val header : string
-
 val latex : Processresults.goal Treestuff.tree -> string

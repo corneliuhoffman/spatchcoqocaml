@@ -40,13 +40,16 @@ let manage li =
     {emptygoal with number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = strToStatement (get_texts t)}
   |_ -> {emptygoal with number= "" ;hyps =[]; conclusion ={name=""; content =""}};;
 let goallist x = 
-  
-  print_string "the lists has length";
-  let gg = to_list ((List.hd (to_list (x$$"goals")))$$"list") in
-  List.map (fun a -> print_string (to_string a); print_string "\n\n") gg;
-  print_int (List.length gg);
-  let l = to_list ((List.hd gg)$$"goal") in
-  l;;
+  let goals=to_list (x$$"goals") in
+  match goals with
+  | [] -> []
+  | _ -> 
+  let gg = to_list ((List.hd goals)$$"list") in
+  (* List.map (fun a -> print_string (to_string a); print_string "\n\n") gg;
+  print_int (List.length gg); *)
+  match gg with
+  | [] -> []
+  | _ ->  to_list ((List.hd gg)$$"goal") 
 
 let processoutput x = 
   let goals= goallist x in 
@@ -58,3 +61,20 @@ let printmessages x =
   let ll =List.map (select "richpp") (to_list (x$$"message")) in 
   let newlist=List.map (function a -> List.map (String.concat "") (List.map texts (to_list a))) ll in
   String.concat "\n========================\n" (List.map (function a -> xmltostr (String.concat "\n" a)) newlist);; 
+let get_a_goal li = 
+  let procs = List.filter (fun x-> processoutput x  != ["no more goals"]) li in
+  match procs with
+  []-> List.hd li
+  | _-> List.hd (List.rev procs)
+
+
+
+
+
+
+
+
+
+
+
+

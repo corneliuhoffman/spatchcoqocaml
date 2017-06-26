@@ -1,10 +1,26 @@
+
+
+let string_to_utf str =
+	String.map (fun ch -> if (Glib.Utf8.validate (String.make 1  ch)) then ch else '?') str
+
+
 let load_file f =
   let ic = open_in f in
   let n = in_channel_length ic in
   let s = Bytes.create n in
-  really_input ic s 0 n;
+ input ic s 0 n;
   close_in ic;
-  (s)
+  let s1 = (Processinputs.replacelist  s [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
+                               ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >")]) in
+
+  let ss = string_to_utf s1 in
+  (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
+  (* String.concat "\n" (lines (`String s)) in
+  if Utf8conv.is_windows1252 ss then
+  (Printf.printf "\n --\n the text is\n %s \n ----" ss;flush_all())
+   else (); *)
+  if (Glib.Utf8.validate ss) then ss
+else "did not woek"
 
 let to_str x =
 	match x with
@@ -27,7 +43,8 @@ let t = Sexplib.Sexp.of_string s in
 let lii =  to_li t in
 let com =List.map (fun x -> List.map (fun a-> Str.global_replace (Str.regexp "'") "\"" a ) x) lii in
 let listofcommands= List.map (fun x -> List.map (fun a -> Printf.sprintf "%s" (Str.global_replace (Str.regexp "^\"\|\"$" ) "" a)) x) com in
-listofcommands;;
+let orderedlistofcommands= List.sort (fun x y -> String.compare (List.nth  x 1) (List.nth  y 1)) listofcommands in
+orderedlistofcommands;;
 
 
 

@@ -2,11 +2,11 @@ open Soup
 let newparse  a = Markup.string a |> Markup.parse_xml |> Markup.signals |> from_signals;;
 
 let  readFromCoq oc () = 
-  let bb=Bytes.create 10000000 in 
-  let i=Unix.read (Unix.descr_of_in_channel oc) bb 0 10000000 in
+  let bb=Bytes.create 100000000 in 
+  let i=Unix.read (Unix.descr_of_in_channel oc) bb 0 100000000 in
   Bytes.sub bb  0 i;;
 let rec stringReadFromCoq oc n = try readFromCoq oc () with
-    any-> stringReadFromCoq oc ();;
+    any-> ( (* print_string (Printexc.to_string any); *) stringReadFromCoq oc ());;
 
 
 let rec readytoread ic oc =
@@ -18,10 +18,10 @@ let nonblockread ic oc =
   else  (  None);;
 
 let rec repeatreading ic oc =
-  let x = nonblockread ic oc in
+  let x = try (nonblockread ic oc) with any -> ((* print_string (Printexc.to_string any); *) Some (repeatreading ic oc)) in
   match x with
     Some a -> a 
-  |None-> ( repeatreading ic oc);;
+  |None->  repeatreading ic oc;;
 
 
 let get_opsys () =
@@ -44,9 +44,11 @@ let rec getmessages ic oc l =
   let rec sgoal ic oc () = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
     let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
     
-    if x!="" then try newparse x with _ -> sgoal ic oc () else sgoal ic oc () in
+    if x!="" then try newparse x with _ -> sgoal ic oc () else  sgoal ic oc () in
   let x = sgoal ic oc () in 
-  if (List.mem (to_string x) (List.map to_string l) ) then l else getmessages ic oc (l@[x]);;
+  if (List.mem (to_string x) (List.map to_string l) ) then l else  getmessages ic oc (l@[x]);;
+
+
 
 let rec mygoal ic oc str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
   let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
@@ -54,7 +56,7 @@ let rec mygoal ic oc str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\">
 
 let rec soupgoal ic oc () = 
   let x = mygoal ic oc "" in
-  try newparse x with _ -> soupgoal ic oc ();;
+  try newparse x with _ ->  soupgoal ic oc ();;
 
 let rec readnow ic oc str =
   let a, b, c = Unix.select [Unix.descr_of_in_channel oc] [Unix.descr_of_out_channel ic] [] 25.0 in
@@ -78,4 +80,18 @@ let movebackto ic i = Printf.fprintf ic "%s" ("<call val=\"Edit_at\"><state_id v
 let rec findstateid ic oc id = match (attribute "val" ((soupstatus ic oc  ()) $ "state_id")) with
     Some x -> if int_of_string x >= int_of_string id then x else findstateid ic oc id
   |_ -> findstateid ic oc id;;
-let rec fstid ic oc id = try (findstateid ic oc id) with any -> ignore (Printf.printf "%s" (Printexc.to_string any)); fstid ic oc id;;
+let rec fstid ic oc id = try (findstateid ic oc id) with any ->  fstid ic oc id;;
+let rec reallyread ic oc id =
+  let mes = getmessages ic oc [] in
+
+  let messages =String.concat "\n\n" (List.map Processresults.printmessages mes) in
+  let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
+
+  let newid =  fstid ic oc id in
+  let check =  int_of_string newid > int_of_string id || error >= 0 in
+  if check then (Printf.printf "old id = %s, newid= %s worked\n " id newid; mes)
+  else (Printf.printf  "old id = %s, newid= %s tried again\n " id newid; reallyread ic oc id)
+    
+
+  
+

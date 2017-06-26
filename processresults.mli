@@ -34,3 +34,4 @@ val manage : 'a Soup.node list -> goal
 val goallist : 'a Soup.node -> Soup.element Soup.node list
 val processoutput : 'a Soup.node -> string list
 val printmessages : 'a Soup.node -> string
+val get_a_goal : 'a Soup.node list -> 'a Soup.node 
