@@ -2,27 +2,30 @@ open Soup
 let newparse  a = Markup.string a |> Markup.parse_xml |> Markup.signals |> from_signals;;
 
 let  readFromCoq oc () = 
-  let bb=Bytes.create 100000000 in 
-  let i=Unix.read (Unix.descr_of_in_channel oc) bb 0 100000000 in
+  let bb=Bytes.create 100000 in 
+  let i=Unix.read (Unix.descr_of_in_channel oc) bb 0 100000 in
+  
   Bytes.sub bb  0 i;;
 let rec stringReadFromCoq oc n = try readFromCoq oc () with
-    any-> ( (* print_string (Printexc.to_string any); *) stringReadFromCoq oc ());;
+    any-> ( (* print_string (Printexc.to_string any); *)  stringReadFromCoq oc ());;
 
 
 let rec readytoread ic oc =
-  let a, b, c = Unix.select [Unix.descr_of_in_channel oc] [Unix.descr_of_out_channel ic] [] 25.0 in
+  let a, b, c = Unix.select [Unix.descr_of_in_channel oc] [Unix.descr_of_out_channel ic] [] 50.0 in
+  Printf.printf "length of b is %i\n" (List.length b);
   a != [];;
 
 let nonblockread ic oc =
+
   if readytoread ic oc then Some (readFromCoq oc ())
-  else  (  None);;
+  else  (print_string "blocked \n";flush_all (); None);;
 
 let rec repeatreading ic oc =
-  let x = try (nonblockread ic oc) with any -> ((* print_string (Printexc.to_string any); *) Some (repeatreading ic oc)) in
+  let x = try (nonblockread ic oc) with any -> ( Some (repeatreading ic oc)) in
   match x with
     Some a -> a 
-  |None->  repeatreading ic oc;;
-
+  |None->   (print_string "trying\n";flush_all (); repeatreading ic oc);;
+ 
 
 let get_opsys () =
   let ic = Unix.open_process_in "uname" in
@@ -41,12 +44,15 @@ let isWin ()=
   try (Str.search_forward (Str.regexp "Win") (Sys.os_type) 0)>=0 with _-> false
 
 let rec getmessages ic oc l =
-  let rec sgoal ic oc () = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
-    let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
+  let rec sgoal ic oc () = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";  flush_all ());
+   
+    let x = if isWin () then   repeatreading ic oc  else stringReadFromCoq oc () in
     
-    if x!="" then try newparse x with _ -> sgoal ic oc () else  sgoal ic oc () in
-  let x = sgoal ic oc () in 
-  if (List.mem (to_string x) (List.map to_string l) ) then l else  getmessages ic oc (l@[x]);;
+   
+    if x!="" then try newparse x with _ -> (print_string "ha\n"; sgoal ic oc ()) else (print_string "tooo\n"; sgoal ic oc ()) in
+  let b = sgoal ic oc () in 
+  
+  if (l!= [] && (to_string b) = (to_string (List.hd l) )) then ( Printf.printf "done\n"; l) else  (Printf.printf "Lenght of l is %i\n" (List.length l); getmessages ic oc (b::l));;
 
 
 
@@ -81,16 +87,16 @@ let rec findstateid ic oc id = match (attribute "val" ((soupstatus ic oc  ()) $ 
     Some x -> if int_of_string x >= int_of_string id then x else findstateid ic oc id
   |_ -> findstateid ic oc id;;
 let rec fstid ic oc id = try (findstateid ic oc id) with any ->  fstid ic oc id;;
-let rec reallyread ic oc id =
+let rec reallyread ic oc id check =
   let mes = getmessages ic oc [] in
 
   let messages =String.concat "\n\n" (List.map Processresults.printmessages mes) in
   let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
 
   let newid =  fstid ic oc id in
-  let check =  int_of_string newid > int_of_string id || error >= 0 in
+  let check =  int_of_string newid > int_of_string id || error >= 0 || check in
   if check then (Printf.printf "old id = %s, newid= %s worked\n " id newid; mes)
-  else (Printf.printf  "old id = %s, newid= %s tried again\n " id newid; reallyread ic oc id)
+  else (Printf.printf  "old id = %s, newid= %s tried again\n " id newid; reallyread ic oc id check )
     
 
   

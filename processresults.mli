@@ -21,6 +21,10 @@ val print_goal : statement -> string
 val print_goals : goal -> string
 (** makes a goal into a string *)
 
+val astofstr : string -> bool-> string*Ast.expr
+
+val listofstr : string -> bool -> string list
+
 val xmltostr : string -> string
 (** changes the xml to string replacing &nbst;*)
 
@@ -32,6 +36,6 @@ val strToStatement : string -> statement
 val get_texts : 'a Soup.node -> string
 val manage : 'a Soup.node list -> goal
 val goallist : 'a Soup.node -> Soup.element Soup.node list
-val processoutput : 'a Soup.node -> string list
+val processoutput : 'a Soup.node -> goal list
 val printmessages : 'a Soup.node -> string
 val get_a_goal : 'a Soup.node list -> 'a Soup.node 

@@ -1,4 +1,5 @@
 open GMain
+open Gobject.Data
 open GdkKeysyms
 open Str
 open String
@@ -9,10 +10,11 @@ open Treestuff
 let listofcommands = Commands.commands ();;
 
 (* List.map (fun x -> List.map print_string x; flush_all ()) listofcommands;; *)
-
+type status = BUSY | WAITING ;;
 let completionindex = ref 0
 let completionlist = ref []
 let id=ref "1";;
+let coqstatus = ref BUSY ;;
 let oldid=ref "1";;
 type mainthing ={ mutable state_id: string; mutable goals :Processresults.goal list; mutable leaving_tactic: string; mutable values: string array };;
 let coqstr = ref "";;
@@ -63,7 +65,7 @@ if (not (Coqstuff.isWin ())) then (
   set_binary_mode_in oc true;
   Unix.set_nonblock (Unix.descr_of_in_channel oc))
 else ();;
-
+coqstatus := WAITING;
 let repeat = if Coqstuff.isWin () then  30 else 1 in
 let imports =["Require Import Classical.";  "Require Import Utf8."; ] in
 ignore(List.map (fun x-> 
@@ -159,39 +161,180 @@ let get_first_lines str =
   let l = (Str.split (Str.regexp "\n") str) in
   if l !=[] then String.concat "\n" (List.rev (List.tl (List.rev l)))
   else "";;
+let popup x_root y_root txt =
+let window = GWindow.window ~urgency_hint:true ~modal:true ~title:"Spatchcoq" () in
+window#move ~x:x_root ~y:y_root;
+let vbox = GPack.vbox  ~packing:window#add () in
 
-let addListToNotebook (notebook:GPack.notebook) list = 
+  ignore(window#connect#destroy);
+
+let win = GText.view ~editable:false 
+      ~packing:vbox#add () in
+      win#buffer#set_text txt;
+
+
+window
+;;
+let addListToNotebook (notebook:GPack.notebook) list (win10:GText.view)= 
   remove_book notebook ();
   List.map (fun x-> 
       let text = x in
       let label = GMisc.label ~text:("Goal " ) () in
       let frame = GBin.frame ~label:"" ~width:100 ~height:75 ~border_width:10
-          ~packing:(fun x-> Printf.printf "%s" (string_of_int (notebook#append_page ~tab_label:label#coerce x))) () in
-      let view = GText.view ~editable:false  ~packing:frame#add () in
-      view#buffer#set_text text;
-      view#misc#modify_base [(`NORMAL, `NAME "lightgray")]) list;;
+          ~packing:(fun a-> Printf.printf "%s" (string_of_int (notebook#append_page ~tab_label:label#coerce a))) () in
+      let scroll = GBin.scrolled_window 
+      ~hpolicy:`ALWAYS ~vpolicy:`ALWAYS 
+      ~border_width:2 
+      ~packing:frame#add () in
+
+      
+let cols = new GTree.column_list in
+let col_name = cols#add string in 
+let col_color = cols#add string in 
+let data = List.map Processresults.print_goal x.hyps  in
+let conc = Processresults.print_goal x.conclusion in
+      let create_model data conc =
+  
+  let store = GTree.list_store cols in
+  let fill (name) =
+    let iter = store#append () in
+    store#set ~row:iter ~column:col_name name;
+    store#set ~row:iter ~column:col_color "lightgray";
+   
+  in
+List.iter fill data;
+  store in 
+
+let create_view ~model ~packing () =
+  let view = GTree.view ~model ~packing () in
+
+  (* Column #1: col_name is string column *)
+  let col = GTree.view_column 
+      ~renderer:(GTree.cell_renderer_text [], ["text", col_name; "background", col_color]) () in
+  ignore (view#append_column col);
+  view#set_headers_visible false;
+
+  (* Column #2: col_age is int column *)
+  
+
+  view in
+
+
+  let store = create_model data conc in
+  let view = create_view ~model:store ~packing:scroll#add () in
+  view#set_headers_visible false;
+      let iter = store#append () in
+    store#set ~row:iter ~column:col_name conc;
+        store#set ~row:iter ~column:col_color "Orange";
+
+
+      (* GText.view ~editable:false  ~packing:frame#add () in
+      view#buffer#set_text text; *)
+      view#misc#modify_base [(`NORMAL, `NAME "lightgray")];
+
+
+let selection_changed (model:#GTree.model) selection () =
+  let pr path =
+    let row = model#get_iter path in
+    let col= model#get ~row ~column:col_color in
+    let name = model#get ~row ~column:col_name in
+    Printf.printf "the name is %s" name;flush_all ();
+    ( let goal = (col = "Orange") in
+      let hypname, ast =Processresults.astofstr name goal in
+      let pieces = Processresults.listofstr name goal in
+      Printf.printf "there are %i %s" (List.length pieces) (List.hd pieces);flush_all ();
+
+    (* let x, y = Gdk.Window.get_pointer_location (Gdk.Window.root_parent ()) in
+    let break = Str.split (Str.regexp ":") name in
+      let nname, formula = if List.length break =1 then "", name else List.hd break, String.concat ":" (List.tl break) in 
+    
+ *)
+let menupieces = (List.map (fun name -> `I (name, (fun () -> 
+
+let stop = win10#buffer#get_iter `INSERT in
+           win10#buffer#insert ~iter:stop ("("^name^")") )) ) pieces) in
+
+let tactics = (List.map (fun n -> `I (n, (fun () -> 
+
+let stop = win10#buffer#get_iter `INSERT in
+let ast = (Formulaparsing.parse name) in
+           win10#buffer#insert ~iter:stop (n) )) ) 
+           (Formulaparsing.produce_possible_tactics_goal ast hypname goal) ) in
+    GToolbox.popup_menu ~entries:(menupieces@[`S]@tactics)
+
+               (* [`I (name, (fun () -> 
+
+let stop = win10#buffer#get_iter `INSERT in
+           win10#buffer#insert ~iter:stop ("("^name^")") )); `S] *)
+
+            ~button:0 ~time:(Int32.of_int 0); ())
+
+      in
+  List.iter pr selection#get_selected_rows
+  
+in 
+(* 
+let view_selection_func (model:#GTree.model) path currently_selected =
+  let row = model#get_iter path in
+  let name = model#get ~row ~column:col_name in
+  if currently_selected
+  then (
+    let pieces = Processresults.listofstr name in
+    (* let x, y = Gdk.Window.get_pointer_location (Gdk.Window.root_parent ()) in
+    let break = Str.split (Str.regexp ":") name in
+      let nname, formula = if List.length break =1 then "", name else List.hd break, String.concat ":" (List.tl break) in 
+    
+ *)
+    GToolbox.popup_menu ~entries:((List.map (fun name -> `I (name, (fun () -> 
+
+let stop = win10#buffer#get_iter `INSERT in
+           win10#buffer#insert ~iter:stop ("("^name^")") )) ) pieces)@[`S]@(List.map (fun n -> `I (n, (fun () -> 
+
+let stop = win10#buffer#get_iter `INSERT in
+           win10#buffer#insert ~iter:stop (n) )) ) 
+           (Formulaparsing.produce_possible_tactics_goal (Formulaparsing.parse name)) ) )
+
+               (* [`I (name, (fun () -> 
+
+let stop = win10#buffer#get_iter `INSERT in
+           win10#buffer#insert ~iter:stop ("("^name^")") )); `S] *)
+
+            ~button:0 ~time:(Int32.of_int 0); ())
+  else ();
+
+  flush stdout;
+  true in *)
+view#selection#set_mode `SINGLE;
+  view#selection#connect#changed ~callback:(selection_changed store view#selection);
+
+
+
+(* view#selection#set_select_function (view_selection_func store);
+ *)
+
+    ) list
 
 
 
 let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listoftheorems (notebook:GPack.notebook)  = 
-  id:=Coqstuff.fstid ic oc  !id; 
-  let xx=(get_first_line (win10#buffer#get_text ())) in 
-  Printf.printf "the id is now %s \n " (!id); flush_all ();
+  if !coqstatus = WAITING then
+    (coqstatus:=BUSY;
+    id:=Coqstuff.fstid ic oc  !id; 
+    let xx=(get_first_line (win10#buffer#get_text ())) in 
+    Printf.printf "the id is now %s \n " (!id); flush_all ();
 
-  if (try (Str.search_forward (Str.regexp "Lemma \| Theorem \| Proposition \| Axiom \| Definition") xx 0 )>=0  with _-> false) then 
+    if (try (Str.search_forward (Str.regexp "Lemma \| Theorem \| Proposition \| Axiom \| Definition") xx 0 )>=0  with _-> false) then 
     mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with  hyps =[{name=""; content =xx}]}]; leaving_tactic=xx; values =[||]}]; 
-  if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
-    (begin Coqstuff.writeToCoq ic   xx !id;
-       
-      let x = Coqstuff.reallyread ic oc  !id in
+    if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
+      (begin Coqstuff.writeToCoq ic   xx !id;
+      let x = Coqstuff.reallyread ic oc  !id false in
 
       let ids = List.map (fun a -> try (attribute "val" (a $ "state_id")) with _-> None) x in
-
       let maxid =  List.fold_left (fun a b -> 
       let z = (match b with
       Some z -> int_of_string z
       |None -> -1) in  max a z ) 0 ids in
-     
+      print_int maxid;
      (*  List.map (fun a -> print_string (to_string a)) x; *)
       let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
 
@@ -232,8 +375,8 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
                    let rems = List.filter (fun a -> try (attribute "val" (a $ "state_id") = Some (string_of_int maxid))  with _-> false  ) x in 
                  Printf.printf "The uniques are %i\n" (List.length rems);
                  let strings = List.map (fun a -> Processresults.processoutput a ) rems in
-                 Printf.printf "%s\n\n" (String.concat "\n\n======\n\n" (List.map (fun a ->String.concat "\n\n\n" a) strings)); flush_all ();
-                   let possible_goal = Processresults.get_a_goal x in
+(*                  Printf.printf "%s\n\n" (String.concat "\n\n======\n\n" (List.map (fun a ->String.concat "\n\n\n" (Processresults.print_goal  a)) strings)); flush_all ();
+ *)                   let possible_goal = Processresults.get_a_goal x in
                    let y =  match  (Processresults.goallist possible_goal) with
                    [] -> Coqstuff.soupgoal ic oc ()
                    |_ -> possible_goal
@@ -253,13 +396,14 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
 
                    (* mainobj.ids <- !id::mainobj.ids;
                       mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
-                   ignore(addListToNotebook notebook (Processresults.processoutput y)); () ))
+                   ignore(addListToNotebook notebook (Processresults.processoutput y) win10); () ))
 
           (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) end )
       else (win11#buffer#set_text messages; Coqstuff.movebackto  ic !id) end)
   else  
-    GToolbox.message_box ~title:"error" ~ok:"hi" (xx^"is not an accepted tactic please check your text.")
-;;
+    GToolbox.message_box ~title:"error" ~ok:"Ok" (xx^"is not an accepted tactic please check your text.");
+coqstatus := WAITING )  
+else () ;;
 let saveformarking file listoftheorems =
 
  let out = open_out file in
@@ -315,12 +459,12 @@ let main () =
   let listoftheorems = ref [] in
   let window = GWindow.window ~width:1200 ~height:600
       ~title:"Spatchcoq" () in
-  let vbox = GPack.vbox  ~packing:window#add () in
+  let vbox0 = GPack.vbox  ~packing:window#add () in
 
   ignore(window#connect#destroy ~callback:Main.quit);
 
   (* Menu bar *)
-  let menubar = GMenu.menu_bar ~packing:vbox#pack () in
+  let menubar = GMenu.menu_bar ~packing:vbox0#pack () in
   let factory = new GMenu.factory menubar in
   let accel_group = factory#accel_group in
   let file_menu = factory#add_submenu "File" in
@@ -328,6 +472,9 @@ let main () =
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
   ignore( factory#add_item "Quit" ~key:_Q ~callback: Main.quit);
+ let hbox = GPack.hbox  ~packing:vbox0#add () in
+ let vbox = GPack.vbox  ~packing:hbox#add () in
+ 
 
   (* first row *)
   let row0 = GPack.hbox  ~height:300 ~homogeneous:true ~packing:vbox#pack() in
@@ -344,16 +491,52 @@ let main () =
   let notebook = GPack.notebook ~tab_pos:`TOP
       ~packing:row0#add  () in
 
-  let addListToNotebook  list = 
-    remove_book notebook ();
-    List.map (fun x-> 
-        let text = x in
-        let label = GMisc.label ~text:("Goal " ) () in
-        let frame = GBin.frame ~label:"" ~width:100 ~height:75 ~border_width:10
-            ~packing:(fun x-> Printf.printf "%s" (string_of_int (notebook#append_page ~tab_label:label#coerce x))) () in
-        let view = GText.view ~editable:false  ~packing:frame#add () in
-        view#buffer#set_text text;
-        view#misc#modify_base [(`NORMAL, `NAME "lightgray")]) list in
+  (* let addListToNotebook  list = 
+  remove_book notebook ();
+  List.map (fun x-> 
+      let text = x in
+      let label = GMisc.label ~text:("Goal " ) () in
+      let frame = GBin.frame ~label:"" ~width:100 ~height:75 ~border_width:10
+          ~packing:(fun a-> Printf.printf "%s" (string_of_int (notebook#append_page ~tab_label:label#coerce a))) () in
+      let scroll = GBin.scrolled_window 
+      ~hpolicy:`ALWAYS ~vpolicy:`ALWAYS 
+      ~border_width:2 
+      ~packing:frame#add () in
+
+let cols = new GTree.column_list in
+let col_name = cols#add string in 
+let data = List.map Processresults.print_goal x.hyps  in
+      let create_model data =
+  
+  let store = GTree.list_store cols in
+  let fill (name) =
+    let iter = store#append () in
+    store#set ~row:iter ~column:col_name name;
+   
+  in
+  List.iter fill data;
+  store in 
+
+let create_view ~model ~packing () =
+  let view = GTree.view ~model ~packing () in
+
+  (* Column #1: col_name is string column *)
+  let col = GTree.view_column 
+      ~renderer:(GTree.cell_renderer_text [], ["text", col_name]) () in
+  ignore (view#append_column col);
+
+  (* Column #2: col_age is int column *)
+  
+
+  view in
+
+
+  let model = create_model data in
+  let view = create_view ~model ~packing:scroll#add () in
+
+      (* GText.view ~editable:false  ~packing:frame#add () in
+      view#buffer#set_text text; *)
+      view#misc#modify_base [(`NORMAL, `NAME "lightgray")]) list in *)
 
   (* let win01 = GText.view ~editable:false
                               ~packing:scroll01#add () in
@@ -369,10 +552,24 @@ let main () =
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row1#add () in
   let win10 = GText.view 
       ~packing:scroll10#add () in
-  win10#buffer#set_text "Lemma a:1=1.";
+  win10#buffer#set_text "SearchPattern (_->_).";
 
   win10#misc#modify_base [(`NORMAL, `NAME "lightyellow")];
+let table =GPack.table 
+  ~columns:2 ~width:60 ~packing:hbox#pack () in
+  
 
+let images =[("∨",1,1); ("∧",1,2); ("→",2,1); ("∀",2,2); ("∃", 1, 3); ("¬", 2, 3); ("↔", 1,4); ("≠", 2,4)
+] in
+List.map 
+  (fun (a,i,j) -> 
+    let button =GButton.button ~label:a () in
+    table#attach ~left:i ~top:j (button)#coerce;
+    ignore(button#connect#clicked 
+    ~callback:(fun x ->
+    let stop = win10#buffer#get_iter `INSERT in
+    win10#buffer#insert a))) images;
+  
   let file_ok_sel filew () =
     let file=filew#filename in
     try 
@@ -542,8 +739,10 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
 
 
   (*right window*)
+  let scroll11=GBin.scrolled_window ~border_width:10
+      ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row1#add () in
   let win11 = GText.view 
-      ~packing:row1#add () in
+      ~packing:scroll11#add () in
   win11#buffer#set_text "";
 
 
@@ -589,15 +788,36 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
 
          let justcommands = List.map (fun x ->  
              (Processinputs.makevar (List.hd (List.tl x)))) listofcommands in
-         if !completionlist = [] then
-           completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands 
+          completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands; 
+          GToolbox.popup_menu ~entries:(List.map 
+            (fun a -> `I (a, (fun () -> 
+              let stop = win10#buffer#get_iter `INSERT in
+              let start = stop#backward_sentence_start in
+              win10#buffer#delete ~start ~stop;
+            win10#buffer#insert a) )) !completionlist)
+             ~button:0 ~time:(Int32.of_int 0) ); 
+
+
+
+         (* if !completionlist = [] then
+           completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands; 
+            GToolbox.popup_menu ~entries:(List.map 
+            (fun a -> `I (a, (fun () -> 
+              let stop = win10#buffer#get_iter `INSERT in
+              let start = stop#backward_sentence_start in
+              win10#buffer#delete ~start ~stop;
+            win10#buffer#insert a) )) completionlist)
+             ~button:0 ~time:(Int32.of_int 0) 
          else (
-           win10#buffer#set_text (List.nth !completionlist (!completionindex mod (List.length !completionlist))); 
+          let stop = win10#buffer#get_iter `INSERT in
+        let start = stop#backward_sentence_start in
+        win10#buffer#delete ~start ~stop;
+           win10#buffer#insert  (List.nth !completionlist (!completionindex mod (List.length !completionlist))); 
            let before = win10#buffer#get_text () in
            logs :=  (ESC (gettime (), before))::!logs;
            completionindex:=(1 + !completionindex) mod  (List.length !completionlist)))
       else 
-        completionlist:=[];
+        completionlist:=[]; *)
 
       false
     end in
@@ -632,18 +852,33 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
       match !mainobj with
         h::t::l->
         Coqstuff.movebackto  ic  t.state_id;
-        let y = Coqstuff.soupgoal ic oc  () in
-        
+        (* let y = Coqstuff.soupgoal ic oc  () in *)
         id:=t.state_id;
+        let x = Coqstuff.reallyread ic oc  !id true in
+
+        let possible_goal = Processresults.get_a_goal x in
+        let y =  match  (Processresults.goallist possible_goal) with
+                   [] -> Coqstuff.soupgoal ic oc ()
+                   |_ -> possible_goal
+                  in
+        
+        
         mainobj:=t::l;
-        ignore(addListToNotebook  (Processresults.processoutput  y)); ()
+        ignore(addListToNotebook notebook (Processresults.processoutput  y) win10); ()
       |t::[] -> Coqstuff.movebackto  ic  t.state_id;
         (match !listoftheorems with
           []->
-          let y = Coqstuff.soupgoal ic oc  () in
-
           id:=t.state_id;
-          ignore(addListToNotebook  (Processresults.processoutput  y)); ()
+        let x = Coqstuff.reallyread ic oc  !id true in
+
+        let possible_goal = Processresults.get_a_goal x in
+        let y =  match  (Processresults.goallist possible_goal) with
+                   [] -> Coqstuff.soupgoal ic oc ()
+                   |_ -> possible_goal
+                  in
+        
+        
+            ignore(addListToNotebook notebook (Processresults.processoutput  y) win10); ()
         |h::t ->
           (
             match h with 
@@ -651,11 +886,18 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
               (*         List.map Processresults.print_goals hd.goals;
               *)        
               Coqstuff.movebackto  ic  hd.state_id;
-              let y = Coqstuff.soupgoal ic oc  () in
-
               id:=hd.state_id;
-              mainobj:=tl;
-              ignore(addListToNotebook  (Processresults.processoutput  y)); ();
+         let x = Coqstuff.reallyread ic oc  !id true in
+
+        let possible_goal = Processresults.get_a_goal x in
+        let y =  match  (Processresults.goallist possible_goal) with
+                   [] -> Coqstuff.soupgoal ic oc ()
+                   |_ -> possible_goal
+                  in
+        
+        
+               mainobj:=tl;
+              ignore(addListToNotebook notebook (Processresults.processoutput  y) win10); ();
               listoftheorems:= t; ()
               | _ -> ()))
         | _ -> ();
@@ -687,7 +929,16 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
           Treestuff.create_tree tree
         ) newlist ); ()) );
 
+let row3 = GPack.hbox ~height:20 ~homogeneous:true ~packing:vbox#pack () in
+let textwin = GEdit.entry ~text:"?" ~packing:row3#pack () in
+let buttontree = GButton.button ~label:"SearchPattern"
+      ~packing:row3#add () in
+  ignore (buttontree#connect#clicked ~callback:(fun () -> 
+    let txt = win10#buffer#get_text () in
+    win10#buffer#set_text ("SearchPattern ("^textwin#text^").\n"^txt);
+runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
 
+    () ));
   (* Display the windows and enter Gtk+ main loop *)
   window#add_accel_group accel_group;
   window#show ();

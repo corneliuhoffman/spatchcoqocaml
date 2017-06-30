@@ -1,0 +1,116 @@
+(* The first section of the grammar definition, called the *header*,
+   is the part that appears below between %{ and %}.  It is code
+   that will simply be copied literally into the generated parser.ml. 
+   Here we use it just to open the Ast module so that, later on
+   in the grammar definition, we can write expressions like 
+   [Int i] instead of [Ast.Int i]. *)
+
+%{
+open Ast
+%}
+
+(* The next section of the grammar definition, called the *declarations*,
+   first declares all the lexical *tokens* of the language.  These are 
+   all the kinds of tokens we can expect to read from the token stream.
+   Note that each of these is just a descriptive name---nothing so far
+   says that LPAREN really corresponds to '(', for example.  The tokens
+   that have a <type> annotation appearing in them are declaring that
+   they will carry some additional data along with them.  In the
+   case of INT, that's an OCaml int.  In the case of ID, that's
+   an OCaml string. *)
+
+%token <string> ID
+%token SPACE
+%token PLUS
+%token MINUS
+%token TIMES
+%token LPAREN
+%token RPAREN
+%token IMPLIES
+%token COMMA
+%token <string> LIST
+%token AND
+%token OR
+%token EXISTS
+%token FORALL
+%token NOT
+%token LET
+%token EQUALS
+%token NE
+%token IFF
+%token IN
+%token EOF
+
+(* After declaring the tokens, we have to provide some additional information
+   about precedence and associativity.  The following declarations say that
+   PLUS is left associative, that IN is not associative, and that PLUS
+   has higher precedence than IN (because PLUS appears on a line after IN).  
+   
+   Because PLUS is left associative, "1+2+3" will parse as "(1+2)+3"
+   and not as "1+(2+3)".
+   
+   Because PLUS has higher precedence than IN, "let x=1 in x+2" will
+   parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
+%left SPACE
+%nonassoc IN
+%nonassoc EXISTS
+%nonassoc FORALL
+%nonassoc EQUALS
+%nonassoc NE
+%left COMMA
+%right IMPLIES
+%right IFF
+%right OR
+%right AND
+
+%nonassoc NOT
+%right PLUS
+%right MINUS
+%right TIMES
+
+
+(* After declaring associativity and precedence, we need to declare what
+   the starting point is for parsing the language.  The following
+   declaration says to start with a rule (defined below) named [prog].
+   The declaration also says that parsing a [prog] will return an OCaml
+   value of type [Ast.expr]. *)
+
+%start <Ast.expr> prog
+
+(* The following %% ends the declarations section of the grammar definition. *)
+
+%%
+
+
+prog:
+	| e = expr; EOF { e }
+	;
+	
+
+          
+
+  
+expr:
+	| x = ID { Var x }
+  | e1= expr; IMPLIES; e2 = expr { Implies(e1,e2) }
+  | e1= expr; IFF; e2 = expr { Iff(e1,e2) }
+	| e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
+  | e1 = expr; MINUS; e2 = expr { Minus(e1,e2) }
+  | e1 = expr; TIMES; e2 = expr { Times(e1,e2) }
+  | e1 = expr; AND; e2 = expr { And(e1,e2) }
+  | e1 = expr; OR; e2 = expr { Or(e1,e2) }
+  | e1= expr; EQUALS; e2=expr {Equals(e1, e2)}
+  | e1= expr; NE; e2=expr {Not(Equals(e1, e2))}
+
+  | NOT; e=expr {Not(e)}
+  | EXISTS; e1 = expr; e2=expr; COMMA; e3=expr {Exists(List([e1; e2]) , e3)}
+  | FORALL; e1 = expr; e2=expr; COMMA; e3=expr {Forall(List([e1; e2]) , e3)}
+  
+	| LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
+	| LPAREN; e = expr; RPAREN {e} 
+  | a =expr; b =expr { List ([ a; b]) }
+	;
+
+
+
+(* And that's the end of the grammar definition. *)

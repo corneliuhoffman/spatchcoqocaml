@@ -18,7 +18,7 @@ val isWin : unit -> bool
 (** checks if it is a wubdows machine *)
 val getmessages :
   out_channel ->
-  in_channel -> Soup.soup Soup.node list -> Soup.soup Soup.node list
+  in_channel ->  Soup.soup Soup.node list -> Soup.soup Soup.node list
 
 (** gets the messages as a soup mode list *)
 val mygoal : out_channel -> in_channel -> bytes -> bytes
@@ -48,5 +48,5 @@ val fstid : out_channel -> in_channel -> string -> string
 (**finds the state id after the string *)
 val reallyread :
   out_channel ->
-  in_channel -> string -> Soup.soup Soup.node list
+  in_channel -> string -> bool -> Soup.soup Soup.node list
 
