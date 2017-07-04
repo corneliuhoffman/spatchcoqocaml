@@ -89,14 +89,15 @@ let rec findstateid ic oc id = match (attribute "val" ((soupstatus ic oc  ()) $ 
 let rec fstid ic oc id = try (findstateid ic oc id) with any ->  fstid ic oc id;;
 let rec reallyread ic oc id check =
   let mes = getmessages ic oc [] in
-
+  
   let messages =String.concat "\n\n" (List.map Processresults.printmessages mes) in
+  Printf.printf "theread:%s" messages;
   let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
 
   let newid =  fstid ic oc id in
   let check =  int_of_string newid > int_of_string id || error >= 0 || check in
-  if check then (Printf.printf "old id = %s, newid= %s worked\n " id newid; mes)
-  else (Printf.printf  "old id = %s, newid= %s tried again\n " id newid; reallyread ic oc id check )
+  if check then (Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages; mes)
+  else (Printf.printf  "old id = %s, newid= %s tried again\n %s\n" id newid messages;flush_all (); reallyread ic oc id check )
     
 
   

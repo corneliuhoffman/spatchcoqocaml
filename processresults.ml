@@ -5,13 +5,14 @@ type statement ={ name: string; content: string};;
 type goal ={number: string; hyps : statement list; conclusion: statement; mutable state_id: int ; mutable leaving_tactic: string; mutable values:string array};;
 
 
-let emptygoal ={number="0"; hyps=[];conclusion ={name=""; content=""}; state_id=0; leaving_tactic =""; values =[||] } 
+let emptygoal ={number="0"; hyps=[];conclusion ={name=""; content="no goals"}; state_id=0; leaving_tactic =""; values =[||] } 
 
 
 
 let print_goal {name=b; content= c} =
-
-let d = try (Formulaparsing.print (Formulaparsing.parse c)) with _ -> c in
+Printf.printf "in str:b=%s acum %s\n" b c;
+let d = try (Formulaparsing.print (Formulaparsing.parse (String.trim c))) with any -> print_string c;flush_all (); raise any in
+Printf.printf "formula %s\n " c; flush_all ();
  if b ="" 
   then
     Printf.sprintf "%s "  (String.trim d)
@@ -26,11 +27,12 @@ let print_goals {number=n; hyps=h; conclusion= c; leaving_tactic=l; values = val
 let astofstr str goal=
 let n, formula = if goal then  "", str 
 else (
-  let break = Str.split (Str.regexp ":") str in
+  let break = Str.split (Str.regexp ":") (String.trim str) in
   let n, formula = if List.length break =1 then "", str else List.hd break, String.concat ":" (List.tl break)
 in n, formula) in 
- 
- n,  Formulaparsing.parse formula
+ Printf.printf "formula %s\n " formula ; flush_all ();
+ let f = try (Formulaparsing.parse formula) with any -> print_string " in astofstr";flush_all (); raise any in
+ n,  f
     
 let listofstr str goal =
 
@@ -56,9 +58,10 @@ let get_texts x = String.concat "" (texts x);;
 let manage li =
   match li with
     h::hyp::t::[]-> 
-    {emptygoal with number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = strToStatement (get_texts t)}
+    {emptygoal with number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = {name =""; content = (cleanstr (get_texts t))}}
   |_ -> {emptygoal with number= "" ;hyps =[]; conclusion ={name=""; content =""}};;
 let goallist x = 
+  print_string (to_string x);
   let goals=to_list (x$$"goals") in
   match goals with
   | [] -> []

@@ -28,6 +28,19 @@ let rec print x = match x with
       let b= match e2 with Var x -> print e2 
       |_ ->"("^(print e2)^")" in 
      a^" + "^b
+  | Union(e1,e2)          -> 
+      let a = match e1 with Var x -> print e1 
+      |_ ->"("^(print e1)^")" in
+      let b= match e2 with Var x -> print e2 
+      |_ ->"("^(print e2)^")" in 
+     a^" ∪ "^b   
+  | Intersection(e1,e2)          -> 
+      let a = match e1 with Var x -> print e1 
+      |_ ->"("^(print e1)^")" in
+      let b= match e2 with Var x -> print e2 
+      |_ ->"("^(print e2)^")" in 
+     a^" ∩ "^b
+
   | Times(e1,e2)          -> 
       let a = match e1 with Var x -> print e1 
       |_ ->"("^(print e1)^")" in
@@ -40,14 +53,28 @@ let rec print x = match x with
       let b= match e2 with Var x -> print e2 
       |_ ->"("^(print e2)^")" in 
      a^" → "^b
+  | Subset(e1,e2)          -> 
+      let a = match e1 with Var x -> print e1 
+      |_ ->"("^(print e1)^")" in
+      let b= match e2 with Var x -> print e2 
+      |_ ->"("^(print e2)^")" in 
+     a^" ⊆ "^b
+| In(e1,e2)          -> 
+      let a = match e1 with Var x -> print e1 
+      |_ ->"("^(print e1)^")" in
+      let b= match e2 with Var x -> print e2 
+      |_ ->"("^(print e2)^")" in 
+     a^" ∈ "^b
  | Iff(e1,e2)          -> 
       let a = match e1 with Var x -> print e1 
       |_ ->"("^(print e1)^")" in
       let b= match e2 with Var x -> print e2 
       |_ ->"("^(print e2)^")" in 
      a^" ↔ "^b
+| Complement(Var e1)          -> "∁ "^(e1)
+  | Complement(e)               -> "∁ ("^(print e)^")"
 
-
+  |Empty   -> "∅"
 
    
   
@@ -80,8 +107,8 @@ let rec getlist x =
   
 
   
-  | Not(e)               -> (print x)::(getlist e)
-  | Or(e1,e2) | And(e1, e2)  | Implies(e1,e2) | Add(e1,e2) | Iff(e1, e2) | Minus(e1,e2) | Times(e1,e2) | Equals(e1, e2) | Exists(e1 , e2) | Forall(e1 , e2)
+  | Not(e) | Complement(e)              -> (print x)::(getlist e)
+  | Or(e1,e2) | And(e1, e2)  | Implies(e1,e2) | Add(e1,e2) | Subset(e1,e2) | Union (e1,e2) | Intersection(e1, e2) | In(e1, e2) | Iff(e1, e2) | Minus(e1,e2) | Times(e1,e2) | Equals(e1, e2) | Exists(e1 , e2) | Forall(e1 , e2)
          -> (print x)::((getlist e1)@(getlist e2))
 
   |List(e1::t) -> (print x)::((getlist e1)@(List.concat (List.map getlist t)))

@@ -13,7 +13,7 @@ let load_file f =
   let s1 = (Processinputs.replacelist  s [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
                                ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >")]) in
 
-  let ss = string_to_utf s1 in
+  let ss = s1 in(* string_to_utf s1 in *)
   (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
   (* String.concat "\n" (lines (`String s)) in
   if Utf8conv.is_windows1252 ss then

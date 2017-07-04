@@ -31,14 +31,23 @@ open Ast
 %token <string> LIST
 %token AND
 %token OR
+%token UNION
+%token INTERSECTION
+%token IN 
+%token COMPLEMENT 
+%token SETMINUS
+
+%token EMPTY
 %token EXISTS
 %token FORALL
 %token NOT
 %token LET
 %token EQUALS
+%token SUBSET
+
 %token NE
 %token IFF
-%token IN
+
 %token EOF
 
 (* After declaring the tokens, we have to provide some additional information
@@ -52,7 +61,7 @@ open Ast
    Because PLUS has higher precedence than IN, "let x=1 in x+2" will
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
 %left SPACE
-%nonassoc IN
+
 %nonassoc EXISTS
 %nonassoc FORALL
 %nonassoc EQUALS
@@ -62,10 +71,17 @@ open Ast
 %right IFF
 %right OR
 %right AND
+%right  UNION
+%right  INTERSECTION
+%right  IN 
+%right  SUBSET 
 
+%nonassoc COMPLEMENT 
+%nonassoc EMPTY
 %nonassoc NOT
 %right PLUS
 %right MINUS
+%right SETMINUS
 %right TIMES
 
 
@@ -83,33 +99,43 @@ open Ast
 
 
 prog:
-	| e = expr; EOF { e }
-	;
-	
+  | e = expr; EOF { e }
+  ;
+  
 
           
 
   
 expr:
-	| x = ID { Var x }
+  | x = ID { Var x }
   | e1= expr; IMPLIES; e2 = expr { Implies(e1,e2) }
   | e1= expr; IFF; e2 = expr { Iff(e1,e2) }
-	| e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
+  | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
   | e1 = expr; MINUS; e2 = expr { Minus(e1,e2) }
+  | e1 = expr; SETMINUS; e2 = expr { Setminus(e1,e2) }
   | e1 = expr; TIMES; e2 = expr { Times(e1,e2) }
   | e1 = expr; AND; e2 = expr { And(e1,e2) }
   | e1 = expr; OR; e2 = expr { Or(e1,e2) }
+  | e1 = expr; UNION; e2 = expr { Union(e1,e2) }
+  | e1 = expr; INTERSECTION; e2 = expr {Intersection(e1,e2) }
+  | COMPLEMENT; e=expr {Complement(e)}
+  | e1=expr; SUBSET; e2=expr {Subset(e1, e2)} 
+  | EMPTY; {Empty}
   | e1= expr; EQUALS; e2=expr {Equals(e1, e2)}
   | e1= expr; NE; e2=expr {Not(Equals(e1, e2))}
 
   | NOT; e=expr {Not(e)}
+  | EXISTS; e1 = expr; COMMA; e3=expr {Exists(List([e1]) , e3)}
+
   | EXISTS; e1 = expr; e2=expr; COMMA; e3=expr {Exists(List([e1; e2]) , e3)}
+
   | FORALL; e1 = expr; e2=expr; COMMA; e3=expr {Forall(List([e1; e2]) , e3)}
-  
-	| LET; x = ID; EQUALS; e1 = expr; IN; e2 = expr { Let(x,e1,e2) }
-	| LPAREN; e = expr; RPAREN {e} 
+  | FORALL; e1 = expr; COMMA; e3=expr {Forall(List([e1]) , e3)}
+
+  | e1 = expr; IN; e2 = expr { In(e1,e2) }
+  | LPAREN; e = expr; RPAREN {e} 
   | a =expr; b =expr { List ([ a; b]) }
-	;
+  ;
 
 
 
