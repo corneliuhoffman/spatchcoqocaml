@@ -12,19 +12,18 @@ let rec stringReadFromCoq oc n = try readFromCoq oc () with
 
 let rec readytoread ic oc =
   let a, b, c = Unix.select [Unix.descr_of_in_channel oc] [Unix.descr_of_out_channel ic] [] 50.0 in
-  Printf.printf "length of b is %i\n" (List.length b);
   a != [];;
 
 let nonblockread ic oc =
 
   if readytoread ic oc then Some (readFromCoq oc ())
-  else  (print_string "blocked \n";flush_all (); None);;
+  else  ( None);;
 
 let rec repeatreading ic oc =
   let x = try (nonblockread ic oc) with any -> ( Some (repeatreading ic oc)) in
   match x with
     Some a -> a 
-  |None->   (print_string "trying\n";flush_all (); repeatreading ic oc);;
+  |None->   ( repeatreading ic oc);;
  
 
 let get_opsys () =
@@ -52,13 +51,13 @@ let rec getmessages ic oc l =
     if x!="" then try newparse x with _ -> (print_string "ha\n"; sgoal ic oc ()) else (print_string "tooo\n"; sgoal ic oc ()) in
   let b = sgoal ic oc () in 
   
-  if (l!= [] && (to_string b) = (to_string (List.hd l) )) then ( Printf.printf "done\n"; l) else  (Printf.printf "Lenght of l is %i\n" (List.length l); getmessages ic oc (b::l));;
+  if (l!= [] && (to_string b) = (to_string (List.hd l) )) then (  l) else  ( getmessages ic oc (b::l));;
 
 
 
 let rec mygoal ic oc str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
   let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
-  if str = x then x else ( mygoal ic oc x);;
+  if str = x then x else ( print_string "ho";flush_all(); mygoal ic oc x);;
 
 let rec soupgoal ic oc () = 
   let x = mygoal ic oc "" in
@@ -95,8 +94,14 @@ let rec reallyread ic oc id check =
   let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
 
   let newid =  fstid ic oc id in
-  let check =  int_of_string newid > int_of_string id || error >= 0 || check in
-  if check then (Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages; mes)
+  if check then (Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages; 
+
+mes)
+  else 
+  let c=  int_of_string newid > int_of_string id || error >= 0 || check in
+  if c then (Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages; 
+
+mes)
   else (Printf.printf  "old id = %s, newid= %s tried again\n %s\n" id newid messages;flush_all (); reallyread ic oc id check )
     
 

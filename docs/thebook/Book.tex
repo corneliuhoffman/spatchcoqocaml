@@ -1,11 +1,11 @@
-\documentclass[11pt]{book}
+\documentclass[12pt]{svmono}
 \usepackage{geometry}        
 \geometry{letterpaper}    
 \usepackage[parfill]{parskip}  
 \usepackage{graphicx}
 \usepackage{amssymb}
 \usepackage{epstopdf}
-
+\usepackage{appendix}
 \DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
 
 \usepackage[colorlinks=true, pdfstartview=FitV, linkcolor=blue, 
@@ -15,7 +15,7 @@
 \usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
 \geometry{letterpaper}    
 \usepackage{graphicx}
-  \usepackage{ams math}
+  \usepackage{amsmath}
   \usepackage{tikz}
  \usepackage{tcolorbox}
  \tcbuselibrary{skins}
@@ -30,7 +30,8 @@
 \usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
 								% TeX will automatically convert eps --> pdf in pdflatex		
 \usepackage{amssymb}
-
+\usepackage{epigraph}								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{proof}
 
 %\author{The Author}
 %\date{}							% Activate to display a given date or no date
@@ -39,12 +40,15 @@
 
 %\newcommand{\proc}[1]{\texttt{\colorbox{green!25}{#1}}}
 \newcommand{\proc}[1]{\begin{tcolorbox}[colback=green!35!white,colframe=black]#1 \end{tcolorbox}}
- 
- \newcommand{\coqtwo}[2]{
+ \newcommand{\coq}[2]{\begin{tcolorbox}[bicolor,righthand width=\linewidth/4,colback=gray!10!white,colframe=black, ,colbacklower=orange ]$#1$ \tcblower
+$ #2 \ $ \end{tcolorbox}}
+ \newcommand{\coqtwo}[3]{
  \begin{tcolorbox}[bicolor,righthand width=\linewidth/4,sidebyside,colback=green!35!white,colbacklower=gray!10!white] {\small \texttt{#1}}\tcblower
-$#2$ \end{tcolorbox}}
- 
-\newcommand{\coq}[1]{\begin{tcolorbox}[colback=gray!10!white,colframe=black]$#1$ \end{tcolorbox}}
+]{\begin{tcolorbox}[bicolor,righthand width=\linewidth/4,colback=gray!10!white,colframe=black, ,colbacklower=orange ]$#2$ \tcblower
+$ #3 \ $ \end{tcolorbox}}  \end{tcolorbox}}
+ \newcommand{\rmk}[1]{
+\begin{tcolorbox}[title= remark, colback=red!5!white,colframe=gray]
+#1\end{tcolorbox}}
 \newcommand{\mess}[1]{\begin{tcolorbox}[colback=white,colframe=black] #1 \end{tcolorbox}}
 \newtheorem{Theorem}{Theorem}
 \newtheorem{Lemma}{Lemma}
@@ -54,14 +58,14 @@ $#2$ \end{tcolorbox}}
 \tcbuselibrary{breakable}
 
 
-\newtheorem{theorem}{Theorem}
-\newtheorem{corollary}[theorem]{Corollary}
-\newtheorem{definition}{Definition}
-\newtheorem{lemma}{Lemma}
-\newtheorem{exercise}{Exercise}
-\newtheorem{remark}{Remark}
-\newtheorem{example}{Example}
-\newtheorem{warning}{Warning}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{corollary}[theorem]{Corollary}
+%\newtheorem{definition}{Definition}
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{exercise}{Exercise}
+%\newtheorem{remark}{Remark}
+%\newtheorem{example}{Example}
+%\newtheorem{warning}{Warning}
 \usepackage{subfiles}
 \def\grad{ \mbox{grad}}
 \def\curl{ \mbox{curl}}
@@ -85,9 +89,27 @@ $#2$ \end{tcolorbox}}
 \maketitle
 
 \tableofcontents
-\include{Installation/UserManual}
-\subfile{Tactics/tactics}
 
+ \frontmatter
+\mainmatter
+\chapter{Introduction}
+\include{Installation/UserManual}
+
+%\include{Installation/menus}
+%\include{Installation/examples}
+
+
+\mainmatter
+\chapter{basic proof techniques.}
+\include{prooftech/proof1}
+\include{prooftech/predicate}
+\appendix
+\appendixpage
+\noappendicestocpagenum
+\addappheadtotoc
+
+\include{Tactics/tactics}
+\include{Installation/examples}
 
 \bibliographystyle{plain-annote}
 \bibliography{mybibliography}

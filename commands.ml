@@ -4,6 +4,52 @@ let string_to_utf str =
 	String.map (fun ch -> if (Glib.Utf8.validate (String.make 1  ch)) then ch else '?') str
 
 
+let lines ?encoding (src : [`Channel of in_channel | `String of string]) =
+  let rec loop d buf acc = match Uutf.decode d with
+  | `Uchar u ->
+      begin match Uchar.to_int u with
+      | 0x000A ->
+          let line = Buffer.contents buf in
+          Buffer.clear buf; loop d buf (line :: acc)
+      | _ ->
+          Uutf.Buffer.add_utf_8 buf u; loop d buf acc
+      end
+  | `End -> List.rev (Buffer.contents buf :: acc)
+  | `Malformed _ -> Uutf.Buffer.add_utf_8 buf Uutf.u_rep; loop d buf acc
+  | `Await -> assert false
+  in
+  let nln = `Readline (Uchar.of_int 0x000A) in
+  loop (Uutf.decoder ~nln ?encoding src) (Buffer.create 512) [];;
+
+
+
+let load_file1 f =
+  let ic = open_in f in
+  let n = in_channel_length ic in
+  let s = Bytes.create n in
+ input ic s 0 n;
+
+ let changelist = [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
+                               ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >") ;("∈", "iin");
+                              ("∩", "oint") ;("∪", "ouni"); ( "⊆", "osubs"); ("∅" ,"empty") ;("∁","compl")] in
+  close_in ic;
+  let s1 = (Processinputs.replacelist  s changelist ) in
+
+
+print_string (Glib.Convert.locale_to_utf8 "∈");flush_all ();
+  let slist = Str.split (Str.regexp "") s1 in
+  let valist =List.map (fun a ->print_string a;flush_all (); if (Glib.Utf8.validate a) then a else "?") slist in
+  let ss = String.concat "" valist in
+  print_string (snd  (Glib.Convert.get_charset ()));flush_all ();
+  (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
+  (* String.concat "\n" (lines (`String s)) in
+  if Utf8conv.is_windows1252 ss then
+  (Printf.printf "\n --\n the text is\n %s \n ----" ss;flush_all())
+   else (); *)
+  if (Glib.Utf8.validate ss) then (Processinputs.replacelist ss (List.map (fun x-> (snd x, fst x)) changelist))
+
+else  "did not woek"
+
 let load_file f =
   let ic = open_in f in
   let n = in_channel_length ic in
@@ -13,14 +59,21 @@ let load_file f =
   let s1 = (Processinputs.replacelist  s [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
                                ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >")]) in
 
-  let ss = s1 in(* string_to_utf s1 in *)
+
+  let slist = Str.split (Str.regexp "") s1 in
+  let valist =List.map (fun a ->print_string a;flush_all (); if (Glib.Utf8.validate a) then a else "?") slist in
+  let ss = String.concat "" valist in
+  print_string (snd  (Glib.Convert.get_charset ()));flush_all ();
   (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
   (* String.concat "\n" (lines (`String s)) in
   if Utf8conv.is_windows1252 ss then
   (Printf.printf "\n --\n the text is\n %s \n ----" ss;flush_all())
    else (); *)
-  if (Glib.Utf8.validate ss) then ss
-else "did not woek"
+  if (Glib.Utf8.validate s1) then s1
+
+else  "did not woek"
+
+
 
 let to_str x =
 	match x with

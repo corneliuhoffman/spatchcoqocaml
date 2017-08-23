@@ -10,14 +10,15 @@ let emptygoal ={number="0"; hyps=[];conclusion ={name=""; content="no goals"}; s
 
 
 let print_goal {name=b; content= c} =
-Printf.printf "in str:b=%s acum %s\n" b c;
-let d = try (Formulaparsing.print (Formulaparsing.parse (String.trim c))) with any -> print_string c;flush_all (); raise any in
-Printf.printf "formula %s\n " c; flush_all ();
- if b ="" 
+
+let d = try (Formulaparsing.print (Formulaparsing.parse (String.trim c))) with any -> print_string c;flush_all (); c (* raise any *) in
+
+(* Printf.printf "formula %s\n " (Ast.to_string (Formulaparsing.parse (String.trim c))); flush_all ();
+ *) if b ="" 
   then
     Printf.sprintf "%s "  (String.trim d)
   else
-    Printf.sprintf "%s : %s " (String.trim b) (String.trim d);;
+    Printf.sprintf "<b>%s</b> : %s " (String.trim b) (String.trim d);;
 let print_goals {number=n; hyps=h; conclusion= c; leaving_tactic=l; values = values} = 
   n^"\n--\n"^(String.concat "\n" (List.map print_goal h))^"\n================\n"^(print_goal c)^"\n";;  
 
@@ -31,7 +32,7 @@ else (
   let n, formula = if List.length break =1 then "", str else List.hd break, String.concat ":" (List.tl break)
 in n, formula) in 
  Printf.printf "formula %s\n " formula ; flush_all ();
- let f = try (Formulaparsing.parse formula) with any -> print_string " in astofstr";flush_all (); raise any in
+ let f = try (Formulaparsing.parse formula) with any -> Var formula in
  n,  f
     
 let listofstr str goal =
@@ -61,7 +62,6 @@ let manage li =
     {emptygoal with number =get_texts h;hyps = List.map (fun x-> strToStatement (get_texts x) )(to_list (hyp$$"_")); conclusion = {name =""; content = (cleanstr (get_texts t))}}
   |_ -> {emptygoal with number= "" ;hyps =[]; conclusion ={name=""; content =""}};;
 let goallist x = 
-  print_string (to_string x);
   let goals=to_list (x$$"goals") in
   match goals with
   | [] -> []
@@ -81,6 +81,7 @@ let processoutput x =
 let printmessages x =
   let clean st = Printf.sprintf "%s" "\n"^(Str.global_replace (Str.regexp "<_>") "\n-------\n" st ) in
   let ll =List.map (select "richpp") (to_list (x$$"message")) in 
+
   let newlist=List.map (function a -> List.map (String.concat "") (List.map texts (to_list a))) ll in
   String.concat "\n========================\n" (List.map (function a -> xmltostr (String.concat "\n" a)) newlist);; 
 let get_a_goal li = 

@@ -1,12 +1,12 @@
-\part{ Description of the tactics and hints}
+
 \chapter{Tactics}
 
-\section{This is trivial.}
+\paragraph{\bf This is trivial.}
 
 This will only work on very easy statements. If it works it will solve the current goal. Try to avoid overuse. Do better than your lecturers.
 
 
-\section{I cannot prove this.}
+\paragraph{\bf I cannot prove this.}
 
 If you are stuck this tactic will ``prove'' the current goal. If you use this in a proof at the end if the proof when you try to use Qed you will get the following error
 \mess{``Error:Attempt to save a proof with given up goals. If this is really what
@@ -14,62 +14,54 @@ you want to do, use Admitted in place of Qed.}
 To avoid the error just type Admitted instead of Qed.
 
 
-\section{Prove left hand side.}
+\paragraph{\bf Prove left hand side.}
 Suppose you want to prove the following goal:
-\coq{\cdots\\ 
-===== \\ 
+\coq{\cdots
+}{
 P\lor Q}
 
 The above mentioned tactic will the produce a the following goal
 
-\coq{\cdots\\ 
-===== \\ 
+\coq{ }{
 P}
  and so you will have to now prove a simple goal.
 
-\section{Prove right hand side.}
+\paragraph{\bf Prove right hand side.}
 Symmetric with the above, suppose you want to prove the following goal:
-\coq{\cdots\\ 
-===== \\ 
+\coq{ \cdots }{
 P\lor Q}
 
 The above mentioned tactic will the produce a the following goal
 
-\coq{\cdots\\ 
-===== \\ 
+\coq{ \cdots }{
 Q}
 
 
 
-\section{Prove VAR in the disjunction.}
+\paragraph{\bf Prove VAR in the disjunction.}
 This tactic combines the above two. More precisely,
 suppose you want to prove the following goal:
-\coq{\cdots\\ 
-===== \\ 
+\coq{\cdots}{
 P\lor Q}
 
 Then applying 
 \inp{Prove P in the disjunction.}
 
 will produce the goal 
-\coq{\cdots\\ 
-===== \\ 
-P}
+\coq{\cdots}{P}
 while applying
 \inp{Prove Q in the disjunction.}
 
 will produce the goal 
-\coq{\cdots\\ 
-===== \\ 
+\coq{\cdots}{
 Q}
 
-\section{Eliminate the conjuction in hypothesis VAR.}
+\paragraph{\bf Eliminate the conjuction in hypothesis VAR.}
 
 Suppose your goal looks like
-\coq{\cdots\\ 
+\coq{\cdots
 Hyp: P\land Q\\
-\cdots \\
-===== \\ 
+\cdots }{
 \cdots}
 
 Then applying 
@@ -79,18 +71,16 @@ will produce a goal similar to the one below:
 \coq{\cdots\\ 
 Hyp: P\\
 Hyp0: Q\\
-\cdots\\
-===== \\ 
-\cdots}
+\cdots}{\cdots}
 allowing you to use the parts of Hyp independently.
 
 
-\section{Consider cases based on disjunction in hypothesis VAR.}
+\paragraph{\bf Consider cases based on disjunction in hypothesis VAR.}
 Suppose your goal looks like
 \coq{\cdots\\ 
 Hyp: P\lor Q\\
 \cdots \\
-===== \\ 
+}{
 \cdots}
 Then applying 
 \inp{Consider cases based on disjunction in hypothesis Hyp.}
@@ -98,21 +88,21 @@ will produce two separate goals similar to the one below:
 \coq{\cdots\\ 
 Hyp: P\\
 \cdots \\
-===== \\ 
+}{
 \cdots}
 
 \coq{\cdots\\ 
 Hyp: Q\\
 \cdots \\
-===== \\ 
+}{
 \cdots}
 
 obtaining a proof by cases.
 
-\section{Prove the conjunction in the goal by first proving VAR then VAR.}
+\paragraph{\bf Prove the conjunction in the goal by first proving VAR then VAR.}
 Suppose your goal looks like
 \coq{\cdots\\ 
-===== \\ 
+}{
 P\land Q}
  Then 
  \inp{Prove the conjunction in the goal by first proving P then Q.}
@@ -120,17 +110,17 @@ P\land Q}
  will separate the proof in two different goals
  
  \coq{\cdots\\ 
-===== \\ 
+}{
 P}
 \coq{\cdots\\ 
-===== \\ 
+}{
 Q}
 
  
-\section{Assume VAR then prove VAR.}
+\paragraph{\bf Assume VAR then prove VAR.}
 Suppose your goal looks like
 \coq{\cdots\\ 
-===== \\ 
+}{
 P\rightarrow Q}
 
 then 
@@ -138,17 +128,17 @@ then
 will modify the goal to
 
 \coq{\cdots\\ 
-P\\
-===== \\ 
+P
+}{
 Q}
 
 
 
-\section{Prove both directions of VAR iff VAR.}
+\paragraph{\bf Prove both directions of VAR iff VAR.}
 
 Suppose your goal looks like
-\coq{\cdots\\ 
-===== \\ 
+\coq{\cdots
+}{
 P\leftrightarrow Q}
 
 then 
@@ -156,20 +146,20 @@ then
 will split the goal into two different goals
 
 \coq{\cdots\\ 
-===== \\ 
+}{
 P\rightarrow Q}
 
 \coq{\cdots\\ 
-===== \\ 
+}{
 Q\rightarrow P}
 
 
 
-\section{Fix an arbitrary element VAR.}
+\paragraph{\bf Fix an arbitrary element VAR.}
 
 Suppose your goal looks like
 \coq{\cdots\\ 
-===== \\ 
+}{ 
 \forall x:S, P(x) }
 
 then 
@@ -178,14 +168,14 @@ will modify the goal to
 
 \coq{\cdots\\ 
 a:S\\
-===== \\ 
+}{
 P(a)}
 
-\section{Fix VAR the existentially quantified variable in VAR.}
+\paragraph{\bf Fix VAR the existentially quantified variable in VAR.}
 Suppose your goal looks like
 \coq{\cdots\\ 
 Hyp:\exists x:S, P(x)\\
-===== \\ 
+}{
 \cdots }
 
 then 
@@ -195,15 +185,15 @@ will modify the goal to
 \coq{\cdots\\ 
 a:S\\
 Hyp:P(a)\\
-===== \\ 
+}{
 \cdots}
 
 
-\section{Obtain VAR using variable VAR in the universally quantified hypothesis VAR.}
+\paragraph{\bf Obtain VAR using variable VAR in the universally quantified hypothesis VAR.}
 Suppose your goal looks like
 \coq{\cdots\\ 
 Hyp:\forall x:S, P(x)\\
-===== \\ 
+}{ 
 \cdots }
 
 then 
@@ -212,11 +202,11 @@ then
 
 will attempt to apply the result $P(a)$ to prove the result $Q$.
 
-\section{Prove the existential claim is true for VAR.}
+\paragraph{\bf Prove the existential claim is true for VAR.}
 
 Suppose your goal looks like
 \coq{\cdots\\ 
-===== \\ 
+}{
 \exists x:S, P(x) }
 
 then 
@@ -224,7 +214,7 @@ then
 will modify the goal to
 
 \coq{\cdots\\ 
-===== \\ 
+}{ 
 P(a)}
 
 
@@ -233,7 +223,7 @@ P(a)}
 Suppose your goal looks like
 \coq{\cdots\\ 
 Hyp: x= f\\
-===== \\ 
+}{
  P(x) }
 
 then 
@@ -242,7 +232,7 @@ will replace every occurrence of x in P by f. Similarly if the goal is
 
 \coq{\cdots\\ 
 Hyp: x= f\\
-===== \\ 
+}{ 
  P(f) }
 
 \inp{Rewrite the goal using Hyp.}
@@ -251,7 +241,7 @@ will replace every occurrence of f in P by x.
 Finally if Thm is a theorem whose conclusion includes and equality $x=f$ and if the goal of your theorem looks like
 
 \coq{\cdots\\ 
-===== \\ 
+}{
  P(x) }
  Then 
 \inp{Rewrite the goal using Thm.}
@@ -259,20 +249,20 @@ will replace every occurrence of x in P by f.
 
 
 
-\section{True by arithmetic properties.}
+\paragraph{\bf True by arithmetic properties.}
 
 This tactic will attempt to prove the statement by using the ring properties (commutativity, associativity and distributivity) of the natural, integers or reals. 
 
-\section{Claim VAR by rewriting VAR using VAR.}
+\paragraph{\bf Claim VAR by rewriting VAR using VAR.}
 
 This is very similar to \inp{Rewrite the goal using VAR.}
 
 The idea is that 
 \inp{Claim Q by rewriting Hyp using Thm.}
 
-Will attempt to prove the statement $Q$ by applying the rewritten version of $Hyp$. the rules for $Thm$ are as above.
+Will attempt to prove the statement $Q$ by applying the rewritten version of $Hyp$. The rules for $Thm$ are as above.
 
-\section{Claim VAR.}
+\paragraph{\bf Claim VAR.}
 
 This is forward proof tactic. 
 \inp{Claim P.}
@@ -280,31 +270,31 @@ This is forward proof tactic.
 will introduce a new claim, splitting the goal
 
 \coq{\cdots\\ 
-===== \\ 
+}{
 Q }
 
 into 
 
 \coq{\cdots\\ 
-===== \\ 
+}{
  P }
 and 
 
 \coq{\cdots\\ 
 Hyp:P\\
-===== \\ 
+}{
  Q }
 
 
 
 
 
-\section{Rewrite hypothesis VAR using the definition of VAR.}
+\paragraph{\bf Rewrite hypothesis VAR using the definition of VAR.}
 If the hypothesis Hyp will involve a previous definition d, then
 \inp{Rewrite hypothesis Hyp using the definition of d.}
  will unfold a definition of d inside Hyp.
 
-\section{Apply induction on VAR.}
+\paragraph{\bf Apply induction on VAR.}
 
 This is a rather general tactic. It will generally act as an induction omnibus. More precisely
 
@@ -312,56 +302,56 @@ This is a rather general tactic. It will generally act as an induction omnibus. 
 will depend on the (inductive) type of n. For example if $n$ is a natural number and the goal is
 
 \coq{\cdots\\ 
-===== \\ 
+}{
  P(n) }
  then 
 \inp{Apply induction on n.}
 
 will split the proof into two goals
 \coq{\cdots\\ 
-===== \\ 
+}{
  P(0) }
  
  and 
  
  \coq{\cdots\\ 
  IHn:P(n)\\
-===== \\ 
+}{
  P( S n) }
 On the other hand if $n$ is an integer, the goal
 \coq{\cdots\\ 
-===== \\ 
+}{ 
  P(n) }
 will be split into 3 cases
 
 \coq{\cdots\\ 
-===== \\ 
+}{ 
  P(0) }
  
  \coq{\cdots\\ 
  n:positive
-===== \\ 
+}{
  P(Z.pos\  n) }
  
   \coq{\cdots\\ 
  n:negative
-===== \\ 
+}{ 
  P(Z.neg\  n) }
 
-\section{Rewrite goal using the definition of VAR.}
+\paragraph{\bf Rewrite goal using the definition of VAR.}
 If the goal will involve a previous definition d, then
 \inp{Rewrite goal using the definition of d.}
  will unfold a definition of d inside the conclusion of the goal.
 
 
-\section{obtain VAR applying VAR to VAR}.
+\paragraph{\bf obtain VAR applying VAR to VAR}.
 
-\section{Prove by contradiction.}
+\paragraph{\bf Prove by contradiction.}
 
 Assume the goal is:
 
 \coq{\cdots\\ 
-===== \\ 
+}{
  P }
  
  then  
@@ -369,7 +359,7 @@ Assume the goal is:
  
  \coq{\cdots\\ 
  \neg P\\
-===== \\ 
+}{
  False}
 
 

@@ -99,7 +99,7 @@ let rec print_mytree t = match t with
     |[_;"mrk"] -> true
     |_ -> false )
     		(Array.to_list (Sys.readdir dir)) in
-
+    		List.map print_string list; flush_all ();
     	let strings=List.map (fun text ->
     	let treelist = List.map print_mytree (get_trees (dir^"/"^text)) in 
     	let students =

@@ -15,7 +15,7 @@ let computescores strings lems =
 	 List.map (fun student ->
 		let filteredresults = List.filter (fun x-> Pcre.pmatch ~rex:(Pcre.regexp "Lemma|Proposition|Theorem") x.title) student.results in
 		let scores  =List.map (fun x-> 
-			let thexlemma = List.filter (fun a->  a.name  = x.title) lems in
+			let thexlemma = List.filter (fun a-> print_string x.title;flush_all (); a.name  = x.title) lems in
 			if thexlemma != [] then 
 			let lem = List.hd thexlemma in 
 			lem.score *. (100. -. 
@@ -105,6 +105,7 @@ lemmas:= modifylemmas  score#text penalty#text label#text lemmas
     ) list in
 
 let numberofstr = List.length !strings in
+print_int numberofstr; flush_all ();
 let lems = (Marker.get_lemas !strings) in
 let list =List.map (fun lem -> 
 	let proc  = process lem !strings in 

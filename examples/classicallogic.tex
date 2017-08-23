@@ -29,7 +29,9 @@ $(P:Prop):(not\,(not\,P))\Rightarrow \,P.$
  \end{Lemma}
 
 
- Proof: \begin{subproof}We will assume $Hyp : ¬ ¬ P $ and show $P $.\begin{subproof}Assume that $P $ is false, that is $H : ¬ P $ and prove a contradiction.\begin{subproof}We use the definition of $not$ in $Hyp$ to obtain $Hyp : (P \Rightarrow False) \Rightarrow False $ \begin{subproof}Apply theorem $(Hyp H)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} therefore we have $False $.\end{subproof}.The conclusion $P $ follows by contractiction.\end{subproof} We have now showed that if $Hyp : ¬ ¬ P $ then $P $ a proof of $¬ ¬ P \Rightarrow P $.\end{subproof}\begin{Lemma}[implies2] 
+ Proof: \begin{subproof}We will assume $Hyp : ¬ ¬ P $ and show $P $.\begin{subproof}Assume that $P $ is false, that is $H : ¬ P $ and prove a contradiction.\begin{subproof}We use the definition of $not$ in $Hyp$ to obtain $Hyp : (P \Rightarrow False) \Rightarrow False $ \begin{subproof}Apply theorem $(Hyp H)$ to get $ $.\begin{subproof}This is done\end{subproof}\end{subproof} therefore we have $False $.\end{subproof}.The conclusion $P $ follows by contractiction.\end{subproof} We have now showed that if $Hyp : ¬ ¬ P $ then $P $ a proof of $¬ ¬ P \Rightarrow P $.\end{subproof}
+ 
+ \begin{Lemma}[implies2] 
 $(P\,Q:Prop):(P\Rightarrow Q)\Rightarrow (not\,P\,\lor \,Q).$
  \end{Lemma}
 

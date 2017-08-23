@@ -22,7 +22,7 @@ open Formulaparser
    identifiers. *)
 
 let white = [' ' '\t']+
-let letter = ['a'-'z' 'A'-'Z' '0'-'9' ':' '|' '^' '.'] 
+let letter = ['a'-'z' 'A'-'Z' '0'-'9' ':' '.'] 
 let id = letter+
 let lists = (letter+ white?)*
 (* The final section of the lexer definition defines how to parse a character
@@ -35,7 +35,10 @@ let lists = (letter+ white?)*
 rule read = 
   parse
   | white { read lexbuf }
+  | "S" {SUCC}
   |  "≠" {NE}
+  | "^" {POW}
+  | "|" {DIV}
   | "+"   { PLUS }
   | "-"   { MINUS }
   | "*"   {TIMES}
@@ -43,6 +46,11 @@ rule read =
   | ")"   { RPAREN }
   | "let" { LET }
   | "="   { EQUALS }
+  |"∧" {AND}
+  |"and" {AND}
+  |"∨" {OR}
+  |"or" {OR}
+  |"and" {AND}
   | "<->"   {IFF}
   | "↔"  {IFF}
   | "->"   {IMPLIES}
@@ -54,11 +62,7 @@ rule read =
   |"forall" {FORALL}
   |"∃" {EXISTS}
   |"exists" {EXISTS}
-  |"∧" {AND}
-  |"and" {AND}
-  |"∨" {OR}
-  |"or" {OR}
-  |"and" {AND}
+  | "∅" {EMPTYSET}
   |"∪" {UNION}
   |"∩" {INTERSECTION}
   |"∈" {IN}

@@ -61,6 +61,9 @@ let header ="
 \\newtheorem{Lemma}{Lemma}
 \\newtheorem{Proposition}{Proposition}
 \\newtheorem{Definition}{Definition}
+\\newtheorem{Inductive}{Inductive Definition}
+\\newtheorem{Variable}{Variable}
+\\newtheorem{Notation}{Notation}
 \\newtheorem{Axiom}{Axiom}
  \\usepackage{tcolorbox}
  \\tcbuselibrary{skins}
@@ -76,6 +79,10 @@ let header ="
 \\begin{document}
 \\maketitle\n\n";;
 
+let preplatex str = 
+  changestrings str [ ("∨", "\\lor ");  ("→", "\\Rightarrow "); ("∀", "\\forall "); 
+                               ("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow "); (" +", " "); 
+                               ("∈", "\\in "); ("∩", "\\cap "); ("∪", "\\cup ");("_", "-"); ("⊆", "\\subseteq "); ("∅", "\\emptyset "); ("∁", "\\complement "); ("<b>", ""); ("</b>", "")]
 
 let rec latex (tree:Processresults.goal Treestuff.tree) =
   match tree with
@@ -83,7 +90,7 @@ let rec latex (tree:Processresults.goal Treestuff.tree) =
     if x = Processresults.emptygoal then  "This is done"
     else (
       if not (x.leaving_tactic = "") then  x.leaving_tactic 
-      else "\\red{THIS STILL NEEDS A PROOF}")
+      else "{\\color{red} THIS STILL NEEDS A PROOF}")
   |TREE (x, li)-> 
     let leave = (x.leaving_tactic^"\n") in
     let nohyps = change "@newhyp" leave (List.map (fun a -> 
@@ -96,7 +103,8 @@ let rec latex (tree:Processresults.goal Treestuff.tree) =
     let novals = change "@val" nonewcon (Array.to_list x.values) in
     let uncleaned = String.trim (change "@latex" novals (List.map (fun a -> "\\begin{subproof}"^(latex a)^"\\end{subproof}" ) li)) in
     (changestrings uncleaned [ ("∨", "\\lor ");  ("→", "\\Rightarrow "); ("∀", "\\forall "); 
-                               ("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow "); (" +", " ")])
+                               ("∃", "\\exists ");  ("∧", "\\land "); ("↔", "\\Leftrightarrow "); (" +", " "); 
+                               ("∈", "\\in "); ("∩", "\\cap "); ("∪", "\\cup ");("_", "-"); ("⊆", "\\subseteq "); ("∅", "\\emptyset "); ("∁", "\\complement "); ("<b>", ""); ("</b>", "")])
 
 
 

@@ -22,8 +22,10 @@ open Ast
 %token <string> ID
 %token SPACE
 %token PLUS
+%token DIV
 %token MINUS
 %token TIMES
+%token POW
 %token LPAREN
 %token RPAREN
 %token IMPLIES
@@ -36,8 +38,9 @@ open Ast
 %token IN 
 %token COMPLEMENT 
 %token SETMINUS
+%token EMPTYSET
+%token SUCC
 
-%token EMPTY
 %token EXISTS
 %token FORALL
 %token NOT
@@ -60,29 +63,41 @@ open Ast
    
    Because PLUS has higher precedence than IN, "let x=1 in x+2" will
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
-%left SPACE
 
-%nonassoc EXISTS
-%nonassoc FORALL
-%nonassoc EQUALS
+
+%nonassoc LIST
+%nonassoc EMPTYSET
 %nonassoc NE
 %left COMMA
 %right IMPLIES
 %right IFF
 %right OR
 %right AND
-%right  UNION
-%right  INTERSECTION
-%right  IN 
+%nonassoc EXISTS
+%nonassoc FORALL
+%nonassoc EQUALS
+
+
+
+
+%nonassoc NOT
+%nonassoc IN
 %right  SUBSET 
+%right  INTERSECTION
+%right  UNION
+
+
 
 %nonassoc COMPLEMENT 
-%nonassoc EMPTY
-%nonassoc NOT
+
+%right DIV
 %right PLUS
 %right MINUS
 %right SETMINUS
 %right TIMES
+%nonassoc SUCC
+%right POW
+
 
 
 (* After declaring associativity and precedence, we need to declare what
@@ -106,10 +121,14 @@ prog:
           
 
   
-expr:
+expr: 
+  |EMPTYSET; { EmptySet }
   | x = ID { Var x }
+  | e=expr; POW; f=expr {Pow(e,f)}
+  | SUCC; e= expr {Succ(e)}
   | e1= expr; IMPLIES; e2 = expr { Implies(e1,e2) }
   | e1= expr; IFF; e2 = expr { Iff(e1,e2) }
+  | e1=expr; DIV; e2 = expr {Div(e1, e2)} 
   | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
   | e1 = expr; MINUS; e2 = expr { Minus(e1,e2) }
   | e1 = expr; SETMINUS; e2 = expr { Setminus(e1,e2) }
@@ -117,10 +136,11 @@ expr:
   | e1 = expr; AND; e2 = expr { And(e1,e2) }
   | e1 = expr; OR; e2 = expr { Or(e1,e2) }
   | e1 = expr; UNION; e2 = expr { Union(e1,e2) }
+   | e1 = expr; UNION; e2 = expr ; e3 =expr { List([Union(e1,e2); e3]) }
   | e1 = expr; INTERSECTION; e2 = expr {Intersection(e1,e2) }
   | COMPLEMENT; e=expr {Complement(e)}
   | e1=expr; SUBSET; e2=expr {Subset(e1, e2)} 
-  | EMPTY; {Empty}
+  
   | e1= expr; EQUALS; e2=expr {Equals(e1, e2)}
   | e1= expr; NE; e2=expr {Not(Equals(e1, e2))}
 
@@ -133,7 +153,7 @@ expr:
   | FORALL; e1 = expr; COMMA; e3=expr {Forall(List([e1]) , e3)}
 
   | e1 = expr; IN; e2 = expr { In(e1,e2) }
-  | LPAREN; e = expr; RPAREN {e} 
+  | LPAREN; e = expr; RPAREN {(e)} 
   | a =expr; b =expr { List ([ a; b]) }
   ;
 
