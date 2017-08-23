@@ -1,0 +1,542 @@
+\epigraph{Nothing goes over my head. My reflexes are too fast, I would catch it.}{ Drax.}
+
+\section{Motivational Speeches}
+We start the book with a  few sections on Mathematical logic. This is usually a hard thing to grasp at the first sight so we hope that enough exercise with it will help the reader become confident in it.
+One of the issues is the fact the English language is more nuanced than mathematical logic. To exemplify this we will choose a common   internet meme\footnote{My son Luca showed it to me.}. 
+
+The phrase
+``I never said she stole my money.'' has 7 different meanings depending on the emphasis. For example ``{\bf I } never said she stole my money'' means that perhaps somebody else said it, ``I never said {\bf she} stole my money'' means that I said that somebody else stole it  while ``I never said she stole my {\bf money}.'' means that perhaps she stole something else.
+
+ Mathematical logic is a lot more precise than that. Every statement has to be either true or false. Nuances have no place in this. You have to formulate statements in such a way that there is only one interpretation.
+
+
+
+\section{Propositional Calculus}
+
+A lot of concepts in Mathematics (and CS) rely on the notion of a proposition. We will consider that an elementary notion.
+
+\begin{Definition}
+A proposition  is a declarative sentence which is either true or false but not both.
+\end{Definition}
+
+This seems like an rather pompous definition but it is very important for what follows. here are some examples of propositions:
+\begin{itemize}
+\item Earth is a planet.
+\item $2+2=5$
+\item $\forall x \in \mathbb{R}, x^2 \ge 0$
+\item Men are mortal.
+\end{itemize}
+
+However, the day to day language is much richer than mere logic. We can give  many examples of sentences that are not propositions. 
+
+\begin{itemize}
+
+\item What time is it?
+\item  We are better off today than 3 years ago.
+\item $x+3>5$
+\item It will rain tomorrow.
+
+\end{itemize}
+
+  \subsection{Connectors and Inference Rules}
+Just like other mathematical concepts, there is a ``calculus'' for dealing with  propositions. Some versions of this date back to Aristotle but they have been slightly modified thorough the ages. There are five connectors (operators) on the set of propositions. There are: and ($\land$), or ($\lor$),  implication ($\rightarrow$) and negation( $\neg$) and iff ($\leftrightarrow$). The first three are so called ``binary operators'', that is they combine two propositions into one and the third one is a ``unary operation''  much like minus is for numbers. Most of these notions will seem familiar to you, our approach will however be a little bit more formal. 
+
+Each connector has two rules, an introduction and an elimination rule. We will also describe them using the standard logic notation. More precisely, the notation
+$$\infer[name]{Q}{P}$$
+means that the inference rule ``name'' allows you to infer Q from P.
+
+ 
+\rmk{
+In brief, the introduction rule of a connector tells you what to do in order to prove a propositions involving the connector.}
+ 
+\rmk{
+The elimination rule of a connector tells you how to use a hypothesis involving the connector to prove other things.
+ }
+
+ We will list these bellow. Note that those connectors will be used later in Predicate calculus and there we will be able to give many more examples.
+\paragraph{\bf Implication}
+if $P$ and $Q$ are two propositions then the Implication, denoted by $P\rightarrow Q$ is a proposition that is only false if  $P$ is true and $Q$ is false. 
+
+\begin{itemize}
+\item ``If it rains then you need your umbrella'' can be written as (``It rains'')$\rightarrow$(``you need your umbrella'').
+
+\end{itemize}
+This is the most counterintuitive of all connectors. Note that if the proposition $P$ is false then $P\rightarrow Q$ is automatically true regardless of the truth value of $Q$.
+
+Let us describe the implication introduction rule.  In order to prove the statement $P\rightarrow Q$ we  assume $P$ and try to prove $Q$. In usual logic notation we have:
+
+\infer{P\rightarrow Q}{%
+    \infer*{Q}{P}
+}
+
+The equivalent SpatchCoq tactic is ``Assume P then prove Q.''
+
+
+The corresponding elimination rule is sometimes called ``modus ponens''. If you have the hypothesis $H:P\rightarrow Q$ and the hypothesis $H1:P$ then you can show $Q$. In logical notation
+$$\infer{Q}{P\rightarrow Q & P}$$
+
+In SpatchCoq we use the tactic ``Apply result (H H1)'' or ``Apply result H1.'' followed by ``Apply result H.''
+
+
+
+To fix the details we will prove one example, the famous Aristotelian syllogism 
+
+Socrates is a Man.
+
+All men are mortal.
+
+Therefore Socrates is mortal.
+
+We will be somewhat abusive using 3 propositions {\bf Socrates, Man, Mortal}. We will redo this more carefully in Section~\ref{sec:predicatecalculus}.
+
+We have two Axioms, 
+$$\mbox{A1 :  \bf Socrates} \rightarrow \mbox{\bf Man}.$$
+$$\mbox{A2: \bf  Man} \rightarrow \mbox{\bf Mortal}.$$
+
+And we need to show that $$\mbox{\bf Socrates} \rightarrow \mbox{\bf Mortal}.$$
+
+To do that we need to use Implication introduction, that is we need to assume {\bf Socrates} and try to prove {\bf Mortal}. 
+
+Since we know  A1 and {\bf Socrates}, implication elimination tells us that we have {\bf Man}. 
+
+Similarly since we know A2 and {\bf Man}, implication elimination gives you {\bf Mortal}, which is what we needed to prove.
+
+The corresponding argument in SpatchCoq goes as follows. We first set up the three variables:
+
+\inp{Variables Socrates Man Mortal :Prop.}
+
+And then list the two axioms
+
+\inp{Axiom A1 :  Socrates -> Man.}
+\inp{Axiom A2 : Man -> Mortal.}
+
+And finally type
+\inp{Lemma soc: Socrates->Mortal.}
+
+To get
+\coq{ }{Socrates \rightarrow Mortal}
+
+Next we use
+\inp{Assume Socrates then prove Mortal.}
+
+to get
+
+\coq{Hyp:Socrates}{Mortal}
+
+We can now go two ways. 
+
+The first one is a ``forward proof'', very much like the text above, use:
+
+\inp{Obtain Man applying A1 to Hyp.}
+to get
+\coq{Hyp:Socrates\\ H:Man}{Mortal}
+and then 
+\inp{Apply result (A2 H).}
+to finish the proof.
+
+The second method is a ``backward proof'', this is a method preferred by Coq and therefore by SpatchCoq.
+
+ \inp{Apply result A2.}
+ 
+ to get
+\coq{Hyp:Socrates}{Man}
+
+This is equivalent to the above. What we mean is that using A2, we now only need to show Man.
+
+Now we do
+ \inp{Apply result A1.}
+ 
+ to get
+ 
+ \coq{Hyp:Socrates}{Socrates}
+ which follows by assumption, that is
+ \inp{This follows from assumptions.}
+ 
+ 
+ Of course this is such a simple example that one can do directly 
+ \inp{Apply result (A2 (A1 Hyp)).}
+ 
+ 
+\begin{tcolorbox}[colback=red!5!white,colframe=black]
+This might be the place to notice that implication elimination behaves much like a function application in standard mathematics. If you know $H:P\rightarrow Q$  and you know $H1:P$ then $(H H1)$ is a proof for Q. 
+
+Moreover, the labels of the hypotheses are not mere labels. They are objects of the same type as the respective hypothesis. They can be viewed as witnesses for the truth of the respective propositions. Moreover, if we finish our proof with Qed then the name of Lemma itself becomes a witness for its proof.
+
+ 
+ \end{tcolorbox}
+Indeed try
+\inp{Lemma soc: Socrates->Mortal.\\
+Assume Socrates then prove Mortal.\\
+Apply result (A2 (A1 Hyp)).\\
+Qed.\\
+Print soc.}
+
+to get 
+
+\texttt{
+soc =$ \lambda$ Hyp : Socrates, A2 (A1 Hyp) \\
+     : Socrates $\rightarrow$ Mortal}
+ Which signifies that soc is a function  that takes the witness Hyp of the truth of Socrates and produces a witness A2 (A1 Hyp) of the truth of Mortal.
+ We will return to types later.
+
+
+
+\paragraph{\bf Conjunction}
+if $P$ and $Q$ are two propositions then their conjunction, denoted by $P\land Q$ is a proposition that is only true if both $P$ and $Q$ are true. here are some examples.
+
+\begin{itemize}
+\item ``She is both intelligent and hard working'' can be written as (``She is intelligent'')$\land$(``She is hard working'').
+\item $0<4<5$ can be written as $(0<4)\land (4<5)$.
+\end{itemize}
+
+
+The conjunction introduction says that in order to prove $P\land Q$, you need to prove both $P$ and $Q$. In logic notation we have
+$$\infer{P\land Q}{P & Q}$$
+In SpatchCoq the tactic we use is ``Prove the conjunction in the goal by first proving P then Q.''
+
+The Conjunction elimination consists of  two separate rules,
+$$\infer{P}{P\land Q} \mbox{and} \infer{Q}{P\land Q}$$ To be more precise, if you know $H:P\land Q$ then you can deduce $H1:P$ and $H2:Q$. The corresponding SpatchCoq tactic is ``Eliminate the conjuction in hypothesis H.''
+
+To exemplify this, we shall prove the commutativity of conjunction.
+If $P,Q$ are propositions, then $P\land Q \rightarrow Q \land P$. To do so, we use, as above the implication introduction, so we assume that $P\land Q$ holds and show that $Q\land P$. 
+
+Now we will employ to imply the conjunction elimination. Since we know that $P\land Q$ holds, we also know that $P$ holds and that $Q$ holds. by Conjunction introduction we have that $Q\land P$ holds.
+
+The formal proof in SpatchCoq is a bit more elaborate. We start with the Lemma:
+\inp{Lemma ancomm(P Q:Prop) : $P\land Q -> Q \land P$.} 
+
+to get \coq{P Q:Prop}{P\land Q \rightarrow Q \land P}
+
+We then use
+\inp{Assume ($P \land Q$) then prove ($Q \land P$).}
+
+to get
+\coq{P Q:Prop \\ Hyp : P \land Q}{Q \land P}
+
+We know use
+\inp{Eliminate the conjuction in hypothesis Hyp.}
+To get
+\coq{P Q:Prop \\ Hyp0 : P\\ Hyp1:Q}{Q \land P}
+
+Now we use 
+
+\inp{Prove the conjunction in the goal by first proving Q then P.}
+
+To get two goals
+\coq{P Q:Prop \\ Hyp0 : P\\ Hyp1:Q}{Q }
+
+and
+
+\coq{P Q:Prop \\ Hyp0 : P\\ Hyp1:Q}{P}
+
+which can each be solved by
+
+\inp{This follows from assumptions.}
+
+
+
+
+
+
+
+\paragraph{\bf Disjunction}
+ if $P$ and $Q$ are two propositions then their Disjunction, denoted by $P\lor Q$ is a proposition that is only false if both $P$ and $Q$ are false. That is it is true if either $P$ or $Q$ or both are true.  Note that in SpatchCoq you can enter this by either clicking on the symbol or by typing $\forwardslash/$. Here are some examples:
+
+\begin{itemize}
+\item ``He is either at work or on his way home'' can be written as (``He is  at work'')$\lor$(``He is on his way home'').
+\item $0\le 4$ can be  written as $(0<4)\lor (0=4)$ 
+\end{itemize}
+Note that, unlike in nature language, the connector $\lor$ is not an ``exclusive or''. The proposition $P\lor Q$ is true in the case both $P$ and $Q$ are true.
+
+The disjunction introduction consists of two different rules. In order to prove $P\/Q$ you can either prove the left hand side or the right hand side.  tHe logical expressions are
+$$\infer[left]{P\lor Q}{P} \mbox{ and } \infer[right]{P\lor Q}{Q}.$$
+
+In SpatchCoq we have thee tactics: ``Prove left hand side.'', ``Prove right hand side.'' and 
+``Prove * in the disjunction.''
+
+Disjunction elimination is a bit harder to describe but it is a very natural method of ``case by case'' analysis. If you know $H: P\lor Q$ and you  want to prove $R$ then you need to prove $R$ in case $P$ holds as well as in case $Q$ holds.
+$$\infer{R}{P\lor Q &\infer{R}{P} & \infer{R}{Q}}$$
+
+In SpatchCoq the tactic is: ``Consider cases based on disjunction in hypothesis H.''
+
+We now give a detailed proof of the commutativity of disjunction:
+$$P\lor ->Q\lor P.$$ 
+
+Of course we first assume $P\lor Q$ happens and show $Q \lor P$. To do so we need to argue by cases using Disjunction elimination.
+
+Case 1: P holds. In this case we will prove the right hand side of the disjunction in the goal.This is an assumption and by disjunction intro we are done.
+
+Case 2: Q holds. In this case we will prove the left hand side of the disjunction in the goal. This is an assumption  and by disjunction intro we are done.
+
+Here is the spatchcoq version
+
+\inp{
+Lemma ancomm$(P\ Q:Prop):P\lor Q ->Q\lor P.$\\
+Assume $(P \lor Q)$ then prove $(Q \lor P)$.\\
+Consider cases based on disjunction in hypothesis Hyp.}
+
+at this point, there are two goals generated.
+
+\coq{P\ Q:Prop\\ Hyp0:P}{P\lor Q}
+\coq{P \ Q:Prop\\ Hyp1:Q}{P\lor Q}
+
+These are easily eliminated by
+
+\inp{
+Prove right hand side.\\
+This follows from assumptions.}
+respectively 
+\inp{
+Prove left hand side.\\
+This follows from assumptions.}
+
+
+\paragraph{\bf Negation}
+if $P$ is a proposition then its Negationtion, denoted by $\neg P$ is a proposition that is  false if  $P$ is true and true if $P$ is false. Note that in SpatchCoq this can be typed by clicking on the symbol or by writing not.
+
+\begin{itemize}
+\item ``It is not raining'' can be written as $\neg$(`` It rains'').
+\item $0\le 4$ can be  written as $\neg (0>4)$ 
+
+The negation introduction's logic statement is
+$$\infer{\neg P}{\infer{False}{P}}.$$
+In other words, the negation of $P$ is the same thing as $P\rightarrow False$. This is an important statement to make and, indeed in SpatchCoq in order to deal with negation you will need to use ``Rewrite goal using the definition of not.'' respectively ``Rewrite hypothesis	H using the definition of not.''. To give an example we shall prove 
+$$P \rightarrow \neg \neg P$$
+We of course first assume $P$ and then prove $\neg \neg P$. To do this we first note that this is the same thing as $(P->False)->False$ and so we assume $P->False$ and try to show $False$. Since now we know $P->False$ and $P$, we can use implication elimination to get False.
+
+
+
+
+The proof in Spatchcoq is identical:
+
+\inp{Lemma notnot$(P:Prop):P \rightarrow \neg \neg P.$\\
+Assume P then prove (not (not P)).\\
+Rewrite goal using the definition of not.\\
+Assume $(P \rightarrow False)$ then prove False.\\
+Apply result (Hyp0 Hyp).}
+
+\end{itemize}
+
+
+\paragraph{\bf If and only if}
+
+If $p$ and $Q$ are propositions then $P\leftrightarrow Q$ is the same as $(P\leftarrow Q) \land (Q\leftarrow P)$. In spatchCoq we use the tactic
+
+``Prove both directions of P iff Q.''  as introduction rule in order to prove $P\leftrightarrow Q$ and the same tactic ``Eliminate the conjuction in hypothesis Hyp.'' to eliminate the hypothesis $Hyp: P<->Q$.
+
+
+
+ 
+
+
+
+\subsection{A puzzle}
+
+We will now use a puzzle to give a more serious example	 of propositional calculus, its inference rules and their implementation in SpatchCoq. 
+
+The puzzle, ``the lady or the Tiger'' comes from the book  ``The Lady Or the Tiger?: And Other Logic Puzzles'' by Raymond M. Smullyan. It is slightly adapted for the 21st century.
+
+A  prisoner is offered the choice between two doors. Behind each door he could find either the key to his freedom or a very hungry tiger.
+
+ \begin{itemize}
+
+ \item The clue on the first door reads ``the key to your freedom  is in this room and the tiger in the other''.
+ \item The clue on the second door reads ``one of the rooms contains  the key to your freedom and the other room the tiger.''
+  \item He knows that one of the two clues is correct and the other is incorrect.
+ \end{itemize}
+
+What would you do in his place?
+
+We will formalise the questions as follows: We will denote by P the proposition  ``the first room contains the key to freedom'' and by Q the proposition ``the second room contains the key to freedom''. Of course $\neg P$ means ``the first room contains the tiger'' and  $\neg Q$ means ``the second room contains the tiger''.
+
+The clue on the first door is ``the key to your freedom  is in this room and the tiger in the other'' which can be written as $$D1:P\land \neg Q$$.
+
+The second door clue is ``one of the rooms contains  the key to your freedom and the other room the tiger.'' which can be rewritten as ``{\bf either} the first room has the key and the second the tiger {\bf or} the first room has the tiger and the second the key'' so we can write it as:
+ $$D2 : (P\land \neg Q) \lor (\neg P \land Q).$$ 
+ 
+ The fact that exactly one clue is correct and the other is incorrect can be written as ``{\bf either} the first door is correct and the second incorrect {\bf or} the first door is incorrect and the second is correct''. This can be written as $(D1 \land \neg D2 )\lor (\neg D1 \land D2)$ which expands to $$((P\land \neg Q)\land \neg ((P\land \neg Q) \lor (\neg P \land Q)))\lor (\neg(P\land \neg Q) \land ((P\land \neg Q) \lor (\neg P \land Q))).$$ 
+
+This looks horrible. We will however show that the second room has the key, that is Q.
+
+
+For example, the statement we want to prove is 
+$$(D1 \land \neg D2 )\lor (\neg D1 \land D2)\rightarrow Q.$$ 
+We can set-up SpatchCoq with
+
+\inp{Variables P Q:Prop.}
+
+to define the two propositions $P$ and $Q$.
+Then define 
+
+\inp{Definition D1:= $P \land not Q.$}
+
+\inp{Definition  D2:= $( \neg P \land Q)\lor(P \neg Q)$.}
+\inp{Definition onlyone:= $(D1 \land \neg D2)\lor(\neg D1 \land D2)$.}
+\inp{Lemma a: onlyone  $\rightarrow Q.$}
+
+After applying the tactic 
+\inp{Assume onlyone then prove Q.} we get
+
+\coq{Hyp: online}{Q}
+We now use the tactic that we used for not:
+\inp{Rewrite hypothesis Hyp  using the definition of onlyone.}
+to get
+
+\coq {Hyp: (D1 \land (not \ D2)) \lor ((not\ D1) \land D2)}{Q}
+
+We now use 
+\inp{Consider cases based on disjunction in hypothesis Hyp .}
+to get two new goals
+
+\coq {Hyp0:D1 \land (not\ D2)}{Q}
+
+and
+
+
+\coq {Hyp1:not\ D1 \land  D2}{Q}
+
+
+\inp{Eliminate the conjuction in hypothesis Hyp0.\\
+Rewrite hypothesis Hyp1  using the definition of D2.\\
+Rewrite hypothesis Hyp  using the definition of D1.
+}
+
+brings us to
+
+\coq{Hyp:(P \land (not\ Q))\\
+Hyp1: not\ (((not\ P) \land Q) \lor (P \land (not\ Q)))}{Q}
+
+we will now use the proof by contradiction (see \ref{sec:proofbycontradiction})
+\inp{
+Prove by contradiction.}
+
+to get
+
+\coq{Hyp:(P \land (not\ Q))\\
+Hyp1: not\ (((not\ P) \land Q) \lor (P \land (not\ Q)))\\ H:not\ Q}{False}
+
+We note that Hyp1 is of type (not X) that is (X->False) and so we can apply it (as in the backward proof mentioned above)
+
+\inp{Apply result Hyp1} 
+gives
+
+
+\coq{Hyp:(P \land (not\ Q))\\
+Hyp1: not\ (((not\ P) \land Q) \lor (P \land (not\ Q)))\\
+H : not\ Q}{((not\ P) \land Q) \lor (P \land (not\ Q))}
+
+Now we note that Hyp is exactly the right hand side of the disjunction so we can use.
+
+\inp{Prove right hand side.\\
+This follows from assumptions.}
+
+to finish up this part of the proof.
+
+we are now left with
+
+\coq {Hyp1:not\ D1 \land  D2}{Q}
+
+and, as above we do
+\inp{Eliminate the conjuction in hypothesis Hyp1.\\
+Rewrite hypothesis Hyp  using the definition of D1.\\
+Rewrite hypothesis Hyp0  using the definition of D2.}
+
+to get:
+\coq{Hyp:not\ (P \land (not\ Q))\\
+Hyp0:(((not\ P) \land Q) \lor (P \land (not\ Q)))\\
+}{Q}
+
+Since Hyp0 is a disjunction we do
+\inp{Consider cases based on disjunction in hypothesis Hyp0 .}
+
+To get again a case by case analysis.
+
+\coq{Hyp:not\ (P \land (not\ Q))\\
+Hyp1:(not\ P) \land Q\\
+}{Q}
+
+and
+
+\coq{Hyp:not\ (P \land (not\ Q))\\
+Hyp2:P \land (not\ Q)\\
+}{Q}
+
+In the first case we use
+
+\inp{Eliminate the conjuction in hypothesis Hyp1 .\\
+This follows from assumptions.}
+
+and in the second we prove by contradiction
+
+\inp{Prove by contradiction.\\
+Apply result (Hyp Hyp2).\\
+Qed.}
+
+\subsection{Constructive vs Classical}
+
+Classical logic includes a certain axiom that the romans called ``tertium non datur'' or ``the excluded middle''. This Axiom states that of $P$ is a proposition then $P\lor \neg P$ always hold. At the beginning of the 20th century a number of mathematicians started debating the need for such an axiom. They came to be collectively called intuitionists. The trouble with that position is that it takes away from the power of this axiom without necessarily offering something in return. The things you are able to prove are much more restrictive. As a consequence classical logic carried the day.
+
+However at the end of the century, as Theoretical Computer Science started to gain strength and depth, excluding the excluded middled carried another promise: computability. Via the Curry-Howard correspondence, a ``constructive proof'' (i.e. one without the rule of excluded middle) is equivalent to the construction of a function. In particular, the familiar ``proof by contradiction'' relies on a variant of the excluded middle, namely the fact that the statements $P$ and $\neg \neg P$ are equivalent. We have seen that $P \leftarrow \neg \neg P$ above but the other implication relies on classical logic.
+
+Seem ``constructivists'' argue that a proof of $P$ should be a witness to its truth and not merely to the falsity of its negation (as it is the case with $\neg \neg P$. This carries quite a bit of weight in the CS world even if not (yet) so much in the Mathematical world.
+
+We are not ready to abandon the path of classicism and will assume excluded middle for now. We would however, try to eliminate needlessly using proofs ``by contradiction''.
+ 
+ \paragraph{\bf Exercises}
+ \begin{enumerate}
+ \item[assume] $P \rightarrow P$.
+ \item[left]$ P \rightarrow P\lor Q$.
+  \item[distr] $P\land (Q\lor R) \rightarrow P\land Q)\lor (P\land R).$
+  \item [contrap]$ (P\rightarrow Q) \rightarrow (\neg Q \rightarrow \neg P)$
+  \item[implies] $(P\rightarrow Q)\rightarrow (\neg\,P\,\lor \,Q).$
+\item[deMorgan] $\neg\,(P\lor Q)\rightarrow (\neg\,P\,\land \neg\,Q).$
+
+  
+ \item[impand] $((P \rightarrow Q) \land (P \rightarrow R)) \leftrightarrow (P \rightarrow (Q\land R))$
+\item[impor] $((P \rightarrow Q) \lor (P \rightarrow R)) \leftrightarrow (P \rightarrow (Q\lor R))$
+\item[andimp] $(P\rightarrow(Q\rightarrow R)) \leftrightarrow ((P\land Q) \rightarrow R)$.
+\item[andorimp] $((P \rightarrow R) \land (Q \rightarrow R)) \leftrightarrow ((P \lor Q) \rightarrow R)$
+\item[orandimp] $((P \rightarrow R) \lor (Q \rightarrow R)) \leftrightarrow ((P \land Q) \rightarrow R)$
+\item[twoone] $(P \lor Q) \land \neg  P \rightarrow Q$
+\item[twotwo] $\neg Q \land (P \rightarrow Q) \rightarrow  \neg P$
+\item[twothree] $ C \land (A \rightarrow B) \land (C \rightarrow ( A \rightarrow \neg B)) \rightarrow \neg A$
+\item[twofour] $ (P \lor  Q) \land (\neg P \lor R) \rightarrow Q \lor R$.
+
+\item  What can you deduce from the following statements?
+\begin{enumerate}
+\item All babies are illogical.
+\item Nobody is despised who can manage a crocodile.
+\item Illogical persons are despised.
+\end{enumerate}
+
+
+
+\item What can you deduce from the following statements?
+\begin{enumerate}
+\item No ducks waltz.
+\item No officers ever decline to waltz.
+\item All my poultry are ducks.
+\end{enumerate}
+
+
+
+
+\item What can you deduce from the following statements?
+\begin{enumerate}
+\item Things sold in the street are of no great value.
+\item Nothing but rubbish can be had for a song.
+\item Eggs of the Great Auk are very valuable.
+\item It is only what is sold in the street that is really rubbish.
+
+\end{enumerate}
+\item What can you deduce from the following statements?
+\begin{enumerate}
+\item All writers, who understand human nature, are clever.
+\item No one is a true poet unless he can stir the hearts of men.
+\item Shakespeare wrote ``Hamlet''.
+\item No writer, who does not understand human nature, can stir the hearts of men.
+\item None but a true poet could have written ``Hamlet''.
+
+\end{enumerate}
+
+\end{enumerate}
