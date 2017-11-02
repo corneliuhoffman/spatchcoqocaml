@@ -48,7 +48,7 @@ let rec getmessages ic oc l =
     let x = if isWin () then   repeatreading ic oc  else stringReadFromCoq oc () in
     
    
-    if x!="" then try newparse x with _ -> (print_string "ha\n"; sgoal ic oc ()) else (print_string "tooo\n"; sgoal ic oc ()) in
+    if x!="" then try newparse x with _ -> ((* print_string "ha\n";  *)sgoal ic oc ()) else ((* print_string "tooo\n"; *) sgoal ic oc ()) in
   let b = sgoal ic oc () in 
   
   if (l!= [] && (to_string b) = (to_string (List.hd l) )) then (  l) else  ( getmessages ic oc (b::l));;
@@ -57,7 +57,7 @@ let rec getmessages ic oc l =
 
 let rec mygoal ic oc str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
   let x = if isWin () then repeatreading ic oc  else stringReadFromCoq oc () in
-  if str = x then x else ( print_string "ho";flush_all(); mygoal ic oc x);;
+  if str = x then x else ( (* print_string "ho";flush_all(); *) mygoal ic oc x);;
 
 let rec soupgoal ic oc () = 
   let x = mygoal ic oc "" in
@@ -83,26 +83,26 @@ let movebackto ic i = Printf.fprintf ic "%s" ("<call val=\"Edit_at\"><state_id v
 
 
 let rec findstateid ic oc id = match (attribute "val" ((soupstatus ic oc  ()) $ "state_id")) with
-    Some x -> if int_of_string x >= int_of_string id then x else findstateid ic oc id
-  |_ -> findstateid ic oc id;;
-let rec fstid ic oc id = try (findstateid ic oc id) with any ->  fstid ic oc id;;
+    Some x -> if int_of_string x >= int_of_string id then (Printf.printf "found it %s\n" x;flush_all ();  x) else (Printf.printf "still sameid";flush_all (); findstateid ic oc id)
+  |_ -> Printf.printf "none in findstateid";flush_all (); findstateid ic oc id;;
+let rec fstid ic oc id = try (findstateid ic oc id) with any -> Printf.printf "noneinfstid";flush_all (); fstid ic oc id;;
 let rec reallyread ic oc id check =
   let mes = getmessages ic oc [] in
   
   let messages =String.concat "\n\n" (List.map Processresults.printmessages mes) in
-  Printf.printf "theread:%s" messages;
+   
   let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
 
   let newid =  fstid ic oc id in
-  if check then (Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages; 
+  if check then ((* Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages;  *)
 
 mes)
   else 
   let c=  int_of_string newid > int_of_string id || error >= 0 || check in
-  if c then (Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages; 
+  if c then ((* Printf.printf "old id = %s, newid= %s worked\n %s \n " id newid messages;  *)
 
 mes)
-  else (Printf.printf  "old id = %s, newid= %s tried again\n %s\n" id newid messages;flush_all (); reallyread ic oc id check )
+  else ((* Printf.printf  "old id = %s, newid= %s tried again\n %s\n" id newid messages;flush_all (); *) reallyread ic oc id check )
     
 
   

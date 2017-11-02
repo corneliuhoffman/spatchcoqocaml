@@ -28,7 +28,7 @@ open Ast
 %token POW
 %token LPAREN
 %token RPAREN
-%token IMPLIES
+
 %token COMMA
 %token <string> LIST
 %token AND
@@ -44,7 +44,7 @@ open Ast
 %token EXISTS
 %token FORALL
 %token NOT
-%token LET
+%token IMPLIES
 %token EQUALS
 %token SUBSET
 
@@ -65,30 +65,40 @@ open Ast
    parse as "let x=1 in (x+2)" and not as "(let x=1 in x)+2". *)
 
 
+
+
+
+
+
+
+
+
+
 %nonassoc LIST
 %nonassoc EMPTYSET
 %nonassoc NE
 %left COMMA
-%right IMPLIES
-%right IFF
+%right below_INTERSECTION1  
+
+%nonassoc IMPLIES
 %right OR
 %right AND
+%nonassoc EQUALS
 %nonassoc EXISTS
 %nonassoc FORALL
-%nonassoc EQUALS
-
-
-
 
 %nonassoc NOT
-%nonassoc IN
-%right  SUBSET 
-%right  INTERSECTION
-%right  UNION
+%right below_INTERSECTION  
 
+%right  SUBSET 
+
+%nonassoc IN
+%right INTERSECTION UNION
 
 
 %nonassoc COMPLEMENT 
+
+
 
 %right DIV
 %right PLUS
@@ -97,6 +107,7 @@ open Ast
 %right TIMES
 %nonassoc SUCC
 %right POW
+%right IFF
 
 
 
@@ -123,10 +134,13 @@ prog:
   
 expr: 
   |EMPTYSET; { EmptySet }
-  | x = ID { Var x }
+
+
+  
+
   | e=expr; POW; f=expr {Pow(e,f)}
   | SUCC; e= expr {Succ(e)}
-  | e1= expr; IMPLIES; e2 = expr { Implies(e1,e2) }
+  
   | e1= expr; IFF; e2 = expr { Iff(e1,e2) }
   | e1=expr; DIV; e2 = expr {Div(e1, e2)} 
   | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
@@ -136,7 +150,7 @@ expr:
   | e1 = expr; AND; e2 = expr { And(e1,e2) }
   | e1 = expr; OR; e2 = expr { Or(e1,e2) }
   | e1 = expr; UNION; e2 = expr { Union(e1,e2) }
-   | e1 = expr; UNION; e2 = expr ; e3 =expr { List([Union(e1,e2); e3]) }
+   
   | e1 = expr; INTERSECTION; e2 = expr {Intersection(e1,e2) }
   | COMPLEMENT; e=expr {Complement(e)}
   | e1=expr; SUBSET; e2=expr {Subset(e1, e2)} 
@@ -145,16 +159,21 @@ expr:
   | e1= expr; NE; e2=expr {Not(Equals(e1, e2))}
 
   | NOT; e=expr {Not(e)}
-  | EXISTS; e1 = expr; COMMA; e3=expr {Exists(List([e1]) , e3)}
-
-  | EXISTS; e1 = expr; e2=expr; COMMA; e3=expr {Exists(List([e1; e2]) , e3)}
-
-  | FORALL; e1 = expr; e2=expr; COMMA; e3=expr {Forall(List([e1; e2]) , e3)}
-  | FORALL; e1 = expr; COMMA; e3=expr {Forall(List([e1]) , e3)}
+  | EXISTS; e1 = expr; COMMA; e3=expr {Exists(e1 , e3)}
+  | FORALL; e1 = expr; COMMA; e3=expr {Forall(e1 , e3)}
+  | e1= expr; IMPLIES; e2 = expr { Implies(e1,e2) }
+  | e1 = expr; UNION; e2 = expr ; b = ID { List([Union(e1,e2); Var b]) }
+  | e1 = expr; INTERSECTION; e2 = expr ; b = ID { List([Intersection(e1,e2); Var b]) }
 
   | e1 = expr; IN; e2 = expr { In(e1,e2) }
   | LPAREN; e = expr; RPAREN {(e)} 
-  | a =expr; b =expr { List ([ a; b]) }
+  | e1= expr; IMPLIES; e2 = expr; b=ID %prec below_INTERSECTION1 { Implies(e1,(List([e2; Var b]))) }
+  |func {$1};
+
+
+func:
+  | a =func; b = ID  %prec below_INTERSECTION { List ([ a; Var b]) }
+  | x = ID { Var x }
   ;
 
 

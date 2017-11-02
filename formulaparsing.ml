@@ -6,6 +6,7 @@ open Ast
 (* Parse a string into an ast *)
 let parse s =
   let lexbuf = Lexing.from_string s in
+ 
   let ast = Formulaparser.prog Formulalexer.read lexbuf in
   ast
 
@@ -107,8 +108,11 @@ let rec print x = match x with
 
   |Exists(e1 , e2) -> "∃ "^(print e1)^", "^(print e2)
   |Forall(e1 , e2) -> "∀ "^(print e1)^", "^(print e2)
-  |List(e1::e2) -> (print e1)^" "^(String.concat " " (List.map print e2))
-  
+  |List(e1::e2) -> (* match e1 with Var x  -> *) (print e1)^" "^(String.concat " " (List.map print e2))
+  (* | List( _ )  -> (print e1)^" "^(String.concat " " (List.map print e2))
+ 
+  | _-> "("^(print e1)^") "^(String.concat " " (List.map print e2))
+   *)
 (* prints a formula *)
 let rec getlist x = 
 

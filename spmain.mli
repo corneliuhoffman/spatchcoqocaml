@@ -1,12 +1,9 @@
 val listofcommands : string list list 
 val id : string ref
 val oldid : string ref
-type mainthing = {
-  mutable state_id : string;
-  mutable goals : Processresults.goal list;
-  mutable leaving_tactic : string;
-  mutable values : string array;
-}
+val listoftrees: Processresults.goal Treestuff.tree list ref
+val current_tree:Processresults.goal Treestuff.tree ref
+val current_head:Processresults.goal ref
 val coqstr : string ref
 val checkforcoq : unit -> unit
 val oc : in_channel

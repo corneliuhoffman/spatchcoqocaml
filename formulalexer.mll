@@ -44,7 +44,6 @@ rule read =
   | "*"   {TIMES}
   | "("   { LPAREN }
   | ")"   { RPAREN }
-  | "let" { LET }
   | "="   { EQUALS }
   |"∧" {AND}
   |"and" {AND}
