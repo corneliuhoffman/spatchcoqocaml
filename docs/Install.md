@@ -21,6 +21,10 @@ Now install the packages.
     opam install sexplib
     opam install ppx_deriving
     opam install ppx_sexp_conv
+    opam install ppx_deriving
+    opam intall netclient
+    opam install ppx_sexp_conv
+    opam install js_of_ocaml
     
 
 ## Compile spatchcoq
