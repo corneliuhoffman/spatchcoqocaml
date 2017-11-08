@@ -27,6 +27,7 @@ Now install the packages.
     opam install ppx_sexp_conv
     opam install ppx_deriving
     opam intall netclient
+     opam intall menhir
     opam install ppx_sexp_conv
     opam install js_of_ocaml
     
@@ -41,5 +42,5 @@ To compile spatchcoq:
 
 or shorter:
     
-    ocamlbuild -use-ocamlfind 'spmain.native'
+    ocamlbuild -use-ocamlfind -use-menhir 'spmain.native'
     mv spmain.native spatchcoq
