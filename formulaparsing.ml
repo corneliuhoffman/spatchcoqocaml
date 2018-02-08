@@ -156,9 +156,10 @@ print_string (string_of_bool goal);
   
 |Equals(a, b) -> if goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"Claim VAR by rewriting "^(med name)^" using VAR."]
   |_->  if  goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"This is trivial."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions."]
+;;
 
-
-
+print_string (Ast.to_string (parse "∀  n  :  nat,  n  ≠  0"));;
+flush_all ()
 
 
       
