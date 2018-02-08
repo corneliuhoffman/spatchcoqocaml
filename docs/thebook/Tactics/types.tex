@@ -1,0 +1,51 @@
+\chapter{Sets vs types}\label{chap:setsvstypes}
+
+
+This is a rather subtle section. It deals with a primitive notion in Automated Theorem Provers, the concept of type. Reading through the book you might have wondered about the occurrence of things like this:
+
+\coq{P:Prop\\ Q:Prop\\ H:P->Q}{\cdots}
+
+The notation seems to be similar for $P:Prop$ and for $Hyp:P->Q$.
+
+Let us try some experiments. We first define some varibale, P and Q witll be propositions and h ``will be` in $P\rightarrow Q$''
+
+\inp{Variable P Prop. Variable Q:Prop.\\Variable h:P->Q.}
+
+Now let us check them, 
+\inp{Check P.\\
+Check (P->Q)}
+
+Nor surprises there, we get $P:Prop$ and ``$P \rightarrow Q : Prop$''
+Now try
+\inp{Check h.}
+
+The result is ``$h
+     : P \rightarrow Q$''. 
+
+ For much of the book one can look at the notation $a:U$ as a SpatchCoq version of $a\in U$. This is not quite correct. In fact $a:U$ denotes the statement ``a is of type U''. In particular, the notation $Hyp:P\rightarrow Q$ and $P:Prop$ have the same kind of meaning. The first one means that Hyp is an object of the type $P\rightarrow Q$ i.e a witness of a proof of $P->Q$ while the second means that $P$ is an object of type $Prop$.
+
+The point is that types are primitive objects in Coq (hence in SpatchCoq) and, more importantly, 
+
+{\bf \Large Types are not Sets!}
+
+In Coq (and SpatchCoq) every object has a unique type. For example, 0 cannot represent both the natural number zero and the integer zero. The two objects are different and you need a conversion between them. try for example:
+\inp{Check 0.}
+\inp{Check 0\%Z.}
+
+
+
+
+Now consider the following:
+
+\inp{Check Type.}
+
+you get ``Type: Type''!!!!! What does that even mean? It seems that Type is of type Type, surely this must be some sort of Russell paradox.
+
+This is in some sense, the crux of the matter. Modern type theory evolved out of an attempt, 
+by Russell himself, to resolve the paradoxes of Set Theory. This was surpassed in popularity by the ZF Axiomatic Set Theory and waited, half forgotten, for Computer Scientists to rediscover it. The type system of Coq(and SpatchCoq) is based 
+
+In fact, the notation ``$Type : Type$'' is a small notational abuse. It really means that $Type_{0} : Type_{1}$ or, more generally $Type_{n} : Type_{n+1}$. This is exactly how Russell imagined types,  as an infinite series. At the bottom there are sets, that is types like nat or $\mathbb{Z}$ or bool or nat->nat. They are themselves types of type Set. The next layer is made of Set itself which of type Type$(_{0})$ is the type Prop. $Typ_{0}$ is itself an objrct which is of type $Type_{1}$ and so on. Note for example:
+
+\inp{Check Type:Type} which produces:
+$Type : Type
+     : Type$.

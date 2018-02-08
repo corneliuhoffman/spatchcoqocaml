@@ -1,13 +1,14 @@
+\chapter{Basic proof techniques.}\label{chap:Basicproof}
 \epigraph{Nothing goes over my head. My reflexes are too fast, I would catch it.}{ Drax.}
 
 \section{Motivational Speeches}
-We start the book with a  few sections on Mathematical logic. This is usually a hard thing to grasp at the first sight so we hope that enough exercise with it will help the reader become confident in it.
+We start the book with a  few sections on Mathematical logic. This is usually a hard thing to grasp at the first sight so we hope to give enough examples to help the reader.
 One of the issues is the fact the English language is more nuanced than mathematical logic. To exemplify this we will choose a common   internet meme\footnote{My son Luca showed it to me.}. 
 
 The phrase
 ``I never said she stole my money.'' has 7 different meanings depending on the emphasis. For example ``{\bf I } never said she stole my money'' means that perhaps somebody else said it, ``I never said {\bf she} stole my money'' means that I said that somebody else stole it  while ``I never said she stole my {\bf money}.'' means that perhaps she stole something else.
 
- Mathematical logic is a lot more precise than that. Every statement has to be either true or false. Nuances have no place in this. You have to formulate statements in such a way that there is only one interpretation.
+ Mathematical logic is a lot more precise than that. Every statement has to be either true or false. Nuances have no place in this. You have to formulate statements in such a way that there is only one interpretation. However, as we will see later, there are some subtleties about the meaning of negation.
 
 
 
@@ -16,7 +17,7 @@ The phrase
 A lot of concepts in Mathematics (and CS) rely on the notion of a proposition. We will consider that an elementary notion.
 
 \begin{Definition}
-A proposition  is a declarative sentence which is either true or false but not both.
+A proposition is a sentence which is either true or false but not both.
 \end{Definition}
 
 This seems like an rather pompous definition but it is very important for what follows. here are some examples of propositions:
@@ -38,12 +39,88 @@ However, the day to day language is much richer than mere logic. We can give  ma
 
 \end{itemize}
 
-  \subsection{Connectors and Inference Rules}
-Just like other mathematical concepts, there is a ``calculus'' for dealing with  propositions. Some versions of this date back to Aristotle but they have been slightly modified thorough the ages. There are five connectors (operators) on the set of propositions. There are: and ($\land$), or ($\lor$),  implication ($\rightarrow$) and negation( $\neg$) and iff ($\leftrightarrow$). The first three are so called ``binary operators'', that is they combine two propositions into one and the third one is a ``unary operation''  much like minus is for numbers. Most of these notions will seem familiar to you, our approach will however be a little bit more formal. 
+  \subsection{Connectors}
+Just like other mathematical concepts, there is a ``calculus'' for dealing with  propositions. Some versions of this date back to Aristotle but they have been slightly modified thorough the ages. There are five connectors (operators) on the set of propositions. There are: and ($\land$), or ($\lor$),  implication ($\rightarrow$),   iff ($\leftrightarrow$) and  negation( $\neg$). The first four are so called ``binary operators'', that is they combine two propositions into one and the last one is a ``unary operation''  much like minus is for numbers. Most of these notions will seem familiar to you, our approach will however be a little bit more formal. Note also that the symbols are not indempendent, one can express some of the symbols using the others.
 
+\paragraph{\bf Conjunction}
+If $P$ and $Q$ are two propositions then their conjunction, denoted by $P\land Q$ is a proposition that is only true if both $P$ and $Q$ are true. We can write the Truth table bellow:
+
+$$\begin{array}{|c|c|c|}\hline P & Q & P\land Q \\\hline T & T & T \\\hline T & F & F \\\hline F & T & F \\\hline F & F & F\\ \hline\end{array}$$
+here are some examples.
+
+\begin{itemize}
+\item ``She is both intelligent and hard working'' can be written as (``She is intelligent'')$\land$(``She is hard working'').
+\item $0<4<5$ can be written as $(0<4)\land (4<5)$.
+\end{itemize}
+
+\paragraph{\bf Disjunction}
+ if $P$ and $Q$ are two propositions then their disjunction, denoted by $P\lor Q$ is a proposition that is only false if both $P$ and $Q$ are false. That is it is true if either $P$ or $Q$ or both are true.  Note that in SpatchCoq you can enter this by either clicking on the symbol or by typing \textbackslash /.
+ 
+ The corresponding truth table is: 
+ $$\begin{array}{|c|c|c|}\hline P & Q & P\lor Q \\\hline T & T & T \\\hline T & F & T \\\hline F & T & T \\\hline F & F & F\\ \hline\end{array}$$
+ 
+ Here are some examples:
+
+\begin{itemize}
+\item ``He is either at work or on his way home'' can be written as (``He is  at work'')$\lor$(``He is on his way home'').
+\item $0\le 4$ can be  written as $(0<4)\lor (0=4)$ 
+\end{itemize}
+Note that, unlike in nature language, the connector $\lor$ is not an ``exclusive or''. The proposition $P\lor Q$ is true in the case both $P$ and $Q$ are true.
+
+
+\paragraph{\bf Implication} If $P$ and $Q$ are two propositions then  $P\rightarrow Q$  (reads P implies Q) is a proposition that is only false if  $P$ is true and $Q$ is false. In other words, we can produce the following ``Truth Table'':
+$$\begin{array}{|c|c|c|}\hline P & Q & P\rightarrow Q \\\hline T & T & T \\\hline T & F & F \\\hline F & T & T \\\hline F & F & T\\ \hline\end{array}$$
+
+\begin{itemize}
+\item ``If it rains then you need your umbrella'' can be written as (``It rains'')$\rightarrow$(``you need your umbrella'').
+
+\end{itemize}
+This is the most counterintuitive of all connectors. Note that if the proposition $P$ is false then $P\rightarrow Q$ is automatically true regardless of the truth value of $Q$.
+
+\paragraph{\bf Negation}
+if $P$ is a proposition then its negation, denoted by $\neg P$  is a proposition that is  false if  $P$ is true and true if $P$ is false. Note that in SpatchCoq this can be typed by clicking on the symbol or by writing not.
+The truth table is very simple:
+$$\begin{array}{|c|c|}\hline P & \neg P\\\hline T & F \\\hline F & T\\ \hline\end{array}$$
+
+
+
+\begin{itemize}
+\item ``It is not raining'' can be written as $\neg$(`` It rains'').
+\item $0\le 4$ can be  written as $\neg (0>4)$ 
+
+
+
+\paragraph{\bf If and only if}
+
+If $P$ and $Q$ are propositions then $P\leftrightarrow Q$ is the same as $(P\rightarrow Q) \land (Q\rightarrow P)$. It means that the two propositions have the exact same truth Value. The truth table is:
+
+$$\begin{array}{|c|c|c|}\hline P & Q & P\leftrightarrow Q \\\hline T & T & T \\\hline T & F & F \\\hline F & T & F \\\hline F & F & T\\ \hline\end{array}$$
+
+
+As you saw in the definition of $\leftrightarrow$, the various connectors are not independent. For example note the following truth tables:
+
+$$\begin{array}{|c|c|c|c|c|}\hline P & Q & P\rightarrow Q & \neg P & (\neg P)\lor Q \\ \hline T & T & T &F &T\\\hline T & F & F &F &F \\\hline F & T & T &T &T \\\hline F & F & T &T&T\\ \hline\end{array}$$
+
+
+$$\begin{array}{|c|c|c|}\hline P & \neg P & \neg (\neg P) \\\hline T & F & T \\\hline F & T & F \\\hline\end{array}$$
+
+$$\begin{array}{|c|c|c|c|c|c|c|}\hline P & Q & \neg P & \neg Q & P\lor Q & \neg ( P \lor Q) & (\neg P)\land \neg Q \\ \hline T & T & F &F & T & F & F \\\hline T & F & F &T & T &F & F \\\hline F & T & T & F & T & F & F \\\hline F & F & T &T&F& T & T\\ \hline\end{array}$$
+
+
+Two composed propositions that have the exact truth values regardless of the values of their components are called equivalent. In other words the statement $P \rightarrow Q$ is equivalent to $\neg P \lor Q$, the propositiont $P$ is equivalent to  $\neg \neg P$ and  $ \neg ( P \lor Q)$ is equivalent to proposition $(\neg P)\land \neg Q $.
+
+A proposition that is equivalent to the proposition True (i.e one that is True regardless of the value of its components) is called a tautology. For example, if $P$ and $Q$ are equivalent then $(\neg P) \lor Q$ is a tautology. In particular  $$ ( P \lor Q) \lor (\neg P\land \neg Q)$$ is a tautology. 
+
+\subsection{Translation between english and propositional calculus}
+
+\subsection{Inference rules}
+
+Of course any argument in propositional logic can be solved with a truth table. However this is quite tedious and hard to extend to more general notions. We prefer to use methods of proof called "inference rules".
 Each connector has two rules, an introduction and an elimination rule. We will also describe them using the standard logic notation. More precisely, the notation
 $$\infer[name]{Q}{P}$$
 means that the inference rule ``name'' allows you to infer Q from P.
+
+
 
  
 \rmk{
@@ -53,33 +130,30 @@ In brief, the introduction rule of a connector tells you what to do in order to 
 The elimination rule of a connector tells you how to use a hypothesis involving the connector to prove other things.
  }
 
- We will list these bellow. Note that those connectors will be used later in Predicate calculus and there we will be able to give many more examples.
-\paragraph{\bf Implication}
-if $P$ and $Q$ are two propositions then the Implication, denoted by $P\rightarrow Q$ is a proposition that is only false if  $P$ is true and $Q$ is false. 
+ We will list these in the next section. Note that those connectors will be used later in Predicate calculus and there we will be able to give many more examples. We will also take this opportunity to introduce some of SpatchCoq's tactics.
 
-\begin{itemize}
-\item ``If it rains then you need your umbrella'' can be written as (``It rains'')$\rightarrow$(``you need your umbrella'').
+\paragraph{\bf Forward proofs, backward proofs and implication rules}
 
-\end{itemize}
-This is the most counterintuitive of all connectors. Note that if the proposition $P$ is false then $P\rightarrow Q$ is automatically true regardless of the truth value of $Q$.
+Let us describe the {\bf implication introduction rule}.  In order to prove the statement $P\rightarrow Q$ we  assume $P$ and try to prove $Q$. In usual logic notation we have:
 
-Let us describe the implication introduction rule.  In order to prove the statement $P\rightarrow Q$ we  assume $P$ and try to prove $Q$. In usual logic notation we have:
-
-\infer{P\rightarrow Q}{%
+$$\infer{P\rightarrow Q}{%
     \infer*{Q}{P}
-}
+}$$
 
 The equivalent SpatchCoq tactic is ``Assume P then prove Q.''
 
 
-The corresponding elimination rule is sometimes called ``modus ponens''. If you have the hypothesis $H:P\rightarrow Q$ and the hypothesis $H1:P$ then you can show $Q$. In logical notation
+The {\bf implication elimination rule} is sometimes called ``modus ponens''. If you have the hypothesis $H:P\rightarrow Q$ and the hypothesis $H1:P$ then you can show $Q$. In logical notation
+
 $$\infer{Q}{P\rightarrow Q & P}$$
 
 In SpatchCoq we use the tactic ``Apply result (H H1)'' or ``Apply result H1.'' followed by ``Apply result H.''
 
 
 
-To fix the details we will prove one example, the famous Aristotelian syllogism 
+Most of the rpoofs you have seen written in textbooks are written in a style called ``direct proof''. Suppose you have a set of hypotheses and you want to prove a conclusion. You then start from the hypotheses and prove a series of intermediate results that then get added to you hypotheses until you can prove the conclusion. Most of the time in practice however the way you arrive to a proof is using a method called ``backward proof''. 
+
+To fix the details we will prove one example, the famous Aristotelian syllogism:
 
 Socrates is a Man.
 
@@ -95,11 +169,17 @@ $$\mbox{A2: \bf  Man} \rightarrow \mbox{\bf Mortal}.$$
 
 And we need to show that $$\mbox{\bf Socrates} \rightarrow \mbox{\bf Mortal}.$$
 
+
+
 To do that we need to use Implication introduction, that is we need to assume {\bf Socrates} and try to prove {\bf Mortal}. 
 
-Since we know  A1 and {\bf Socrates}, implication elimination tells us that we have {\bf Man}. 
+ We start by giving a ``foward proof'' of this. Since we know  A1 and {\bf Socrates}, implication elimination tells us that we have {\bf Man}. Similarly since we know A2 and {\bf Man}, implication elimination gives you {\bf Mortal}, which is what we needed to prove.
 
-Similarly since we know A2 and {\bf Man}, implication elimination gives you {\bf Mortal}, which is what we needed to prove.
+We could have argued backwardly as follows: Since we know A2, by implication elimination, in order to prove {\bf Mortal} it is enough to prove {\bf Man}. Similarly from A1 in order to prove {\bf Man} it is enough to prove {\bf Socrates} which we already have as a hypothesis.
+
+In more complicated proofs one often combines the two methods.
+
+
 
 The corresponding argument in SpatchCoq goes as follows. We first set up the three variables:
 
@@ -131,7 +211,8 @@ The first one is a ``forward proof'', very much like the text above, use:
 to get
 \coq{Hyp:Socrates\\ H:Man}{Mortal}
 and then 
-\inp{Apply result (A2 H).}
+\inp{Obtain Mortal applying A2 to H.}
+and \inp{This follows from assumptions.}
 to finish the proof.
 
 The second method is a ``backward proof'', this is a method preferred by Coq and therefore by SpatchCoq.
@@ -181,15 +262,9 @@ soc =$ \lambda$ Hyp : Socrates, A2 (A1 Hyp) \\
 
 
 
-\paragraph{\bf Conjunction}
-if $P$ and $Q$ are two propositions then their conjunction, denoted by $P\land Q$ is a proposition that is only true if both $P$ and $Q$ are true. here are some examples.
-
-\begin{itemize}
-\item ``She is both intelligent and hard working'' can be written as (``She is intelligent'')$\land$(``She is hard working'').
-\item $0<4<5$ can be written as $(0<4)\land (4<5)$.
-\end{itemize}
 
 
+\paragraph{bf Inference rules for conjunction}
 The conjunction introduction says that in order to prove $P\land Q$, you need to prove both $P$ and $Q$. In logic notation we have
 $$\infer{P\land Q}{P & Q}$$
 In SpatchCoq the tactic we use is ``Prove the conjunction in the goal by first proving P then Q.''
@@ -237,16 +312,7 @@ which can each be solved by
 
 
 
-
-
-\paragraph{\bf Disjunction}
- if $P$ and $Q$ are two propositions then their Disjunction, denoted by $P\lor Q$ is a proposition that is only false if both $P$ and $Q$ are false. That is it is true if either $P$ or $Q$ or both are true.  Note that in SpatchCoq you can enter this by either clicking on the symbol or by typing $\forwardslash/$. Here are some examples:
-
-\begin{itemize}
-\item ``He is either at work or on his way home'' can be written as (``He is  at work'')$\lor$(``He is on his way home'').
-\item $0\le 4$ can be  written as $(0<4)\lor (0=4)$ 
-\end{itemize}
-Note that, unlike in nature language, the connector $\lor$ is not an ``exclusive or''. The proposition $P\lor Q$ is true in the case both $P$ and $Q$ are true.
+\paragraph{Inference rules for disjunction}
 
 The disjunction introduction consists of two different rules. In order to prove $P\/Q$ you can either prove the left hand side or the right hand side.  tHe logical expressions are
 $$\infer[left]{P\lor Q}{P} \mbox{ and } \infer[right]{P\lor Q}{Q}.$$
@@ -260,7 +326,7 @@ $$\infer{R}{P\lor Q &\infer{R}{P} & \infer{R}{Q}}$$
 In SpatchCoq the tactic is: ``Consider cases based on disjunction in hypothesis H.''
 
 We now give a detailed proof of the commutativity of disjunction:
-$$P\lor ->Q\lor P.$$ 
+$$P\lor Q \rightarrow Q\lor P.$$ 
 
 Of course we first assume $P\lor Q$ happens and show $Q \lor P$. To do so we need to argue by cases using Disjunction elimination.
 
@@ -291,13 +357,8 @@ Prove left hand side.\\
 This follows from assumptions.}
 
 
-\paragraph{\bf Negation}
-if $P$ is a proposition then its Negationtion, denoted by $\neg P$ is a proposition that is  false if  $P$ is true and true if $P$ is false. Note that in SpatchCoq this can be typed by clicking on the symbol or by writing not.
 
-\begin{itemize}
-\item ``It is not raining'' can be written as $\neg$(`` It rains'').
-\item $0\le 4$ can be  written as $\neg (0>4)$ 
-
+\paragraph{Inference rules for negation}
 The negation introduction's logic statement is
 $$\infer{\neg P}{\infer{False}{P}}.$$
 In other words, the negation of $P$ is the same thing as $P\rightarrow False$. This is an important statement to make and, indeed in SpatchCoq in order to deal with negation you will need to use ``Rewrite goal using the definition of not.'' respectively ``Rewrite hypothesis	H using the definition of not.''. To give an example we shall prove 
@@ -317,18 +378,152 @@ Apply result (Hyp0 Hyp).}
 
 \end{itemize}
 
+\paragraph{Inference rules for equivalence}
 
-\paragraph{\bf If and only if}
+We will not inisist here because $P\leftrightarrow Q$ is the same as $P\rightarrow Q \land Q\rightarrow P$ and so the inference rules are derivative. In particular
+ in spatchCoq we use  tactic :
+ 
+``Prove both directions of P iff Q.''  
 
-If $p$ and $Q$ are propositions then $P\leftrightarrow Q$ is the same as $(P\leftarrow Q) \land (Q\leftarrow P)$. In spatchCoq we use the tactic
+as introduction rule in order to prove $P\leftrightarrow Q$ and the  tactic 
 
-``Prove both directions of P iff Q.''  as introduction rule in order to prove $P\leftrightarrow Q$ and the same tactic ``Eliminate the conjuction in hypothesis Hyp.'' to eliminate the hypothesis $Hyp: P<->Q$.
+
+``Eliminate the conjuction in hypothesis Hyp.'' 
+
+
+to eliminate the hypothesis $Hyp: P\leftrightarrow Q$.
 
 
 
  
 
 
+
+
+
+\subsection{Constructive vs Classical}\label{subs:Constructive vs Classical}
+
+Classical logic includes a certain axiom that the romans called ``tertium non datur'' or ``the excluded middle''. This Axiom states that of $P$ is a proposition then $P\lor \neg P$ always hold. At the beginning of the 20th century a number of mathematicians started debating the need for such an axiom. They came to be collectively called intuitionists. The trouble with that position is that it takes away from the power of this axiom without necessarily offering something in return. The things you are able to prove are much more restrictive. As a consequence classical logic carried the day.
+
+However at the end of the century, as Theoretical Computer Science started to gain strength and depth, excluding the excluded middled carried another promise: computability. Via the Curry-Howard correspondence, a ``constructive proof'' (i.e. one without the rule of excluded middle) is equivalent to the construction of a function. In particular, the familiar ``proof by contradiction'' relies on a variant of the excluded middle, namely the fact that the statements $P$ and $\neg \neg P$ are equivalent. We have seen that $P \leftarrow \neg \neg P$ above but the other implication relies on classical logic.
+
+Some ``constructivists'' argue that a proof of $P$ should be a witness to its truth and not merely to the falsity of its negation (as it is the case with $\neg \neg P$. This carries quite a bit of weight in the CS world even if not (yet) so much in the Mathematical world.
+
+One of the main methods of "classical logic" is the so called "proof by contradiction". In brief, if you want to prove $P$ then you assume that $P$ is false and then prove a contradiction. The SpatchCoq tactic 
+"Prove by contradiction." will transform the statement
+
+\coq{\cdots}{P}
+
+into 
+\coq{\cdots\\ H: \neg P}{False}
+
+
+As an example of proof by contradiction, consider $P$ a proposition and $\neg \neg P$ its double negation. Are these two statements equivalent? We have proved above one of the implications. The converse, however is a bit stranger and requires a proof by contradiction.
+
+\inp{
+Lemma oneway (P:Prop): $\neg \neg P\rightarrow P.$\\
+Assume (not (not P)) then prove P.}
+
+
+at this point we have 
+
+\coq{ P:Prop\\
+Hyp:not  (not  P)\\
+}{P}
+
+so we will employ 
+\inp{
+Prove by contradiction.}
+
+to get
+\coq{ P:Prop\\
+Hyp:not  (not  P)\\
+H:not P
+}{False}
+ The rest is quite standard.
+\inp{
+Apply result Hyp .\\
+This follows from assumptions.}
+
+We are not ready to abandon the path of classicism and will assume excluded middle for now. We would however, try to eliminate needlessly using proofs ``by contradiction''.
+This is a good point to look at the axiom "classic". If we apply
+\inp{Check classic.}
+
+we get the resulst $$classic
+    : \forall  P : Prop, P \lor \neg P$$
+
+
+Therefore, while not an actual independent tactic, applying
+
+"Apply result classic."
+will solve any goal that looks like
+
+$$P \lor \neg P.$$
+
+For example let us prove that 
+\inp{Lemma a (P Q:Prop): $(P\rightarrow  Q) \rightarrow (\neg P \lor Q)$.
+}
+
+We of course first use implication intros by applyiong
+\inp{Assume $(P \rightarrow Q)$ then prove $((\neg P) \lor Q)$.}
+
+and get:
+
+\coq{P Q:Prop\\Hyp: P\rightarrow Q}{\neg P \lor Q}
+
+At which point we are stuck without any obvious new possibility to advance. We note however that if P was true then we could use Hyp to obtain Q and if $\neg P$ is true then we would have the disjunction automatically. Thefore we do
+
+ 
+
+\inp{Claim ($P \lor \neg P$).\\
+Apply result classic.}
+
+To have
+\coq{P Q:Prop\\Hyp: P\rightarrow Q\\ H:P \lor \neg P.}{\neg P \lor Q}
+
+
+
+We now do a proof by cases that offers no surprises.
+
+
+
+\inp{Consider cases based on disjunction in hypothesis H .
+Prove right hand side.\\
+Apply result Hyp .\\
+This follows from assumptions.\\
+Prove left hand side.\\
+This follows from assumptions.}
+
+
+Note that the converse is quite easier only requiring  a proof by contradiction.
+
+\inp{Lemma b $(P Q:Prop): (not P \lor  Q)\rightarrow (P\rightarrow Q).$\\
+Assume $((not P) \lor Q)$ then prove$ (P \rightarrow  Q).$\\
+Assume P then prove Q.\\
+Consider cases based on disjunction in hypothesis Hyp .\\
+Prove by contradiction.\\
+Apply result Hyp1.\\
+This follows from assumptions.\\
+This follows from assumptions.}
+
+
+See \ref{sec:drinker} for a rather surprising example of classical logic.
+
+\subsection{Know thine fallacies}
+
+Consider the usual modus ponens rule. 
+\infer{P}{\begin{array}{l}Q\\ P \rightarrow Q \end{array}}
+
+Small variations can make this false.
+ Consider for example the following argument from Mounty Python and the Holly Grail.
+ 
+ 
+ 
+ \infer{\mbox{ It is Tusday }}{\begin{array}{l}\mbox{If it is Tuesday then I play poker }\\ \mbox{I play poker}\end{array}}
+ 
+ 
+ 
+ This is one of the most common "formal" fallacy. It is called "Affirming the consequence". Recall that if $P$ is false then $P\rightarrow Q$ is automatically true if $P$ is false and so the deduction above does not hold. It is, however, remarkably prevalent in public discourse especially in adverx
 
 \subsection{A puzzle}
 
@@ -368,16 +563,16 @@ We can set-up SpatchCoq with
 to define the two propositions $P$ and $Q$.
 Then define 
 
-\inp{Definition D1:= $P \land not Q.$}
+\inp{Definition D1:= $P \land \neg Q.$}
 
-\inp{Definition  D2:= $( \neg P \land Q)\lor(P \neg Q)$.}
+\inp{Definition  D2:= $( \neg P \land Q)\lor(P \land \neg Q)$.}
 \inp{Definition onlyone:= $(D1 \land \neg D2)\lor(\neg D1 \land D2)$.}
 \inp{Lemma a: onlyone  $\rightarrow Q.$}
 
 After applying the tactic 
 \inp{Assume onlyone then prove Q.} we get
 
-\coq{Hyp: online}{Q}
+\coq{Hyp: onlyone}{Q}
 We now use the tactic that we used for not:
 \inp{Rewrite hypothesis Hyp  using the definition of onlyone.}
 to get
@@ -415,7 +610,7 @@ to get
 \coq{Hyp:(P \land (not\ Q))\\
 Hyp1: not\ (((not\ P) \land Q) \lor (P \land (not\ Q)))\\ H:not\ Q}{False}
 
-We note that Hyp1 is of type (not X) that is (X->False) and so we can apply it (as in the backward proof mentioned above)
+We note that Hyp1 is of type (not X) that is (X$\rightarrow$False) and so we can apply it (as in the backward proof mentioned above)
 
 \inp{Apply result Hyp1} 
 gives
@@ -472,16 +667,6 @@ and in the second we prove by contradiction
 Apply result (Hyp Hyp2).\\
 Qed.}
 
-\subsection{Constructive vs Classical}
-
-Classical logic includes a certain axiom that the romans called ``tertium non datur'' or ``the excluded middle''. This Axiom states that of $P$ is a proposition then $P\lor \neg P$ always hold. At the beginning of the 20th century a number of mathematicians started debating the need for such an axiom. They came to be collectively called intuitionists. The trouble with that position is that it takes away from the power of this axiom without necessarily offering something in return. The things you are able to prove are much more restrictive. As a consequence classical logic carried the day.
-
-However at the end of the century, as Theoretical Computer Science started to gain strength and depth, excluding the excluded middled carried another promise: computability. Via the Curry-Howard correspondence, a ``constructive proof'' (i.e. one without the rule of excluded middle) is equivalent to the construction of a function. In particular, the familiar ``proof by contradiction'' relies on a variant of the excluded middle, namely the fact that the statements $P$ and $\neg \neg P$ are equivalent. We have seen that $P \leftarrow \neg \neg P$ above but the other implication relies on classical logic.
-
-Seem ``constructivists'' argue that a proof of $P$ should be a witness to its truth and not merely to the falsity of its negation (as it is the case with $\neg \neg P$. This carries quite a bit of weight in the CS world even if not (yet) so much in the Mathematical world.
-
-We are not ready to abandon the path of classicism and will assume excluded middle for now. We would however, try to eliminate needlessly using proofs ``by contradiction''.
- 
  \paragraph{\bf Exercises}
  \begin{enumerate}
  \item[assume] $P \rightarrow P$.

@@ -11,23 +11,306 @@ Nice as it might be, propositional calculus is not complete enough to express wh
 All these require more general notion than that of a proposition, that of a predicate. 
 For example $x>0$ might or might not be true depending on $x$. We can view this as a function from $\mathbb{R}$ to the sett of propositions or as a set of propositions, parametrised by $\mathbb{R}$. 
 
-This exactly the meaning of a predicate, it is a collection of propositions parametrised by a context (type). Here are some propositions.
+This exactly the meaning of a predicate, it is a collection of propositions parametrised by a context (type). More precisely a predicate is a function $P: U \rightarrow Prop$. 
+
+Here are some predicates.
 
 \begin{itemize}
 \item P(x): $x^{2}+x+1 =0$ (here x is a real number).
 \item P(p): p is a prime. (here p is a natural number)
 \item P(x) : x is a man. (here x is an animal)
-\item P(x, y) : x >y. (here both x an y are real numbers and so P : $mathbb{R}^{2}\rightarrow Prop.$
+\item P(x, y) : x > y. (here both x an y are real numbers and so P : $mathbb{R}^{2}\rightarrow Prop.$
 
 \end{itemize}	
 
 Of course you cannot really prove predicates, just statements. Predicates have ``free'' variables and those need to be ``quantified''. There are two quantifiers that bind variables. as with connectors for propositions they have introduction and elimination rules.
 
-\paragraph{\bf Existential Quantifier $\exists$}
+\subsection{\bf Quantifiers, free and bound variables.}
 
-The meaning of this quantifier is self explanatory. If $P:U \rightarrow Prop$ is a predicate then $\exists x:U, P(x)$ is a proposition which is true if you can find an x so that $P(x)$ is true. Note that in SPatchCoq you can enter this either by clicking on the symbol or by typing exists.
+As mentioned above, a predicate is a function which takes values in Prop. As such it has at least free variable (we might consider several variable. predicates). There are two ways to bind predicates,  the existential and the universal quantifier. You have used both of them in a somewhat informal way.
+  Very often you see the following colloquial statements.
+  
+ " Show that $x^2 > 0$. "
+  
+  This is formally incorrect and its correct statement is : " Show that for any real number $x, x^2 > 0$.  
+The second statement is false since $x=0$ is a counterexample. The first one is not a statement unless $x$ has been defined earlier and, if it has, it might be true or false.
+
+  
+  
+The  {\bf existential quantifier} is denoted by $\exists$. Its meaning  is quite self explanatory. If $P:U \rightarrow Prop$ is a predicate then $\exists x:U, P(x)$ is a proposition which is true if you can find an x so that $P(x)$ is true. Note that in SpatchCoq you can enter this either by clicking on the symbol or by typing exists.
 
 
 For example $\exists x:\mathbb{R}, x^{2}+x+1 =0.$ means that the equation $x^{2}+x+1=0$ has a solution. Therefore our first example of the section ``The equation $x^2+x+1=0$ does not have any solution.'' can be written as $\neg (\exists x:\mathbb{R}, x^{2}+x+1 =0).$ 
 
 If we consider the predicate ``P(x) : x likes bread'' on the set People of all people then ``Some people like bread and some do not.'' can be written as $(\exists x:People, P(x))\land (\exists x:People, \neg P(x))$.
+
+The {\bf universal quantifier} is denoted by $\forall$. As with the existential quantifier, the meaning of this is natural, the proposition $\forall a, P(a)$ will hold if  the propositions $P(x)$ will hold no matter what x is. 
+Note that in SpatchCoq you can enter this either by clicking on the symbol or by typing forall.
+
+Note that you can encounter this in many forms.  Here are some examples:
+
+"All square integers are non-negative" is the same thing as $\forall x \in \mathbb{Z}, x^2\ge 0$.
+
+"The sum of any two odd numbers is even" is the same thing as $\forall x  \in \mathbb{Z} \forall y \in  \mathbb{Z} ,  odd(x) \land odd(y) \rightarrow even(x+y)$.
+
+"Anybody has a friend" is the same thing as $\forall x, \exists y, friend (x,y)$.
+
+Note that bound variables can be renamed. For example $\forall x, \exists y, friend (x,y)$ is the smae as
+$\forall y, \exists x, friend (y,x)$. They are also local variables so they can be reused. for example 
+$\forall x, P(x)\rightarrow \exists y, P(y)$ can be also writtnen as $\forall x, P(x)\rightarrow \exists x, P(x)$. However one needs to be careful doing this.
+
+\paragraph{\bf Inference rules}
+
+The {\bf existential introduction} rule: if you have a way to prove $P(a)$ for some $a:U$ then you have proved $\exists x:U, P(x)$. In logic notation this is
+$$\infer{\exists x:U, P(x)}{P(a)}.$$
+
+In Spatchcoq the tactic that you need in this case is ``Prove the existential claim is true for a.''. In order to apply this tactic you need the goal to be of the form $\exists x:U, P(x)$ and if you apply it you now need to prove $P(a)$.
+
+Here is a very simple example. Suppose you want to prove that $\exists x, x^2=4$. To do so we note that $2^2=4$ and so by existential introsductio the result is true. The proof in spatchcoq is
+\inp{Lemma triv:$\exists n:nat, n^2=4.$\\
+Prove the existential claim is true for 2.\\
+This follows from reflexivity.}
+The  {\bf existential elimination} rule: that if you have a hypothesis of the form $\exists x, P(x)$ then you can deduce $P(a)$ for some a. The logic form is
+
+\infer{P(a) \mbox{ for some a}}{\exists x:U, P(x).}
+
+The corresponding SpatchCoq tactic is ``Fix VAR the existentially quantified variable in VAR.''. More precisely if you have a goal that looks like
+\coq{H:\exists x:U, P(x)}{...} then the tactic ``Fix a the existentially quantified variable in H.'' will produce a new goal of the form
+
+\coq{a:U\\
+H:P(a)}{...}
+
+
+The {\bf universal elimination} rule: you know $\forall x, P(x)$ you can deduce $P(a)$ regardless of $a$. The logical notation you is
+
+\infer{P(a) \mbox{ for any a}}{\forall  x:U, P(x).}
+
+The SpatchCoq tactic is a bit harder to explain. If you have
+
+\coq{
+H:\forall x:U,  P(x)}{...}
+you can use 
+
+"Obtain P(a) using variable a in the universally quantified hypothesis H."
+
+To exemplify this we first consider the following statement
+
+$$\forall x:U, P x \rightarrow \exists x:U, P x.$$
+
+Nothing simpler than that right? If a statement is true for all possible values then is of course true for some value. Except for the case where there are no elements of type $U$ at all. In that case the statement $\forall x:U, P x$ will be true but the statement $\exists x:U, P x$ will be false\footnote{
+ Sounds confusing? Does it remind you of another confusing constructor? If you said "implies" then you were right. In fact implies is syntactic sugar  for a special case of forall. More precisely $P\rightarrow Q$ is the same thing as $\forall a:P, Q$, that is for the statement that if you know a proof for $P$ you get one for $Q$. We will not insist here, the interested reader can have a look at \cite{coqdart}}.
+ 
+ To remedy that, we shall assume the the type $U$ is nonempty. Here is a proof of the statement
+ \inp{Variable U:Type.\\
+Lemma a( a:U)($P: U\rightarrow Prop$): ($\forall x:U, P x)\rightarrow \exists x, P x.$\\
+Assume ($\forall  x : U, P x$) then prove ($\exists x : U, P x$).\\
+Obtain (P a) using variable a in the universally quantified hypothesis Hyp.\\
+Prove the existential claim is true for a.\\
+This follows from assumptions.}
+
+
+ Coq is good at universal elimination and can often match the value of the variable  and so if the statement is something like this
+
+\coq{a:U\\ H:\forall x:U, P x }{P a}
+
+then just using 
+
+Apply result H.
+
+ finishes the proof. For example the proof above can be done as follows:
+
+\inp{Variable U:Type.\\
+Lemma a( a:U)(P: U->Prop): $(\forall x:U, P x)\rightarrow \exists x, P x$.\\
+Assume ($\forall  x : U, P x$) then prove ($\exists x : U, P x$).\\
+Prove the existential claim is true for a.\\
+Apply result Hyp.}
+
+
+The {\bf universal introduction} rule: in order to prove $\forall x:U, P(x)$, you fix a random $a:U$ and prove that $P(a)$ holds. The logical notation is:
+
+\infer{ \forall x:U, P(x) }{P(a) \mbox{for all a}}
+
+
+The corresponding SpathCoq tactic  works as follows:
+Suppose the goal is
+
+\coq{\cdots}{ \forall x:U, P(x) }
+
+Then the tactic 
+Fix an arbitrary element a.
+
+produces the goal
+
+\coq{a:U}{P(a)}.
+
+  
+\section{Proof by contradiction and the Drinker's Paradox}\label{sec:drinker}
+
+
+This is a very interesting side effect of classical logic. It was popularised by R Smullyan. The statement is as follows:
+
+In any pub there is a customer so that if he drinks \ then everybody drinks. 
+
+
+This sounds very counterintuitive but the proof is very nice and it will test your understanding of predicate calculus. In particular there will be a few applications of "proof by contradiction" and one of "Apply result classic." The idea is that you consider two cases. If everybody Drinks  then there is no problem, you can pick anybody as you witness. The more difficult case is when not everybody drinks. You then pick one person that does not drink and the statement will still be true. While the idea is quite clear, writing a complete formal proof is rather difficult. 
+
+
+To fix the notations let say that $U$ is the people in the bars and that $Drinks: U \rightarrow Prop$ is the  predicate that verifies if somebody drinks, With this notation, our paradox becomes:
+
+\begin{align}\label{al:drinker}\exists x,  (Drinks \ x \rightarrow \forall y, Drinks \ y).\end{align}
+
+Note that the brackets are essential. Indeed, the statement 
+$$(\exists x,  Drinks\  x) \rightarrow (\forall y, Drinks \  y)$$
+is quite obviously false.
+
+We will go through the proof in SpatchCoq explaining each step.
+
+We start by introducing some variables and state the Lemma. We  first define a type called Customers which should be viewed as the "set" of customers\footnote{This is a type rather than a set. The interested reader should read \ref{chap:setsvstypes}}. Then we ask for an element $a$ in this type and a predicate Drinks that tells you whether customers drink. The statement of the lemma is now identical to \ref{al:drinker}.
+
+
+\inp{Variable (Customers:Type)(a:Customers)(Drinks: Customers->Prop).\\
+Lemma drinker: $\exists$ x:Customers, (Drinks x -> $\forall$ y:Customers, Drinks y).}
+
+
+Alternatively we could have done away with Variables and write in one line at the cost of readability.
+
+\inp{
+Lemma drinke (Customers:Type)(a:Customers)(Drinks: Customers->Prop).r: $\exists$ x:Customers, (Drinks x -> $\forall$ y:Customers, Drinks y).}
+
+The next step is a nonconstructive one. We will claim that either all customers drink or not all customers drink. This is a seemingly silly statement but recall Subsection~\ref{subs:Constructive vs Classical}. We immediatly prove it by using the result classical.
+
+\inp{Claim (($\forall$ y:Customers, Drinks y) $\lor$  not (forall y:Customers, (Drinks y))).\\
+Apply result classic.}
+
+to get the following:
+
+\coq{H:(\forall y : Customers, Drinks\  y) \lor (\neg (\forall y : Customers, Drinks\  y))}{\exists x : Customers, (Drinks\  x \rightarrow (\forall y : Customers, Drinks\  y)}
+
+
+We now execute an or elimination (proof by cases) in H.
+\inp{Consider cases based on disjunction in hypothesis H.}
+to obtain two new goals:
+
+
+\coq{H:(\forall y : Customers, Drinks\  y)}{\exists x : Customers, (Drinks\  x \rightarrow (\forall y : Customers, Drinks\  y)}
+
+
+and respectively
+
+\coq{\neg (\forall y : Customers, Drinks\  y)}{\exists x : Customers, (Drinks\  x \rightarrow (\forall y : Customers, Drinks\  y)}
+
+This forst goal is quite easy to prove. Since we already know that $\forall y : Customers, Drinks\  y$ holds (that is that everybody drinks) then it does not matter which x we pick so we will pick a and prove it. More precisely we do:
+
+\inp{Prove the existential claim is true for a.\\
+Assume (Drinks a) then prove (forall  y : Customers, Drinks y).\\
+This follows from assumptions.}
+
+
+We are now left with case where not everybody drinks. Of course we will pick the one person that does not drink. In SpatchCoq this is a bit more elaborate. We first have to prove that there is somebody that does not drink. We claim this and prove it by contradiction.
+
+\inp{Claim (exists x:Customers, not (Drinks x)).\\
+Prove by contradiction.}
+
+to get 
+
+\coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ H:\neg (\exists x : Customers, neg (Drinks \ x))}{False}
+
+Note that Hyp0 is a negation and (that is of type $P\rightarrow False$ ) so we acan use implication elimination
+
+\inp{Apply the result Hyp0.}
+an so we now only need to prove $(\forall y : Customers, Drinks\ y)$, taht is th goal is
+\coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ H:\neg (\exists x : Customers, neg (Drinks \ x))}{(\forall y : Customers, Drinks\ y)}
+ 
+ We now fix an arbitrary element $x$ (universal introduction) and agaian try to prove by contradiction:
+ 
+ \inp{Fix an arbitrary element x.\\
+Prove by contradiction.}
+
+to get 
+
+
+\coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ H:\neg (\exists x : Customers, neg (Drinks \ x))\\
+x:Customers\\
+H0:\neg(Drinks\  x)}{False}
+
+We now use implication elimination again, this time on H.
+
+\inp{Apply result H .}
+
+and so we only need to prove $\exists x0 : Customers, neg (Drinks \ x0)$. We already know from $H0:\neg(drinks x)$ that the customer $x$ does not drink and so
+
+\inp{Prove the existential claim is true for x.\\
+This follows from assumptions.}
+will finish the proof of "Claim (exists x:Customers, not (Drinks x))."
+
+
+Note that, if we were willing to use library theorems, we could obtained the same claim have searched and used  the right theorem as follows:
+First execute search
+
+\inp{SearchPattern (not (forall \underline{ } , \underline{ })->\underline{ }).}
+
+
+to get an theorem
+
+$$\text{not\underline{ }all\underline{ }ex\underline{ }not}:
+  \forall (U : Type) (P : U \rightarrow Prop), \neg (\forall n : U, \neg P\  n) \implies \exists n : U, P \ n$$
+
+We now use this to opbtain our claim.
+
+
+\inp{
+Obtain (exists n : Customers, not Drinks n) applying (not\underline{ }all\underline{ }ex\underline{ }not Customers Drinks) to Hyp0.}
+
+
+
+Either way the claim looks like
+
+\coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ H:\exists x : Customers, neg (Drinks \ x))}{\exists x : Customers, (Drinks\  x \rightarrow (\forall y : Customers, Drinks\  y)}
+
+A standard existential elimination followed by an existential introduction and an implication introduction. that is
+\inp{Fix b the existentially quantified variable in H .\\
+Prove the existential claim is true for b.\\
+Assume (Drinks b) then prove (forall  y : Customers, Drinks y).}
+
+and we are left with
+
+\coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ b:Customers\\ H: not (Drinks \ b)\\ Hyp Drinks b}{ (\forall y : Customers, Drinks\  y)}
+
+Now H and Hyp finish the proof by contradiction.
+
+\inp{Prove by contradiction.\\
+Apply result H .\\
+This follows from assumptions.\\
+Qed.}
+
+For conformity here is the full proof bellow:
+
+\inp{Variable (Customers:Type)(a:Customers)(Drinks: Customers->Prop).\\
+Lemma drinker: $\exists$ x:Customers, (Drinks x -> $\forall$ y:Customers, Drinks y).\\
+Claim (($\forall$ y:Customers, Drinks y) $\lor$  not (forall y:Customers, (Drinks y))).\\
+Apply result classic.\\
+Consider cases based on disjunction in hypothesis H .\\
+Prove the existential claim is true for a.\\
+Assume (Drinks a) then prove (forall y : Customers, Drinks y).\\
+This follows from assumptions.\\
+Claim (exists x:Customers, not (Drinks x)).\\
+Prove by contradiction.\\
+Apply result Hyp0 .\\
+Fix an arbitrary element x.\\
+Prove by contradiction.\\
+Apply result H .\\
+Prove the existential claim is true for x.\\
+This follows from assumptions.\\
+Fix b the existentially quantified variable in H .\\
+Prove the existential claim is true for b.\\
+Assume (Drinks b) then prove (forall y : Customers, Drinks y).\\
+Prove by contradiction.\\
+Apply result H .\\
+This follows from assumptions.\\
+Qed.}
+
+
+
+
+
+

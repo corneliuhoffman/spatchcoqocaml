@@ -1,0 +1,34 @@
+\preface
+\epigraph{Proofs are to mathematics what spelling (or even calligraphy) is to poetry. Mathematical works do consist of proofs, just as poems do consist of characters.}{Vladimir Arnold}
+
+There are numerous studies about the image of mathematics among professional mathematicians and among the general public. The general public holds the idea that Mathematics is a series of formulas and calculations that are useful but are so complicated that they satisfy the old Arthur C Clarke quote ``Any sufficiently advanced technology is indistinguishable from magic.''.
+
+However similar studies among mathematicians provides a completely different result. Indeed most mathematicians think that the main transferable skill that Mathematics Education brings is not the ability to do the long calculations but the ability to reason correctly and to use abstraction in solving problems.
+
+Therefore, while one should not discard the intrinsic value of effective computational tools, Mathematics is ``about proofs''. Mathematics Education should reflect this. This approach is as old as teaching of Mathematics. Euclid's Elements, probably the oldest textbook in the western world is a collection of proofs and constructions. It has lead the teaching of mathematics for much of last two thousand years. 
+
+However, the teaching of proofs is loosing ground  in the modern Mathematics curriculum. Indeed, for example,  in the UK   Advance level exam from 1957,  7 of the 10 questions involved a small proof. By comparison the 2016 equivalent (C4 AQA test), only 16 out of 75 points were proofs. This in not the place to discuss the many reasons for this development. Nevertheless, the result is that many students start university expecting that mathematics  is a series of cookbook methods and computations. One of the most serious stumbling blocks in University Mathematics is the lack of exposure to proofs.
+
+This text is meant to be an attempt to address this. There are, of course, countless textbooks of the kind so writing yet another standard one would be rather pointless. We will  therefore attempt to be a little non-standard.
+
+In the last few decades computer aided education has come to prominence. Computer Algebra systems such as Maple, Mathematica, Mathlab, Maxima, Sage and so on have permeated the curriculum providing examples, modelling, automated assessment and so on. By comparison, the teaching of proofs and abstractions have seen almost none of these.
+
+Of course computer assisted proofs are almost as old as computers. Already in 1954  Martin Davis encoded Presburger's arithmetic and managed to prove that the sum of even numbers is even. More importantly, a few years later  Newell, Simon and  Shaw wrote  the ``Logic Theorist'', a first order logic solver that managed to prove 38 of the theorems in Russell and Whitehead's  ``Principia Mathematica''. The development of PROLOG in the 70's offered a reasonably simple context to verify first order logic.
+
+Until quite recently thought, proof assistants belonged to the world of Computer Science, more precisely program verification. Very little of the advances in the domain crossed over into mathematics or mathematics education.
+
+In the 80's a plethora of Proof assistants came to prominence. While initially they	 mimicked the standard language of mathematics (see for example Mizar), they soon simplified  their notations for the sake of efficiency. Despite attempts by some developers (such as the decorative mode Isar for Isabelle), most proof assistants are beyond the reach of a beginning mathematics student.
+
+
+We have made several attempts to teach Mathematics with the help of Isabelle and Coq and they all had only modest success. The syntax proved to be too much for the students. The solution we found was to develop a separate interface for Coq that will separate the student from both the terseness and the automation power of the theorem prover and will provide an accessible and interactive syntax. The resulting product is called Spatchcoq, after the method of ``butterflying '' a chicken prior to cooking. We hope that the wonderful authors of Coq would forgive our little inside joke.
+
+The idea of the book is to teach some topics in discrete mathematics (the standard way of introducing proofs) with the help of Spatchcoq. The reader is encouraged to download the software using the instructions in Appendix~\ref{ch:thesoftware}. 
+
+
+ We will slowly introduce the software together with basic methods of proofs in Chapter~\ref{chap:Basicproof} van numerous examples. The inpatient reader can skip quickly to Appendix~\ref{ch:tactics} to get short descriptions of the tactics, respectively to Appendix~\ref{ch:examples} to see two detailed examples. You can also find some other examples of proofs at 
+ 
+ \url{https://github.com/corneliuhoffman/spatchcoqocaml/tree/master/examples}
+
+
+ 
+

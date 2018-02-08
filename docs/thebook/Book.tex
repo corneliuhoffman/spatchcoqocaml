@@ -80,8 +80,8 @@ $ #3 \ $ \end{tcolorbox}}  \end{tcolorbox}}
 
 
 % ------------------- Title and Author -----------------------------
-\title{Sample Book}
-\author{Author}
+\title{Discrete Mathematics with Proof assistants}
+\author{Corneliu Hoffman}
 \begin{document}
 
 
@@ -92,25 +92,30 @@ $ #3 \ $ \end{tcolorbox}}  \end{tcolorbox}}
 
  \frontmatter
 \mainmatter
-\chapter{Introduction}
-\include{Installation/UserManual}
 
-%\include{Installation/menus}
-%\include{Installation/examples}
+  \include{Installation/intro}
+
+
+
+
 
 
 \mainmatter
-\chapter{basic proof techniques.}
+
 \include{prooftech/proof1}
 \include{prooftech/predicate}
 \appendix
-\appendixpage
-\noappendicestocpagenum
-\addappheadtotoc
+%\appendixpage
+%\noappendicestocpagenum
+%\addappheadtotoc
+
+\include{Installation/UserManual}
+
+\include{Installation/menus}
 
 \include{Tactics/tactics}
 \include{Installation/examples}
-
+\include{Tactics/types}
 \bibliographystyle{plain-annote}
 \bibliography{mybibliography}
 

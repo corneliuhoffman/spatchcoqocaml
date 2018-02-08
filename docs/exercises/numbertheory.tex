@@ -1,4 +1,4 @@
-\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\documentclass{article}   	% use "amsart" instead of "article" for AMSLaTeX format
 \usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
 \geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
 %\geometry{landscape}                		% Activate for for rotated page geometry
@@ -8,10 +8,10 @@
 \usepackage{amssymb}
 \usepackage{pmboxdraw}
 
-\usepackage{fontspec}
-\setmainfont{FreeSerif}
-\setmonofont{FreeMono}
-\title{First number theory set}
+%\usepackage{fontspec}
+%\setmainfont{FreeSerif}
+%\setmonofont{FreeMono}
+\title{Number theory set}
 \author{}
 \date{}							% Activate to display a given date or no date
 
@@ -25,12 +25,14 @@
 \newtheorem{definition}{Definition}
 
 \newtheorem{puzzle}{Puzzle}
-
 Prove the Lemmas bellow. Name them as before as oneone,  twoone and so on. Please make sure you save the work as you go along and submit as many solutions as you want. I would prefer 10  flawed solutions to one perfect one. I want to see how you think about it, when do you guess, what searches you do, when do you make mistakes, how do you correct them and so on.
 Note that you will need to start with
 \begin{verbatim}
 Definition div a b:= exists c, b = a* c.
 Notation "a | b" := (div a b)(at level 0).
+Definition even a := exists c, a = 2* c.
+Definition odd a := exists c, a = 2* c+1.
+
 \end{verbatim}
 
 You will also get to use the tactics:
@@ -91,16 +93,18 @@ Nat.mul_eq_0_r: ? n m : nat, n * m = 0 ? n ? 0 ? m = 0
 \item  if $a | b$ and $b | c$, then $a | c$.
 \item If $a | c$ and $b | d$, then $ab | cd$.
 \item If   $a | b $ and $a | c$  then $a | b+c$.
-\item If $a \ne  0$ and $c \ne 0$ $ac | bc$, then $a | b$.
+
 \end{enumerate}
 
 \end{lemma}
+
 
 \begin{lemma}
 \begin{enumerate}
 
 \item The sum of two odd numbers is even.
 \item the sum of two consecutive numbers is odd
+\item every number is either even or odd.
 \item the product of two consecutive numbers is even.
 
 
@@ -108,6 +112,7 @@ Nat.mul_eq_0_r: ? n m : nat, n * m = 0 ? n ? 0 ? m = 0
 
 \end{lemma}
 
+If you have time try those:
 
 \begin{lemma}
 

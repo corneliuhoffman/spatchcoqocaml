@@ -1,7 +1,5 @@
-
-
+\chapter{The software}\label{ch:thesoftware}
 \section{ Installation}
-
 \subsection{Mac OSX}
 \begin{enumerate}
 \item Download and install  the latest version of Coq (it needs to be at least 8.6) from :
@@ -11,7 +9,7 @@
 Move it to your apps folder.
 
 
-\item  Download and unpack spatchocq.app from canvas
+\item  Download and unpack spatchocq.app from 
 move the spatchcoq.app to Applications and start it. 
 
 \item when prompted find the Coq installation you have just move above. Navigate to 
@@ -21,8 +19,18 @@ move the spatchcoq.app to Applications and start it.
 and choose coqtop. See Figure~\ref{fig:macos}
 
 You only do this once.
-\item  You only have to do this once. You might also need to install gtk, the simplest way to do this is  via homebrew
-{\center brew install gtk+}
+\item  You only have to do this once. You might also need to install gtk, the simplest way to do this is  via homebrew.
+
+If do not have homebrew installed,  install it
+\href{https://brew.sh}{ here.}
+
+or  type in the terminal:
+
+{\small \texttt{/usr/bin/ruby -e "\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"}
+
+Next type in terminal:
+
+{\center \texttt brew install gtk+}}
 \begin{figure}\label{fig:macos}
 \center
 \includegraphics[scale=0.5]{Installation/macos.png}

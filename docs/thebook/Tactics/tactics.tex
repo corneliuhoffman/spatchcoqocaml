@@ -1,5 +1,9 @@
 
-\chapter{Tactics}
+     
+     
+     
+     
+\chapter{Tactics}\label{ch:tactics}
 
 \paragraph{\bf This is trivial.}
 
@@ -363,15 +367,55 @@ Assume the goal is:
  False}
 
 
-This follows from reflexivity.
-
-
+\paragraph{\bf This follows from reflexivity.}
+Assume the goal is 
+\coq{\cdots\\ 
+}{
+ a=a }
+ then \inp{This follows from reflexivity.} will finish the proof.
+ 
 This follows from symmetry.
 
 
-Apply result VAR.
+\paragraph{\bf Apply result VAR.}
+Assume that the goal is
+\coq{\cdots\\ Hyp: P->Q \\ ..
+}{
+ Q }
+ 
+Then \inp{Apply result Hyp} will transform the goal to
+
+ \coq{\cdots\\ Hyp: P->Q \\ ..
+}{
+ P }
+
+Similarly if there is a theorem whose name is thm and whose conclusion is $ P\rightarrow Q $then
+Then \inp{Apply result thm} will transform the goal to
+
+ \coq{\cdots\\ Hyp: P->Q \\ ..
+}{
+ P }
+
+\paragraph{\bf This follows from assumptions.}
+if the goal is 
+
+\coq{\cdots \\ Hyp:P\\ \cdots}{P}
+
+Then the tactic
+
+{\bf This follows from assumptions.}
+
+finishes the proof.
 
 
-This follows from assumptions.
+\paragraph{\bf Denote VAR by VAR}
+This is a techincal tactic. 
 
-Denote VAR by VAR.
+{\bf Denote $expr_0$ by $expr_1$.}
+
+ will modify the goal by adding a hypothesis 
+ 
+ $$H: expr_1 = expr_0.$$
+ 
+ You usually use this to rewrite terms to simply some notations\footnote{We owe the idea of this tactic to Curt Bennett}.
+.
