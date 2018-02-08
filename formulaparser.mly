@@ -76,7 +76,7 @@ open Ast
 
 %nonassoc LIST
 %nonassoc EMPTYSET
-%nonassoc NE
+
 %left COMMA
 %right below_INTERSECTION1  
 
@@ -86,7 +86,7 @@ open Ast
 %nonassoc EQUALS
 %nonassoc EXISTS
 %nonassoc FORALL
-
+%nonassoc NE
 %nonassoc NOT
 %right below_INTERSECTION  
 
