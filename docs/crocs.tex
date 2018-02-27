@@ -1,0 +1,108 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Inductive}{Inductive Definition}
+\newtheorem{Variable}{Variable}
+\newtheorem{Variables}{Variables}
+
+\newtheorem{Notation}{Notation}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Variable}[U] \label{Variable:U}
+$U\,:\,Type.$
+ \end{Variable}
+\begin{Definition}[Ensemble] \label{Definition:Ensemble}
+$Ensemble\,:=\,U\,\Rightarrow \,Prop.$
+ \end{Definition}
+\begin{Definition}[In] \label{Definition:In}
+$In\,(A:Ensemble)\,(x:U):=\,A\,x.$
+ \end{Definition}
+\begin{Notation}["x] \label{Notation:"x}
+$"x\,\in \,A":=\,(In\,A\,x)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Definition}[Included] \label{Definition:Included}
+$Included\,(B\,C:Ensemble)\,:\,Prop\,:=\,\forall \,x:U,\,x\in B\,\Rightarrow \,x\,\in \,C.$
+ \end{Definition}
+\begin{Notation}["A] \label{Notation:"A}
+$"A\,\subseteq \,B":=\,(Included\,A\,B)(at\,level\,10).$
+ \end{Notation}
+\begin{Definition}[Union] \label{Definition:Union}
+$Union\,(B\,C:Ensemble)\,:\,Ensemble\,:=\,fun\,x:U\,=>\,(x\in B)\,\lor \,(x\in C).$
+ \end{Definition}
+\begin{Notation}["A] \label{Notation:"A}
+$"A\,\cup \,B":=\,(Union\,A\,B)(at\,level\,8).$
+ \end{Notation}
+\begin{Definition}[Intersection] \label{Definition:Intersection}
+$Intersection\,(B\,C:Ensemble)\,:\,Ensemble\,:=fun\,x:U\,=>\,(x\in B)\,\land (x\in C).$
+ \end{Definition}
+\begin{Notation}["A] \label{Notation:"A}
+$"A\,\cap \,B"\,:=\,(Intersection\,A\,B)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Variable}[Beings:Set.] \label{Variable:Beings:Set.}
+$Beings:Set.$
+ \end{Variable}
+\begin{Variables}[Babies] \label{Variables:Babies}
+$Babies\,Illogical\,ManageCroc\,Despised:\,Beings\Rightarrow Prop.$
+ \end{Variables}
+\begin{Notation}["x] \label{Notation:"x}
+$"x\,'is'\,'a'\,'Baby'\,":=(Babies\,x)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Notation}["x] \label{Notation:"x}
+$"x\,'is'\,'illogical'\,":=(Illogical\,x)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Notation}["x] \label{Notation:"x}
+$"x\,'is'\,'despised'\,":=(Despised\,x)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Notation}["x] \label{Notation:"x}
+$"x\,'can'\,'manage'\,'crocodiles'":=(ManageCroc\,x)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Axiom}[BI:] \label{Axiom:BI:}
+$BI:\,\forall \,x,\,x\,is\,a\,Baby\,\Rightarrow \,x\,is\,illogical.$
+ \end{Axiom}
+\begin{Axiom}[MND] \label{Axiom:MND}
+$MND\,:\,\forall \,x,\,x\,can\,manage\,crocodiles\,\Rightarrow \,not\,(x\,is\,despised).$
+ \end{Axiom}
+\begin{Axiom}[ID:] \label{Axiom:ID:}
+$ID:\,\forall \,x,\,x\,is\,illogical\,\Rightarrow \,x\,is\,despised.$
+ \end{Axiom}
+\begin{Lemma}[LcBabies] \label{Lemma:LcBabies}
+$LcBabies:\,\forall \,x,\,x\,is\,a\,Baby\,\Rightarrow \,not\,(x\,can\,manage\,crocodiles).$
+ \end{Lemma}
+
+
+ Proof: In order to show $\forall x : Beings, (x is a Baby) \Rightarrow (not (x can manage crocodiles)) $ we pick an arbitrary $$x$$ and show $$(x is a Baby) \Rightarrow (not (x can manage crocodiles)) .$$
+
+ We will assume $$Hyp : x is a Baby $$ and show $$not (x can manage crocodiles) .$$Using the definition not, our conclusion becomes $$(x can manage crocodiles) \Rightarrow False .$$We will assume $$Hyp0 : x can manage crocodiles $$ and show $$False .$$Claim $$x is illogical .$$ Let us prove prove that. 
+
+ By $BI$, in order to prove $x is illogical $ it suffices to prove $$x is a Baby .$$ $x is a Baby $ follows trivially from the assumptions.
+
+ and therefore we have proved x is illogical .$H$ and $(ID x)$ imply $$H0 : x is despised .$$ $Hyp0$ and $(MND x)$ imply $$H1 : not (x is despised) .$$ By $H1 $, in order to prove $False $ it suffices to prove $$x is despised .$$ $x is despised $ follows trivially from the assumptions.
+
+ We have showed that if $$Hyp0 : x can manage crocodiles $$ then $$False $$ a proof of $(x can manage crocodiles) \Rightarrow False $.
+
+ Therefore we have showed $$(x can manage crocodiles) \Rightarrow False $$ and so $not (x can manage crocodiles) $.
+
+ We have showed that if $$Hyp : x is a Baby $$ then $$not (x can manage crocodiles) $$ a proof of $(x is a Baby) \Rightarrow (not (x can manage crocodiles)) $.
+
+ Since $$x$$ was arbitrary this shows $\forall x : Beings, (x is a Baby) \Rightarrow (not (x can manage crocodiles)) $.This is done\end{document}

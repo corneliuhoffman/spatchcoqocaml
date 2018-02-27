@@ -1,0 +1,222 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Inductive}{Inductive Definition}
+\newtheorem{Variable}{Variable}
+\newtheorem{Variables}{Variables}
+
+\newtheorem{Notation}{Notation}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Definition}[div] \label{Definition:div}
+$div\,a\,b:=\,\exists \,c,\,b\,=\,a*\,c.$
+ \end{Definition}
+\begin{Notation}["a] \label{Notation:"a}
+$"a\,|\,b"\,:=\,(div\,a\,b)(at\,level\,0).$
+ \end{Notation}
+\begin{Definition}[even] \label{Definition:even}
+$even\,a\,:=\,\exists \,c,\,a\,=\,2*\,c.$
+ \end{Definition}
+\begin{Definition}[odd] \label{Definition:odd}
+$odd\,a\,:=\,\exists \,c,\,a\,=\,2*\,c+1.$
+ \end{Definition}
+\begin{Lemma}[nt0] \label{Lemma:nt0}
+$nt0:\,even\,12.$
+ \end{Lemma}
+
+
+ Proof: Using the definition even, our conclusion becomes $$\exists c : nat, 12 = 2 * c .$$We shall prove $\exists c : nat, 12 = 2 * c $ by showing $$12 = 2 * 6 .$$This follows immediately from arithmetic.This is done
+
+ $$12 = 2 * 6 $$ means that $\exists c : nat, 12 = 2 * c $.
+
+ Therefore we have showed $$\exists c : nat, 12 = 2 * c $$ and so $even 12 $.\begin{Lemma}[nt1] \label{Lemma:nt1}
+$nt1\,(a\,b\,c:nat):\,a\,|\,b\,\land b\,|\,c\,\Rightarrow \,a\,|\,c.$
+ \end{Lemma}
+
+
+ Proof: We will assume $$Hyp : (a | b) \land (b | c) $$ and show $$a | c .$$Using the definition of div, $$Hyp $$ becomes $$Hyp : (\exists c : nat, b = a * c) \land (\exists c0 : nat, c = b * c0) $$ Using the definition div, our conclusion becomes $$\exists c0 : nat, c = a * c0 .$$Since we know $Hyp : (\exists c : nat, b = a * c) \land (\exists c0 : nat, c = b * c0) $ we also know $$Hyp0 : \exists c : nat, b = a * c $$ $$Hyp1 : \exists c0 : nat, c = b * c0 .$$We choose a variable $$x$$ in $$Hyp0 $$ to obtain $$a, b, c, x : nat $$ $$Hyp0 : b = a * x .$$ We choose a variable $$y$$ in $$Hyp1 $$ to obtain $$y : nat $$ $$Hyp1 : c = b * y .$$ We rewrite the goal using $$Hyp1 $$ to obtain $$\exists c0 : nat, b * y = a * c0 .$$We rewrite the goal using $$Hyp0 $$ to obtain $$\exists c0 : nat, a * (x * y) = a * c0 .$$We shall prove $\exists c0 : nat, a * (x * y) = a * c0 $ by showing $$a * (x * y) = a * (x * y) .$$This follows immediately from arithmetic.This is done
+
+ $$a * (x * y) = a * (x * y) $$ means that $\exists c0 : nat, a * (x * y) = a * c0 $.
+
+ We have proved $$\exists c0 : nat, a * (x * y) = a * c0 $$ and so $\exists c0 : nat, b * y = a * c0 $ follows.
+
+ We have proved $$\exists c0 : nat, b * y = a * c0 $$ and so $\exists c0 : nat, c = a * c0 $ follows.
+
+ and so we have proved $\exists c0 : nat, c = a * c0 $.
+
+ and so we have proved $\exists c0 : nat, c = a * c0 $.
+
+ We are done with $\exists c0 : nat, c = a * c0 $
+
+ Therefore we have showed $$\exists c0 : nat, c = a * c0 $$ and so $a | c $.
+
+ We have showed that if $$Hyp : (a | b) \land (b | c) $$ then $$a | c $$ a proof of $((a | b) \land (b | c)) \Rightarrow (a | c) $.\begin{Lemma}[nt2] \label{Lemma:nt2}
+$nt2\,(a\,b\,c\,d\,:\,nat):\,(a\,|\,c)\,\land (b\,|\,d)\,\Rightarrow \,((a*b)\,|\,(c*d)).$
+ \end{Lemma}
+
+
+ Proof: We will assume $$Hyp : (a | c) \land (b | d) $$ and show $$(a * b) | (c * d) .$$Using the definition of div, $$Hyp $$ becomes $$Hyp : (\exists c0 : nat, c = a * c0) \land (\exists c : nat, d = b * c) $$ Since we know $Hyp : (\exists c0 : nat, c = a * c0) \land (\exists c : nat, d = b * c) $ we also know $$Hyp0 : \exists c0 : nat, c = a * c0 $$ $$Hyp1 : \exists c : nat, d = b * c .$$We choose a variable $$x$$ in $$Hyp0 $$ to obtain $$a, b, c, d, x : nat $$ $$Hyp0 : c = a * x .$$ We choose a variable $$y$$ in $$Hyp1 $$ to obtain $$y : nat $$ $$Hyp1 : d = b * y .$$ We rewrite the goal using $$Hyp0 $$ to obtain $$(a * b) | (a * (x * d)) .$$We rewrite the goal using $$Hyp1 $$ to obtain $$(a * b) | (a * (x * (b * y))) .$$Using the definition div, our conclusion becomes $$\exists c0 : nat, a * (x * (b * y)) = a * (b * c0) .$$We shall prove $\exists c0 : nat, a * (x * (b * y)) = a * (b * c0) $ by showing $$a * (x * (b * y)) = a * (b * (x * y)) .$$This follows immediately from arithmetic.This is done
+
+ $$a * (x * (b * y)) = a * (b * (x * y)) $$ means that $\exists c0 : nat, a * (x * (b * y)) = a * (b * c0) $.
+
+ Therefore we have showed $$\exists c0 : nat, a * (x * (b * y)) = a * (b * c0) $$ and so $(a * b) | (a * (x * (b * y))) $.
+
+ We have proved $$(a * b) | (a * (x * (b * y))) $$ and so $(a * b) | (a * (x * d)) $ follows.
+
+ We have proved $$(a * b) | (a * (x * d)) $$ and so $(a * b) | (c * d) $ follows.
+
+ and so we have proved $(a * b) | (c * d) $.
+
+ and so we have proved $(a * b) | (c * d) $.
+
+ We are done with $(a * b) | (c * d) $
+
+ We have showed that if $$Hyp : (a | c) \land (b | d) $$ then $$(a * b) | (c * d) $$ a proof of $((a | c) \land (b | d)) \Rightarrow ((a * b) | (c * d)) $.\begin{Lemma}[nt3] \label{Lemma:nt3}
+$nt3\,(a\,b\,c:nat):\,a\,|\,b\,\land a\,|\,c\,\Rightarrow \,a\,|(\,b+c).$
+ \end{Lemma}
+
+
+ Proof: We will assume $$Hyp : (a | b) \land (a | c) $$ and show $$a | (b + c) .$$Using the definition of div, $$Hyp $$ becomes $$Hyp : (\exists c : nat, b = a * c) \land (\exists c0 : nat, c = a * c0) $$ Since we know $Hyp : (\exists c : nat, b = a * c) \land (\exists c0 : nat, c = a * c0) $ we also know $$Hyp0 : \exists c : nat, b = a * c $$ $$Hyp1 : \exists c0 : nat, c = a * c0 .$$We choose a variable $$x$$ in $$Hyp0 $$ to obtain $$a, b, c, x : nat $$ $$Hyp0 : b = a * x .$$ We choose a variable $$y$$ in $$Hyp1 $$ to obtain $$y : nat $$ $$Hyp1 : c = a * y .$$ We rewrite the goal using $$Hyp0 $$ to obtain $$a | ((a * x) + c) .$$We rewrite the goal using $$Hyp1 $$ to obtain $$a | ((a * x) + (a * y)) .$$Using the definition div, our conclusion becomes $$\exists c0 : nat, (a * x) + (a * y) = a * c0 .$$We shall prove $\exists c0 : nat, (a * x) + (a * y) = a * c0 $ by showing $$(a * x) + (a * y) = a * (x + y) .$$This follows immediately from arithmetic.This is done
+
+ $$(a * x) + (a * y) = a * (x + y) $$ means that $\exists c0 : nat, (a * x) + (a * y) = a * c0 $.
+
+ Therefore we have showed $$\exists c0 : nat, (a * x) + (a * y) = a * c0 $$ and so $a | ((a * x) + (a * y)) $.
+
+ We have proved $$a | ((a * x) + (a * y)) $$ and so $a | ((a * x) + c) $ follows.
+
+ We have proved $$a | ((a * x) + c) $$ and so $a | (b + c) $ follows.
+
+ and so we have proved $a | (b + c) $.
+
+ and so we have proved $a | (b + c) $.
+
+ We are done with $a | (b + c) $
+
+ We have showed that if $$Hyp : (a | b) \land (a | c) $$ then $$a | (b + c) $$ a proof of $((a | b) \land (a | c)) \Rightarrow (a | (b + c)) $.\begin{Lemma}[nt4] \label{Lemma:nt4}
+$nt4\,(n\,m:nat):\,(odd\,n)\,\land (odd\,m)\,\Rightarrow \,(even\,(m+n)).$
+ \end{Lemma}
+
+
+ Proof: We will assume $$Hyp : (odd n) \land (odd m) $$ and show $$even (m + n) .$$Using the definition even, our conclusion becomes $$\exists c : nat, m + n = 2 * c .$$Using the definition of odd, $$Hyp $$ becomes $$Hyp : (\exists c : nat, n = (2 * c) + 1) \land (\exists c : nat, m = (2 * c) + 1) $$ Since we know $Hyp : (\exists c : nat, n = (2 * c) + 1) \land (\exists c : nat, m = (2 * c) + 1) $ we also know $$Hyp0 : \exists c : nat, n = (2 * c) + 1 $$ $$Hyp1 : \exists c : nat, m = (2 * c) + 1 .$$We choose a variable $$x$$ in $$Hyp0 $$ to obtain $$n, m, x : nat $$ $$Hyp0 : n = (2 * x) + 1 .$$ We choose a variable $$y$$ in $$Hyp1 $$ to obtain $$y : nat $$ $$Hyp1 : m = (2 * y) + 1 .$$ We rewrite the goal using $$Hyp0 $$ to obtain $$\exists c : nat, m + ((2 * x) + 1) = 2 * c .$$We rewrite the goal using $$Hyp1 $$ to obtain $$\exists c : nat, (2 * y) + (1 + ((2 * x) + 1)) = 2 * c .$$We shall prove $\exists c : nat, (2 * y) + (1 + ((2 * x) + 1)) = 2 * c $ by showing $$(2 * y) + (1 + ((2 * x) + 1)) = 2 * (x + (y + 1)) .$$This follows immediately from arithmetic.This is done
+
+ $$(2 * y) + (1 + ((2 * x) + 1)) = 2 * (x + (y + 1)) $$ means that $\exists c : nat, (2 * y) + (1 + ((2 * x) + 1)) = 2 * c $.
+
+ We have proved $$\exists c : nat, (2 * y) + (1 + ((2 * x) + 1)) = 2 * c $$ and so $\exists c : nat, m + ((2 * x) + 1) = 2 * c $ follows.
+
+ We have proved $$\exists c : nat, m + ((2 * x) + 1) = 2 * c $$ and so $\exists c : nat, m + n = 2 * c $ follows.
+
+ and so we have proved $\exists c : nat, m + n = 2 * c $.
+
+ and so we have proved $\exists c : nat, m + n = 2 * c $.
+
+ We are done with $\exists c : nat, m + n = 2 * c $
+
+ Therefore we have showed $$\exists c : nat, m + n = 2 * c $$ and so $even (m + n) $.
+
+ We have showed that if $$Hyp : (odd n) \land (odd m) $$ then $$even (m + n) $$ a proof of $odd n \land odd m \Rightarrow even (m + n) $.\begin{Lemma}[nt5] \label{Lemma:nt5}
+$nt5\,(n:nat):\,odd\,(n\,+\,(n+1)).$
+ \end{Lemma}
+
+
+ Proof: Using the definition odd, our conclusion becomes $$\exists c : nat, n + (n + 1) = (2 * c) + 1 .$$We shall prove $\exists c : nat, n + (n + 1) = (2 * c) + 1 $ by showing $$n + (n + 1) = (2 * n) + 1 .$$This follows immediately from arithmetic.This is done
+
+ $$n + (n + 1) = (2 * n) + 1 $$ means that $\exists c : nat, n + (n + 1) = (2 * c) + 1 $.
+
+ Therefore we have showed $$\exists c : nat, n + (n + 1) = (2 * c) + 1 $$ and so $odd (n + (n + 1)) $.\begin{Lemma}[nt6] \label{Lemma:nt6}
+$nt6\,(n:nat):\,even\,n\,\lor \,odd\,n.$
+ \end{Lemma}
+
+
+ Proof: Using the definition even, our conclusion becomes $$(\exists c : nat, n = 2 * c) \lor (odd n) .$$Using the definition odd, our conclusion becomes $$(\exists c : nat, n = 2 * c) \lor (\exists c : nat, n = (2 * c) + 1) .$$Prove by induction. We first prove the base case $$(\exists c : nat, 0 = 2 * c) \lor (\exists c : nat, 0 = (2 * c) + 1) .$$We will prove the left hand side of $(\exists c : nat, 0 = 2 * c) \lor (\exists c : nat, 0 = (2 * c) + 1) $. That is we need to prove $$\exists c : nat, 0 = 2 * c .$$ We shall prove $\exists c : nat, 0 = 2 * c $ by showing $$0 = 2 * 0 .$$This follows immediately from arithmetic.This is done
+
+ $$0 = 2 * 0 $$ means that $\exists c : nat, 0 = 2 * c $.
+
+ We have proved $$\exists c : nat, 0 = 2 * c $$ and so $(\exists c : nat, 0 = 2 * c) \lor (\exists c : nat, 0 = (2 * c) + 1) $ follows.
+
+ Assume $$IHn : (\exists c : nat, n = 2 * c) \lor (\exists c : nat, n = (2 * c) + 1) $$ and prove $$(\exists c : nat, (n + 1) = 2 * c) \lor (\exists c : nat, (n + 1) = (2 * c) + 1) .$$ Since we know $IHn : (\exists c : nat, n = 2 * c) \lor (\exists c : nat, n = (2 * c) + 1) $ we can consider two cases: 
+
+ Case 1 $$Hyp : \exists c : nat, n = 2 * c $$
+
+ We will prove the right hand side of $(\exists c : nat, (n + 1) = 2 * c) \lor (\exists c : nat, (n + 1) = (2 * c) + 1) $. That is we need to prove $$\exists c : nat, (n + 1) = (2 * c) + 1 .$$ We choose a variable $$c$$ in $$Hyp $$ to obtain $$n, c : nat $$ $$Hyp : n = 2 * c .$$ We rewrite the goal using $$Hyp $$ to obtain $$\exists c0 : nat, (2 * c + 1) = (2 * c0) + 1 .$$We shall prove $\exists c0 : nat, (2 * c + 1) = (2 * c0) + 1 $ by showing $$(2 * c + 1) = (2 * c) + 1 .$$This follows immediately from arithmetic.This is done
+
+ $$(2 * c + 1) = (2 * c) + 1 $$ means that $\exists c0 : nat, (2 * c + 1) = (2 * c0) + 1 $.
+
+ We have proved $$\exists c0 : nat, (2 * c + 1) = (2 * c0) + 1 $$ and so $\exists c0 : nat, (n + 1) = (2 * c0) + 1 $ follows.
+
+ and so we have proved $\exists c : nat, (n + 1) = (2 * c) + 1 $.
+
+ We are done with $$\exists c : nat, (n + 1) = (2 * c) + 1 $$ and so $(\exists c : nat, (n + 1) = 2 * c) \lor (\exists c : nat, (n + 1) = (2 * c) + 1) $ follows.
+
+ 
+
+ Case 2 $$Hyp0 : \exists c : nat, n = (2 * c) + 1 $$
+
+ We will prove the left hand side of $(\exists c : nat, (n + 1) = 2 * c) \lor (\exists c : nat, (n + 1) = (2 * c) + 1) $. That is we need to prove $$\exists c : nat, (n + 1) = 2 * c .$$ We choose a variable $$c$$ in $$Hyp0 $$ to obtain $$n, c : nat $$ $$Hyp0 : n = (2 * c) + 1 .$$ We rewrite the goal using $$Hyp0 $$ to obtain $$\exists c0 : nat, ((2 * c) + 1 + 1) = 2 * c0 .$$We shall prove $\exists c0 : nat, ((2 * c) + 1 + 1) = 2 * c0 $ by showing $$((2 * c) + 1 + 1) = 2 * (c + 1) .$$This follows immediately from arithmetic.This is done
+
+ $$((2 * c) + 1 + 1) = 2 * (c + 1) $$ means that $\exists c0 : nat, ((2 * c) + 1 + 1) = 2 * c0 $.
+
+ We have proved $$\exists c0 : nat, ((2 * c) + 1 + 1) = 2 * c0 $$ and so $\exists c0 : nat, (n + 1) = 2 * c0 $ follows.
+
+ and so we have proved $\exists c : nat, (n + 1) = 2 * c $.
+
+ We have proved $$\exists c : nat, (n + 1) = 2 * c $$ and so $(\exists c : nat, (n + 1) = 2 * c) \lor (\exists c : nat, (n + 1) = (2 * c) + 1) $ follows.
+
+ Since we proved both cases, we are done with $(\exists c : nat, (n + 1) = 2 * c) \lor (\exists c : nat, (n + 1) = (2 * c) + 1) $
+
+ this finishes the induction.
+
+ Therefore we have showed $$(\exists c : nat, n = 2 * c) \lor (\exists c : nat, n = (2 * c) + 1) $$ and so $(\exists c : nat, n = 2 * c) \lor (odd n) $.
+
+ Therefore we have showed $$(\exists c : nat, n = 2 * c) \lor (odd n) $$ and so $(even n) \lor (odd n) $.\begin{Lemma}[nt7] \label{Lemma:nt7}
+$nt7\,(n:nat):\,even\,(n*(n+1)).$
+ \end{Lemma}
+
+
+ Proof: Using the definition even, our conclusion becomes $$\exists c : nat, n * (n + 1) = 2 * c .$$$n$ and $(nt6)$ imply $$H : (even n) \lor (odd n) .$$ Since we know $H : (even n) \lor (odd n) $ we can consider two cases: 
+
+ Case 1 $$Hyp : even n $$
+
+ Using the definition of even, $$Hyp $$ becomes $$Hyp : \exists c : nat, n = 2 * c $$ We choose a variable $$c$$ in $$Hyp $$ to obtain $$n, c : nat $$ $$Hyp : n = 2 * c .$$ We rewrite the goal using $$Hyp $$ to obtain $$\exists c0 : nat, 2 * (c * ((2 * c) + 1)) = 2 * c0 .$$We shall prove $\exists c0 : nat, 2 * (c * ((2 * c) + 1)) = 2 * c0 $ by showing $$2 * (c * ((2 * c) + 1)) = 2 * (c * ((2 * c) + 1)) .$${\color{red}This is trivial!!}
+
+ $$2 * (c * ((2 * c) + 1)) = 2 * (c * ((2 * c) + 1)) $$ means that $\exists c0 : nat, 2 * (c * ((2 * c) + 1)) = 2 * c0 $.
+
+ We have proved $$\exists c0 : nat, 2 * (c * ((2 * c) + 1)) = 2 * c0 $$ and so $\exists c0 : nat, n * (n + 1) = 2 * c0 $ follows.
+
+ and so we have proved $\exists c : nat, n * (n + 1) = 2 * c $.
+
+ 
+
+ Case 2 $$Hyp0 : odd n $$
+
+ Using the definition of odd, $$Hyp0 $$ becomes $$Hyp0 : \exists c : nat, n = (2 * c) + 1 $$ We choose a variable $$c$$ in $$Hyp0 $$ to obtain $$n, c : nat $$ $$Hyp0 : n = (2 * c) + 1 .$$ We rewrite the goal using $$Hyp0 $$ to obtain $$\exists c0 : nat, ((2 * c) + 1) * ((2 * c) + (1 + 1)) = 2 * c0 .$$We shall prove $\exists c0 : nat, ((2 * c) + 1) * ((2 * c) + (1 + 1)) = 2 * c0 $ by showing $$((2 * c) + 1) * ((2 * c) + (1 + 1)) = 2 * (((2 * c) + 1) * (c + 1)) .$$This follows immediately from arithmetic.This is done
+
+ $$((2 * c) + 1) * ((2 * c) + (1 + 1)) = 2 * (((2 * c) + 1) * (c + 1)) $$ means that $\exists c0 : nat, ((2 * c) + 1) * ((2 * c) + (1 + 1)) = 2 * c0 $.
+
+ We have proved $$\exists c0 : nat, ((2 * c) + 1) * ((2 * c) + (1 + 1)) = 2 * c0 $$ and so $\exists c0 : nat, n * (n + 1) = 2 * c0 $ follows.
+
+ and so we have proved $\exists c : nat, n * (n + 1) = 2 * c $.
+
+ Since we proved both cases, we are done with $\exists c : nat, n * (n + 1) = 2 * c $
+
+ Therefore we have showed $$\exists c : nat, n * (n + 1) = 2 * c $$ and so $even (n * (n + 1)) $.This is done\end{document}

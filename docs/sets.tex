@@ -1,0 +1,111 @@
+
+\documentclass[11pt, oneside]{article}   	
+
+\usepackage{color}
+\usepackage{graphicx}				
+
+\usepackage{amssymb}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Proposition}{Proposition}
+\newtheorem{Definition}{Definition}
+\newtheorem{Inductive}{Inductive Definition}
+\newtheorem{Variable}{Variable}
+\newtheorem{Variables}{Variables}
+
+\newtheorem{Notation}{Notation}
+\newtheorem{Axiom}{Axiom}
+ \usepackage{tcolorbox}
+ \tcbuselibrary{skins}
+ \tcbuselibrary{theorems}
+\tcbuselibrary{breakable}
+
+
+\newcommand{\mybox}[1]{\begin{tcolorbox}[colback=white,colframe=gray!20!white, breakable, skin=enhancedmiddle]#1 \end{tcolorbox}}
+\title{Brief Article}
+\author{The Author}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\begin{Variable}[U] \label{Variable:U}
+$U\,:\,Type.$
+ \end{Variable}
+\begin{Definition}[Ensemble] \label{Definition:Ensemble}
+$Ensemble\,:=\,U\,\Rightarrow \,Prop.$
+ \end{Definition}
+\begin{Definition}[In] \label{Definition:In}
+$In\,(A:Ensemble)\,(x:U):=\,A\,x.$
+ \end{Definition}
+\begin{Notation}["x] \label{Notation:"x}
+$"x\,\in \,A":=\,(In\,A\,x)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Definition}[Included] \label{Definition:Included}
+$Included\,(B\,C:Ensemble)\,:\,Prop\,:=\,\forall \,x:U,\,x\in B\,\Rightarrow \,x\,\in \,C.$
+ \end{Definition}
+\begin{Notation}["A] \label{Notation:"A}
+$"A\,\subseteq \,B":=\,(Included\,A\,B)(at\,level\,10).$
+ \end{Notation}
+\begin{Definition}[Union] \label{Definition:Union}
+$Union\,(B\,C:Ensemble)\,:\,Ensemble\,:=\,fun\,x:U\,=>\,(x\in B)\,\lor \,(x\in C).$
+ \end{Definition}
+\begin{Notation}["A] \label{Notation:"A}
+$"A\,\cup \,B":=\,(Union\,A\,B)(at\,level\,8).$
+ \end{Notation}
+\begin{Definition}[Intersection] \label{Definition:Intersection}
+$Intersection\,(B\,C:Ensemble)\,:\,Ensemble\,:=fun\,x:U\,=>\,(x\in B)\,\land (x\in C).$
+ \end{Definition}
+\begin{Notation}["A] \label{Notation:"A}
+$"A\,\cap \,B"\,:=\,(Intersection\,A\,B)\,(at\,level\,10).$
+ \end{Notation}
+\begin{Lemma}[a] \label{Lemma:a}
+$a\,(A\,B\,C:Ensemble):((A\cap (B\cup C))\,\subseteq \,((A\cap B)\cup (A\cap C))).$
+ \end{Lemma}
+
+
+ Proof: Using the definition Included, our conclusion becomes $$\forall x : U, (x \in (A \cap (B \cup C))) \Rightarrow (x \in ((A \cap B) \cup (A \cap C))) .$$In order to show $\forall x : U, (x \in (A \cap (B \cup C))) \Rightarrow (x \in ((A \cap B) \cup (A \cap C))) $ we pick an arbitrary $$x$$ and show $$(x \in (A \cap (B \cup C))) \Rightarrow (x \in ((A \cap B) \cup (A \cap C))) .$$
+
+ We will assume $$Hyp : x \in (A \cap (B \cup C)) $$ and show $$x \in ((A \cap B) \cup (A \cap C)) .$$Using the definition (In, Union), our conclusion becomes $$(x \in (A \cap B)) \lor (x \in (A \cap C)) .$$Using the definition of (In, (Intersection)), $$Hyp $$ becomes $$Hyp : (x \in A) \land (x \in (B \cup C)) $$ Since we know $Hyp : (x \in A) \land (x \in (B \cup C)) $ we also know $$Hyp0 : x \in A $$ $$Hyp1 : x \in (B \cup C) .$$Using the definition of (In,Union), $$Hyp1 $$ becomes $$Hyp1 : (x \in B) \lor (x \in C) $$ Since we know $Hyp1 : (x \in B) \lor (x \in C) $ we can consider two cases: 
+
+ Case 1 $$Hyp : x \in B $$
+
+ We will prove the left hand side of $(x \in (A \cap B)) \lor (x \in (A \cap C)) $. That is we need to prove $$x \in (A \cap B) .$$ Using the definition (In, Intersection), our conclusion becomes $$(x \in A) \land (x \in B) .$$In order to prove $(x \in A) \land (x \in B) $ will first prove $$x \in A $$ and then $$x \in B .$$
+
+ First we show $$x \in A .$$ $x \in A $ follows trivially from the assumptions.
+
+ Next we show $$x \in B .$$ $x \in B $ follows trivially from the assumptions.
+
+ Since we showed $$x \in A $$ and $$x \in B $$ we also have $(x \in A) \land (x \in B) $.
+
+ Therefore we have showed $$(x \in A) \land (x \in B) $$ and so $x \in (A \cap B) $.
+
+ We have proved $$x \in (A \cap B) $$ and so $(x \in (A \cap B)) \lor (x \in (A \cap C)) $ follows.
+
+ 
+
+ Case 2 $$Hyp2 : x \in C $$
+
+ We will prove the right hand side of $(x \in (A \cap B)) \lor (x \in (A \cap C)) $. That is we need to prove $$x \in (A \cap C) .$$ Using the definition (In, Intersection), our conclusion becomes $$(x \in A) \land (x \in C) .$$In order to prove $(x \in A) \land (x \in C) $ will first prove $$x \in A $$ and then $$x \in C .$$
+
+ First we show $$x \in A .$$ $x \in A $ follows trivially from the assumptions.
+
+ Next we show $$x \in C .$$ $x \in C $ follows trivially from the assumptions.
+
+ Since we showed $$x \in A $$ and $$x \in C $$ we also have $(x \in A) \land (x \in C) $.
+
+ Therefore we have showed $$(x \in A) \land (x \in C) $$ and so $x \in (A \cap C) $.
+
+ We are done with $$x \in (A \cap C) $$ and so $(x \in (A \cap B)) \lor (x \in (A \cap C)) $ follows.
+
+ Since we proved both cases, we are done with $(x \in (A \cap B)) \lor (x \in (A \cap C)) $
+
+ We are done with $(x \in (A \cap B)) \lor (x \in (A \cap C)) $
+
+ Therefore we have showed $$(x \in (A \cap B)) \lor (x \in (A \cap C)) $$ and so $x \in ((A \cap B) \cup (A \cap C)) $.
+
+ We have showed that if $$Hyp : x \in (A \cap (B \cup C)) $$ then $$x \in ((A \cap B) \cup (A \cap C)) $$ a proof of $(x \in (A \cap (B \cup C))) \Rightarrow (x \in ((A \cap B) \cup (A \cap C))) $.
+
+ Since $$x$$ was arbitrary this shows $\forall x : U, (x \in (A \cap (B \cup C))) \Rightarrow (x \in ((A \cap B) \cup (A \cap C))) $.
+
+ Therefore we have showed $$\forall x : U, (x \in (A \cap (B \cup C))) \Rightarrow (x \in ((A \cap B) \cup (A \cap C))) $$ and so $(A \cap (B \cup C)) \subseteq ((A \cap B) \cup (A \cap C)) $.This is done\end{document}
