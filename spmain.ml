@@ -9,6 +9,7 @@ open GToolbox
 open Treestuff
 let listofcommands = Commands.commands ();;
 let focused=ref true
+
 (* List.map (fun x -> List.map print_string x; flush_all ()) listofcommands;; *)
 type status = BUSY | WAITING ;;
 let completionindex = ref 0
@@ -106,7 +107,12 @@ let checkforcoq () =
 if (Coqstuff.isLinux ()) then (coqstr:="coqtop") else 
   checkforcoq ();;
 
+
 let oc,ic,ec  = Unix.open_process_full (!coqstr^" -ideslave -main-channel stdfds") (Unix.environment ());;
+
+
+
+let coqinit () =
 if (not (Coqstuff.isWin ())) then (
   set_binary_mode_in oc true;
   Unix.set_nonblock (Unix.descr_of_in_channel oc))
@@ -147,7 +153,8 @@ ignore(List.map (fun x-> Coqstuff.writeToCoq ic   x !id;
     id:=Coqstuff.fstid ic oc  !id;
     Printf.printf "\n The id is %s \n" !id; flush_all ())
 
-  imports);
+  imports);;
+coqinit ();;
 (*  let imports =["Local Open Scope Z_scope." ] in
     List.map (fun x-> 
       Coqstuff.writeToCoq ic   x !id;
@@ -343,10 +350,10 @@ let stop = win10#buffer#get_iter `INSERT in
     
 
 let tactics = (List.map (fun n -> `I (n, (fun () -> 
-let stop = win10#buffer#get_iter `INSERT in
+let stop = win10#buffer#get_iter `START in
 let ast = try (Formulaparsing.parse name) with _ -> Var name in
            Printf.printf "the line is %i\n\n" (stop#line); flush_all ()  ;
-           win10#buffer#insert ~iter:stop (n) )) ) 
+           win10#buffer#insert ~iter:stop (n^"\n") )) ) 
            (Formulaparsing.produce_possible_tactics_goal ast hypname goal) ) in
   selection#unselect_all ();
     GToolbox.popup_menu ~entries:(menupieces@[`S]@tactics)
@@ -492,10 +499,10 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
 
                         current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac; values = (Processinputs.get_values xx listofcommands) }, List.map (fun x->Treestuff.LEAF(x)) goals)) !current_tree ;
 
-                        current_head := (List.hd newgoals);
+                        current_head := (List.hd newgoals)
 
-                        Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) !current_tree; flush_all ();   
-                        )
+(*                         Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) !current_tree; flush_all ();   
+ *)                        )
                       else
                       ( 
                         (List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals;flush_all ();
@@ -605,8 +612,8 @@ let savelatex file mainobj listoftheorems=
            LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
             Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in *)(* (
                                 List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d ) *) 
-           Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) totaltree; flush_all ();   
-              m^(Latexstuff.latex thm))  "" printtrees (* (List.rev newlist) *)   in
+(*            Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) totaltree; flush_all ();   
+ *)              m^(Latexstuff.latex thm))  "" printtrees (* (List.rev newlist) *)   in
           let message = Latexstuff.header^message^"\\end{document}" in 
          
           Printf.fprintf out "%s\n" message; flush_all ();
@@ -618,7 +625,7 @@ let main () =
   let window = GWindow.window ~width:1200 ~height:700
       ~title:"Spatchcoq" () in
   let vbox0 = GPack.vbox  ~packing:window#add () in
-
+ vbox0#set_resize_mode`PARENT;
   ignore(window#connect#destroy ~callback:Main.quit);
 
   (* Menu bar *)
@@ -635,7 +642,7 @@ let main () =
  
 
   (* first row *)
-  let row0 = GPack.hbox  ~height:285 ~homogeneous:true ~packing:vbox#pack() in
+  let row0 = GPack.hbox  ~height:285 ~homogeneous:true ~packing:vbox#add() in
   (*left window*)
   let scroll00=GBin.scrolled_window ~border_width:10
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row0#add () in
@@ -643,7 +650,7 @@ let main () =
       ~packing:scroll00#add_with_viewport () in
   win00#buffer#set_text "";
   win00#misc#modify_base [(`NORMAL, `NAME "Honeydew")];
-   win00#misc#modify_font_by_name "System 16";
+   win00#misc#modify_font_by_name "System 14";
   (*right window*)
   (* let scroll01=GBin.scrolled_window ~border_width:10
      ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row0#add () in *)
@@ -718,7 +725,7 @@ let create_view ~model ~packing () =
      win01#misc#modify_base [(`NORMAL, `NAME "lightgrey")]; *)
 
   (*second row*)
-  let row1 = GPack.hbox ~height:285 ~homogeneous:true ~packing:vbox#pack () in
+  let row1 = GPack.hbox ~height:285 ~homogeneous:true ~packing:vbox#add () in
 
   (*left window*)
 
@@ -730,7 +737,7 @@ let create_view ~model ~packing () =
  *)
   win10#misc#modify_base [(`NORMAL, `NAME "lightyellow")];
   let con = win10#misc#create_pango_context#font_description in
-  win10#misc#modify_font_by_name "System 18";
+  win10#misc#modify_font_by_name "System 14";
 
   win10#connect#paste_clipboard ~callback:(fun x->  (* this marks the fact that the user has pasted something in win10*)
 
@@ -782,6 +789,7 @@ List.map
       (* emergency closing *)
       raise e;
   in
+
 
 
   ignore( factory#add_item "Open" ~key:_O ~callback: ( fun () ->
@@ -864,6 +872,11 @@ ignore( factory#add_item "Update" ~key:_M ~callback: ( fun () ->
 Unix.execv (Filename.current_dir_name^"/update")[||] ()
 
     ));
+
+ignore( factory#add_item "Restart" ~key:_M ~callback: ( fun () ->
+
+Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|] 
+));
 
 
   ignore( factory#add_item "Save latex" ~key:_L ~callback: ( fun () ->
@@ -951,7 +964,7 @@ Unix.execv (Filename.current_dir_name^"/update")[||] ()
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row1#add () in
   let win11 = GText.view 
       ~packing:scroll11#add () in
-       win11#misc#modify_font_by_name "System 16";
+       win11#misc#modify_font_by_name "System 14";
   win11#buffer#set_text "";
 
 
@@ -988,8 +1001,9 @@ Unix.execv (Filename.current_dir_name^"/update")[||] ()
 
 
   (*third row*)
-  let row2 = GPack.hbox ~border_width:5 ~height:50 ~homogeneous:true ~packing:vbox#pack () in
+  let row2 = GPack.hbox ~border_width:5 ~height:50 ~homogeneous:true  ~packing:vbox#pack () in
   (* run Button *)
+  row2#set_resize_mode`PARENT;
   let _ = window#event#connect#key_press ~callback:begin fun ev ->
       let _ = GdkEvent.Key.state ev in
       let k = GdkEvent.Key.keyval ev in

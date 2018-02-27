@@ -32,6 +32,9 @@ let load_file1 f =
  let changelist = [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
                                ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >") ;("∈", "iin");
                               ("∩", "oint") ;("∪", "ouni"); ( "⊆", "osubs"); ("∅" ,"empty") ;("∁","compl")] in
+    let changelist1 = [("¬", "not");   ("→", " -> "); ("∀", "forall "); 
+                               ("∃", "exists ");   ("↔", "< - >") ;("∈", "iin");
+                              ("∩", "oint") ;("∪", "ouni"); ( "⊆", "osubs"); ("∅" ,"empty") ;("∁","compl")] in                          
   close_in ic;
   let s1 = (Processinputs.replacelist  s changelist ) in
 
@@ -46,7 +49,7 @@ print_string (Glib.Convert.locale_to_utf8 "∈");flush_all ();
   if Utf8conv.is_windows1252 ss then
   (Printf.printf "\n --\n the text is\n %s \n ----" ss;flush_all())
    else (); *)
-  if (Glib.Utf8.validate ss) then (Processinputs.replacelist ss (List.map (fun x-> (snd x, fst x)) changelist))
+  if (Glib.Utf8.validate ss) then (Processinputs.replacelist ss (List.map (fun x-> (snd x, fst x)) changelist1))
 
 else  "did not woek"
 

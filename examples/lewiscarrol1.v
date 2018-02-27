@@ -19,3 +19,4 @@ Obtain (x is despised) applying (ID x) to H.
 Obtain (not (x is despised)) applying (MND x) to Hyp0.
 Apply result H1 .
 This follows from assumptions.
+Qed.

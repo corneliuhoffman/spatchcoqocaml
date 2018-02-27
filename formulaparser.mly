@@ -93,7 +93,8 @@ open Ast
 %right  SUBSET 
 
 %nonassoc IN
-%right INTERSECTION UNION
+%right INTERSECTION 
+%right UNION
 
 
 %nonassoc COMPLEMENT 
