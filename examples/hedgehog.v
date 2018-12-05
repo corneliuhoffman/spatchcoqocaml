@@ -6,7 +6,7 @@ Notation "x 'takes' 'the' 'Times'":=(Times x)(at level 10).
 Axiom TE:forall x, (x takes the Times)-> x is Educated.
 Axiom HR: forall x, x is Hedgehog-> not (x can read).
 Axiom RE: forall x, not (x can read)-> not (x is Educated).
-Lemma a: forall x, x is Hedgehog-> not (x takes  the Times).
+Lemma a: forall x, (x is Hedgehog )-> (not (x takes  the Times)).
 Fix an arbitrary element x.
 Assume (x is Hedgehog) then prove (not (x takes the Times)).
 Rewrite goal using the definition of not.

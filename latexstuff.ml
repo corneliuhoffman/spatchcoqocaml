@@ -18,11 +18,13 @@ let newconclusion (tree:Processresults.goal Treestuff.tree) n: Processresults.st
   match tree with
     LEAF x -> {name ="error"; content="SOMETHING IS WRONG"}
   |TREE (x,li) ->  try (conclusion (List.nth li n)) with any -> Printf.printf " neconclusion n = %i, length l =%i" n (List.length li); flush_all (); {name=""; content= ""}
+
 let newhyp (oldgoal:Processresults.goal)  (newgoal:Processresults.goal Treestuff.tree) : Processresults.statement list = 
 
   let oldhyps = oldgoal.hyps in
   let newhyps = gethyps newgoal in
   List.filter (fun a -> not (List.mem a oldhyps)) newhyps
+
 let deadhyp (tree:Processresults.goal Treestuff.tree) : Processresults.statement list =
   match tree with
     LEAF x -> [{name ="error"; content="SOMETHING IS WRONG"}]

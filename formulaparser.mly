@@ -21,6 +21,7 @@ open Ast
 
 %token <string> ID
 %token SPACE
+%token LE
 %token PLUS
 %token DIV
 %token MINUS
@@ -80,14 +81,16 @@ open Ast
 %left COMMA
 %right below_INTERSECTION1  
 
-%nonassoc IMPLIES
+%right IMPLIES
+%nonassoc IFF
 %right OR
 %right AND
+%nonassoc NOT
 %nonassoc EQUALS
 %nonassoc EXISTS
 %nonassoc FORALL
 %nonassoc NE
-%nonassoc NOT
+
 %right below_INTERSECTION  
 
 %right  SUBSET 
@@ -100,15 +103,15 @@ open Ast
 %nonassoc COMPLEMENT 
 
 
-
+%nonassoc LE
 %right DIV
-%right PLUS
-%right MINUS
-%right SETMINUS
-%right TIMES
-%nonassoc SUCC
+%left PLUS MINUS
+%left SETMINUS
+%left TIMES
 %right POW
-%right IFF
+%nonassoc SUCC
+
+
 
 
 
@@ -135,6 +138,7 @@ prog:
   
 expr: 
   |EMPTYSET; { EmptySet }
+  |EMPTYSET;b=ID { In( Var b, EmptySet) }
 
 
   
@@ -144,15 +148,14 @@ expr:
   
   | e1= expr; IFF; e2 = expr { Iff(e1,e2) }
   | e1=expr; DIV; e2 = expr {Div(e1, e2)} 
+  | e1 = expr; LE; e2 = expr { Le(e1,e2) }
+
   | e1 = expr; PLUS; e2 = expr { Add(e1,e2) }
   | e1 = expr; MINUS; e2 = expr { Minus(e1,e2) }
-  | e1 = expr; SETMINUS; e2 = expr { Setminus(e1,e2) }
   | e1 = expr; TIMES; e2 = expr { Times(e1,e2) }
   | e1 = expr; AND; e2 = expr { And(e1,e2) }
   | e1 = expr; OR; e2 = expr { Or(e1,e2) }
-  | e1 = expr; UNION; e2 = expr { Union(e1,e2) }
-   
-  | e1 = expr; INTERSECTION; e2 = expr {Intersection(e1,e2) }
+  
   | COMPLEMENT; e=expr {Complement(e)}
   | e1=expr; SUBSET; e2=expr {Subset(e1, e2)} 
   
@@ -163,9 +166,15 @@ expr:
   | EXISTS; e1 = expr; COMMA; e3=expr {Exists(e1 , e3)}
   | FORALL; e1 = expr; COMMA; e3=expr {Forall(e1 , e3)}
   | e1= expr; IMPLIES; e2 = expr { Implies(e1,e2) }
-  | e1 = expr; UNION; e2 = expr ; b = ID { List([Union(e1,e2); Var b]) }
-  | e1 = expr; INTERSECTION; e2 = expr ; b = ID { List([Intersection(e1,e2); Var b]) }
+    | e1 = expr; SETMINUS; e2 = ID; b=ID { In( Var b, Setminus(e1, Var e2)) }
 
+    | e1 = expr; SETMINUS; e2 = expr { Setminus(e1,e2) }
+
+  | e1 = expr; UNION; e2 = ID  ; b = ID { In(Var b, Union(e1,Var e2)) }
+  | e1 = expr; INTERSECTION; e2 = ID ; b = ID { In(Var b,Intersection(e1,Var e2)) }
+  | e1 = expr; UNION; e2 = expr { Union(e1,e2) }
+   
+  | e1 = expr; INTERSECTION; e2 = expr {Intersection(e1,e2) }
   | e1 = expr; IN; e2 = expr { In(e1,e2) }
   | LPAREN; e = expr; RPAREN {(e)} 
   | e1= expr; IMPLIES; e2 = expr; b=ID %prec below_INTERSECTION1 { Implies(e1,(List([e2; Var b]))) }
@@ -173,7 +182,7 @@ expr:
 
 
 func:
-  | a =func; b = ID  %prec below_INTERSECTION { List ([ a; Var b]) }
+  | a =func; b = expr  %prec below_INTERSECTION { List ([ a;  b]) }
   | x = ID { Var x }
   ;
 

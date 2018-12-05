@@ -1,6 +1,6 @@
 \preface
 \epigraph{Proofs are to mathematics what spelling (or even calligraphy) is to poetry. Mathematical works do consist of proofs, just as poems do consist of characters.}{Vladimir Arnold}
-
+Section{General introduction}
 There are numerous studies about the image of mathematics among professional mathematicians and among the general public. The general public holds the idea that Mathematics is a series of formulas and calculations that are useful but are so complicated that they satisfy the old Arthur C Clarke quote ``Any sufficiently advanced technology is indistinguishable from magic.''.
 
 However similar studies among mathematicians provides a completely different result. Indeed most mathematicians think that the main transferable skill that Mathematics Education brings is not the ability to do the long calculations but the ability to reason correctly and to use abstraction in solving problems.
@@ -25,9 +25,35 @@ We have made several attempts to teach Mathematics with the help of Isabelle and
 The idea of the book is to teach some topics in discrete mathematics (the standard way of introducing proofs) with the help of Spatchcoq. The reader is encouraged to download the software using the instructions in Appendix~\ref{ch:thesoftware}. 
 
 
- We will slowly introduce the software together with basic methods of proofs in Chapter~\ref{chap:Basicproof} van numerous examples. The inpatient reader can skip quickly to Appendix~\ref{ch:tactics} to get short descriptions of the tactics, respectively to Appendix~\ref{ch:examples} to see two detailed examples. You can also find some other examples of proofs at 
+ We will slowly introduce the software together with basic methods of proofs in Chapter~\ref{chap:Basicproof} give numerous examples. The inpatient reader can skip quickly to Appendix~\ref{ch:tactics} to get short descriptions of the tactics, respectively to Appendix~\ref{ch:examples} to see two detailed examples. You can also find some other examples of proofs at 
  
  \url{https://github.com/corneliuhoffman/spatchcoqocaml/tree/master/examples}
+\section{Warning for teachers}\label{subsec:warnings}
+
+Spatchcoq is developed on top of Coq and, by extension, will suffer from some of the difficulties inherent in using Coq (or any other proof assistant). Perhaps one of the most important one is the fact that proof assistants are based on type theory rather than set theory (see Appendix~\ref{chap:setsvstypes} for details). In particular every object in Coq has exactly one type and you need a conversion to move form one to the other. We have tried to keep this under the hood as much as possible and to mimic the usual notations and formulations. 
+
+This creates certain surprising complications. For example, in the number theory chapter, we have decided to work with natural numbers rather than integers (this is mainly so that induction will work as expected). In general this is ok but, because $\mathbb{N}$ is not a ring, subtraction is a delicate beast.  This is because, if $m\le n$ are two natural numbers then $m-n=0$. So, for example a statement like $ (m - n) + n = m$ is only true if $m\ge n$. For example $(2-3)+3=0+3=3$. For this reason we advise to tilt your examples in the number theory section towards addition rather than subtraction. We will try to remind the reader about such issues as we go along. We will use the following format:
+
+\warn{Watch for the complications related to minus.}
+
+We will also use some separate coloured boxes to separate txt. More neutral remarks are going to look like this:
+\rmk{This is a remark that should help you understand the paragraph better.}
+
+
+The text that is related to Spatchcoq will also be separated from usual text. The text that we input in to Spatchcoq will appear in input boxes like this:
+\inp{
+Lemma ancomm$(P\ Q:Prop):P\lor Q ->Q\lor P.$\\
+Assume $(P \lor Q)$ then prove $(Q \lor P)$.\\
+Consider cases based on disjunction in hypothesis Hyp.}
+
+The goals that Spatchcoq will return to us will look like this:
+\coq{Hyp:not\ (P \land (not\ Q))\\
+Hyp0:(((not\ P) \land Q) \lor (P \land (not\ Q)))\\
+}{Q}
+
+And the messages that Coq will offer look like this:
+
+\mess{error}
 
 
  

@@ -10,15 +10,15 @@ let emptygoal ={number="-1"; hyps=[];conclusion ={name=""; content="no goals"}; 
 
 
 let print_goal {name=b; content= c} =
-(* let ast = Formulaparsing.parse (String.trim c) in
-Printf.printf "\n\n\n\ this is the %s\n\n\n form %s\n\n" (String.trim c) (Ast.to_string ast);flush_all (); *)
-let d = try (Formulaparsing.print (Formulaparsing.parse (String.trim c))) with any ->  (String.trim c) (* raise any *) in
+  (* let ast = Formulaparsing.parse (String.trim c) in
+     Printf.printf "\n\n\n\ this is the %s\n\n\n form %s\n\n" (String.trim c) (Ast.to_string ast);flush_all (); *)
+  let d = try (Formulaparsing.print (Formulaparsing.parse (String.trim c))) with any ->  (String.trim c) (* raise any *) in
 
- if b ="" 
+  if b ="" 
   then
     Printf.sprintf "%s "  (String.trim d)
   else
-    Printf.sprintf "<b>%s</b> : %s " (String.trim b) (String.trim d);;
+    Printf.sprintf "%s : %s " (String.trim b) (String.trim d);;
 let print_goals {number=n; hyps=h; conclusion= c; leaving_tactic=l; values = values} = 
   n^"\n--\n"^(String.concat "\n" (List.map print_goal h))^"\n================\n"^(print_goal c)^"\nleavingtactic:"^l;;  
 
@@ -26,20 +26,20 @@ let print_goals {number=n; hyps=h; conclusion= c; leaving_tactic=l; values = val
 *)
 
 let astofstr str goal=
-let n, formula = if goal then  "", str 
-else (
-  let break = Str.split (Str.regexp ":") (String.trim str) in
-  let n, formula = if List.length break =1 then "", str else List.hd break, String.concat ":" (List.tl break)
-in n, formula) in 
- Printf.printf "formula %s\n " formula ; flush_all ();
- let f = try (Formulaparsing.parse formula) with any -> Var formula in
+  let n, formula = if goal then  "", str 
+    else (
+      let break = Str.split (Str.regexp ":") (String.trim str) in
+      let n, formula = if List.length break =1 then "", str else List.hd break, String.concat ":" (List.tl break)
+      in n, formula) in 
+  Printf.printf "formula %s\n " formula ; flush_all ();
+  let f = try (Formulaparsing.parse formula) with any -> Var formula in
 
- n,  f
-    
+  n,  f
+
 let listofstr str goal =
 
   let name,ast =  astofstr str goal in
- 
+
   Formulaparsing.getlist ast
 
 let xmltostr str = 
@@ -68,19 +68,19 @@ let goallist x =
   match goals with
   | [] -> []
   | _ -> 
-  let gg = to_list ((List.hd goals)$$"list") in
-  (* List.map (fun a -> print_string (to_string a); print_string "\n\n") gg;
-  print_int (List.length gg); *)
-  match gg with
-  | [] -> []
-  | _ ->  to_list ((List.hd gg)$$"goal") 
+    let gg = to_list ((List.hd goals)$$"list") in
+    (* List.map (fun a -> print_string (to_string a); print_string "\n\n") gg;
+       print_int (List.length gg); *)
+    match gg with
+    | [] -> []
+    | _ ->  to_list ((List.hd gg)$$"goal") 
 
 let processoutput x = 
- Printf.printf "here is a lst: %s\n\n\n\n" (cleanstr (get_texts x)); flush_all (); 
+  Printf.printf "here is a lst: %s\n\n\n\n" (cleanstr (get_texts x)); flush_all (); 
   let goals= goallist x in 
   if goals =[] then [emptygoal]
   else   let g =List.map (fun a -> (manage (to_list (children a)))) goals in
-g;;
+    g;;
 
 let printmessages x =
   let clean st = Printf.sprintf "%s" "\n"^(Str.global_replace (Str.regexp "<_>") "\n-------\n" st ) in
@@ -91,7 +91,7 @@ let printmessages x =
 let get_a_goal li = 
   let procs = List.filter (fun x-> processoutput x  != [emptygoal]) li in
   match procs with
-  []-> List.hd li
+    []-> List.hd li
   | _-> List.hd (List.rev procs)
 
 

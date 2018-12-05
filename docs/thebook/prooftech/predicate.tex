@@ -25,7 +25,7 @@ Here are some predicates.
 
 Of course you cannot really prove predicates, just statements. Predicates have ``free'' variables and those need to be ``quantified''. There are two quantifiers that bind variables. as with connectors for propositions they have introduction and elimination rules.
 
-\subsection{\bf Quantifiers, free and bound variables.}
+\subsection{ Quantifiers, free and bound variables.}
 
 As mentioned above, a predicate is a function which takes values in Prop. As such it has at least free variable (we might consider several variable. predicates). There are two ways to bind predicates,  the existential and the universal quantifier. You have used both of them in a somewhat informal way.
   Very often you see the following colloquial statements.
@@ -143,7 +143,120 @@ produces the goal
 
 \coq{a:U}{P(a)}.
 
-  
+ \section{More Logic puzzles}
+ \subsection{Some examples}
+ 
+Lewis Carroll is mostly known for the delightfully absurd stories of ``Alice's Adventures in Wonderland'' and ``Through the Looking-Glass''. The man behind the pseudonym was Charles Lutwidge Dodgson, an Oxford mathematician with interests in linear algebra, geometry and logic. Toward the end of his life he started to write a  treaty of logic called ``Symbolic Logic''. He had planned the treaty to have three parts but, unfortunately, he only lived to see  ``PART I
+ELEMENTARY'' published. In the intro to the book he mentions that 
+{\quote I have a quantity of MS. in hand for Parts II and III, and hope to be able -- should life, and health, and opportunity, be granted to me, to publish them in the course of the next few years. Their contents will be as follows:
+
+PART II. ADVANCED.
+Further investigations in the subjects of Part I. Propositions of other forms (such as ``Not-all x are y''). Triliteral and Multiliteral Propositions (such as ``All abc are de''). Hypotheticals. Dilemmas. \&c. \&c.
+
+Part III. TRANSCENDENTAL.
+Analysis of a Proposition into its Elements. Numerical and Geometrical Problems. The Theory of Inference. The Construction of Problems. And many other Curiosa Logica.}
+
+
+The book is rather technical and some of the methods exposed there have been overtaken by more modern notations. Nevertheless there are many wonderfully quirky  logical puzzles (syllogisms). They come in the form of a number of propositions of type $P \rightarrow Q$ where $P$ and $Q$ are propositions including quantifiers. Here is an example:
+\begin{verbatim}
+All lions are fierce;
+Some lions do not drink coffee.
+     Some fierce creatures do not drink coffee.
+\end{verbatim}
+
+
+The first two are hypotheses (axioms) and the third is the conclusion (lemma). We will formalise the statements in Spatchcoq and, while doing so we will introduce some the concept of notation. This will allow us to write more natural looking text.
+
+We start, as before with defining some variables.We first define a ``set of beings'' and then a set of predicate on all beings. These predicates are: ``Lion'', ``Fierce'' and ``Coffee''. 
+
+\inp{Variable Beings:Set.\\
+Variables Lion Fierce Coffee:Beings->Prop.}
+
+
+
+Next we introduce notations, note the use of ' ' to bound the words in those notations. The (at level 10) is a mandatory field, the lower the level the closer the brackets. For example if we use (at level 0) for ``x is a lion'' then it will be printed as ``(x) is a lion''. If we use a higher level it will be printed as ``(x is a lion)''.
+
+
+\inp{Notation "x 'is' 'a' 'lion'":= (Lion x) (at level 10).\\
+Notation "x 'is' 'fierce'":= (Fierce x) (at level 10).\\
+Notation "x 'drinks' 'coffee'":= (Coffee x) (at level 10).}
+
+
+Finally we introduce the two axioms and the Lemma:
+\inp{Axiom LF: forall x, x is a lion -> x is fierce.\\
+Axiom LC: exists x, x is a lion $\land$ not (x drinks coffee).\\
+Lemma coffee: exists a, not(a drinks coffee) $\land$ (a is fierce).}
+
+
+Now in order to prove the lemma we first will find a being that is a lion and does not drink coffee. To do that we use the axiom LC.
+
+
+\inp{Claim (exists x, x is a lion $\land$ not (x drinks coffee)).\\
+Apply result LC.}
+
+The result is :
+\coq{(\exists x : Beings, (x is a lion) \land (not (x drinks coffee)))}{(\exists a : Beings, (not (a drinks coffee)) \land (a is fierce))}
+
+
+Now we shall fix the element that is lion and does not drink coffee and prove that is fierce and does not drink coffee. The proof is standard.
+
+
+\inp{Fix b the existentially quantified variable in H .\\
+Prove the existential claim is true for b.\\
+Eliminate the conjuction in hypothesis H. \\
+Prove the conjunction in the goal by first proving (not (b drinks coffee)) then (b is fierce).\\
+This follows from assumptions.\\
+Apply result LF.\\
+This follows from assumptions.}
+
+ \paragraph{\bf Exercises}
+ For each of the following deduce wether the third statement follows from the other two and if it does write a formal proof.
+ \begin{enumerate}
+ \item  \begin{verbatim}
+No doctors are enthusiastic;
+You are enthusiastic.
+    You are not a doctor.\end{verbatim}
+ \item \begin{verbatim}
+Dictionaries are useful;
+Useful books are valuable.
+    Dictionaries are valuable.\end{verbatim}
+ \item \begin{verbatim}
+No misers are unselfish;
+None but misers save egg-shells.
+    No unselfish people save egg-shells.\end{verbatim}
+ \item \begin{verbatim}
+ Some epicures are ungenerous;
+All my uncles are generous.
+    My uncles are not epicures.\end{verbatim}
+\item \begin{verbatim}
+Gold is heavy;
+Nothing but gold will silence him.
+    Nothing light will silence him.\end{verbatim}
+ \item\begin{verbatim}    
+I saw it in a newspaper.
+All newspapers tell lies.
+    It was a lie.\end{verbatim}
+ \item\begin{verbatim}
+Some cravats are not artistic;
+I admire anything artistic.
+    There are some cravats that I do not admire.\end{verbatim}
+ \item\begin{verbatim}
+His songs never last an hour;
+A song, that lasts an hour, is tedious.
+    His songs are never tedious.\end{verbatim}
+ \item\begin{verbatim}
+Some candles give very little light;
+Candles are meant to give light.
+    Some things, that are meant to give light, give very little.\end{verbatim}
+ \item\begin{verbatim}
+All, who are anxious to learn, work hard;
+Some of these boys work hard.
+    Some of these boys are anxious to learn.\end{verbatim}
+\end{enumerate}
+
+
+
+
 \section{Proof by contradiction and the Drinker's Paradox}\label{sec:drinker}
 
 

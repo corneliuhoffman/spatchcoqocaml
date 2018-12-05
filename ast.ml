@@ -3,6 +3,7 @@ type expr =
   | Var of string
   | Succ of expr
   (* | Int of int *)
+  | Le of expr*expr
   | Pow of expr*expr
   | Add of expr*expr
   | Div of expr*expr
@@ -34,6 +35,8 @@ let rec to_string expr = match expr with
 | Var string -> "Var("^string^")"
 (* | Int a -> "Int("^(string_of_int a)^")" *)
 |Succ(a) ->  "Succ("^(to_string a)^")"
+| Le( a,b) ->"Le("^(to_string a)^","^(to_string b)^")"
+
 | Add( a,b) ->"Add("^(to_string a)^","^(to_string b)^")"
 |Pow(a, b) ->"Pow("^(to_string a)^","^(to_string b)^")"
   

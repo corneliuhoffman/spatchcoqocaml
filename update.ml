@@ -48,9 +48,9 @@ if (int_of_string newv) != (int_of_string oldver) then
 
      )
 );
-if not (Coqstuff.isWin ()) then
+(* if not (Coqstuff.isWin ()) then
     Unix.chmod (Filename.current_dir_name^"/spmain") 0o777
-else ();;
+else ();; *)
 
 
 

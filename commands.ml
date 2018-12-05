@@ -36,7 +36,7 @@ let load_file1 f =
                                ("∃", "exists ");   ("↔", "< - >") ;("∈", "iin");
                               ("∩", "oint") ;("∪", "ouni"); ( "⊆", "osubs"); ("∅" ,"empty") ;("∁","compl")] in                          
   close_in ic;
-  let s1 = (Processinputs.replacelist  s changelist ) in
+  let s1 = (Processinputs.replacelist  (Bytes.to_string s) changelist ) in
 
 
 print_string (Glib.Convert.locale_to_utf8 "∈");flush_all ();
@@ -59,7 +59,7 @@ let load_file f =
   let s = Bytes.create n in
  input ic s 0 n;
   close_in ic;
-  let s1 = (Processinputs.replacelist  s [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
+  let s1 = (Processinputs.replacelist  (Bytes.to_string s) [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
                                ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >")]) in
 
 

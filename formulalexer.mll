@@ -39,6 +39,7 @@ rule read =
   |  "≠" {NE}
   | "^" {POW}
   | "|" {DIV}
+  |"<=" {LE}
   | "+"   { PLUS }
   | "-"   { MINUS }
   | "*"   {TIMES}
@@ -68,6 +69,7 @@ rule read =
   |"∁" {COMPLEMENT}
   |"∖" {SETMINUS}
   |"⊆" {SUBSET}
+  |"sub" {SUBSET}
 
   |"or" {OR}
   | "∖"   { SETMINUS }

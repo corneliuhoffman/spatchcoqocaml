@@ -1,1 +1,1 @@
-true: package(str), package(lambdasoup), package(lablgtk2), package(pcre), package(ppx_deriving),package(netclient), package(ppx_sexp_conv), package(sexplib), package(js_of_ocaml)
+true: package(str), package(lambdasoup), package(lablgtk2), package(pcre), package(ppx_deriving),package(netclient), package(ppx_sexp_conv), package(sexplib), package(js_of_ocaml), package(js_of_ocaml.syntax)

@@ -48,7 +48,7 @@ let rec getmessages ic oc l =
     let x = if isWin () then   repeatreading ic oc  else stringReadFromCoq oc () in
     
    
-    if x!="" then try newparse x with _ -> ((* print_string "ha\n";  *)sgoal ic oc ()) else ((* print_string "tooo\n"; *) sgoal ic oc ()) in
+    if x!=Bytes.empty then try newparse (Bytes.to_string x) with _ -> ((* print_string "ha\n";  *)sgoal ic oc ()) else ((* print_string "tooo\n"; *) sgoal ic oc ()) in
   let b = sgoal ic oc () in 
   
   if (l!= [] && (to_string b) = (to_string (List.hd l) )) then (  l) else  ( getmessages ic oc (b::l));;
@@ -60,20 +60,20 @@ let rec mygoal ic oc str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\">
   if str = x then x else ( (* print_string "ho";flush_all(); *) mygoal ic oc x);;
 
 let rec soupgoal ic oc () = 
-  let x = mygoal ic oc "" in
-  try newparse x with _ ->  soupgoal ic oc ();;
+  let x = mygoal ic oc Bytes.empty in
+  try newparse (Bytes.to_string x) with _ ->  soupgoal ic oc ();;
 
 let rec readnow ic oc str =
   let a, b, c = Unix.select [Unix.descr_of_in_channel oc] [Unix.descr_of_out_channel ic] [] 25.0 in
   if a != [] then
     let x= (readFromCoq (Unix.in_channel_of_descr (List.hd a)) ()) in
-    readnow ic oc (str^x) else str;;
+    readnow ic oc (str^(Bytes.to_string x)) else str;;
 
 
 
 let evars ic () = Printf.fprintf ic "<call val=\"Evars\"><unit/></call>\n";flush_all ();;
 let status ic () = Printf.fprintf ic "%s" "<call val=\"Status\"><bool val=\"false\"/></call>";flush_all ();;
-let rec soupstatus ic oc () = ignore (status ic ()); try newparse (stringReadFromCoq oc ()) with _ -> soupstatus ic oc ();;
+let rec soupstatus ic oc () = ignore (status ic ()); try newparse (Bytes.to_string (stringReadFromCoq oc ())) with _ -> soupstatus ic oc ();;
 (* let addtext str i = "</call><call val='Add'><pair><pair><string>"^str^"</string>
    <int>0</int></pair><pair><state_id val='"^i^"'/><bool val='false'/></pair></pair></call>\n";; *)
 let writeToCoq ic  str i = Printf.fprintf ic "%s"  (Processinputs.addtext str i) ;flush_all ()

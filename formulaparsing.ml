@@ -16,9 +16,25 @@ let parse s =
 
 let rec print x = match x with 
   | Var a               -> a
-  |Pow(e, f) -> (print e)^"^"^(print f)
-  | Succ(e) -> "("^(print e)^" + 1)"
-  | EmptySet -> " ∅ "
+  |Pow(e, f) -> let ee=match e with
+  Var a-> print e
+  |_->"("^(print e)^")" in
+  let ff= match f with
+  Var a-> (print f)
+  |_->"("^(print f)^")" in
+  ee^"^"^ff
+(*   | Succ(e) -> "("^(print e)^" + 1)"
+ *)  
+ |Succ(e) ->(match e with
+  Var a-> "S "^(print e)
+  |_->"S ("^(print e)^")")
+ | EmptySet -> " ∅ "
+  | Le(e1,e2) -> 
+  let a = match e1 with Var x -> print e1 
+      |_ ->"("^(print e1)^")" in
+      let b= match e2 with Var x -> print e2 
+      |_ ->"("^(print e2)^")" in 
+     a^" <= "^b
   | Minus(e1,e2) -> 
   let a = match e1 with Var x -> print e1 
       |_ ->"("^(print e1)^")" in
@@ -73,6 +89,7 @@ let rec print x = match x with
       let a = match e1 with Var x -> print e1 
       |_ ->"("^(print e1)^")" in
       let b= match e2 with Var x -> print e2 
+      | EmptySet -> print e2
       |_ ->"("^(print e2)^")" in 
      a^" ∈ "^b
  | Iff(e1,e2)          -> 
@@ -154,8 +171,8 @@ print_string (string_of_bool goal);
    |Forall(a, b) -> if goal then ["Fix an arbitrary element VAR."; "Apply induction on "^(parant a)^"."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."] else ["Obtain VAR using variable VAR in the universally quantified hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
    |Exists(a, b) -> if goal then ["Prove the existential claim is true for VAR."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"This is trivial."] else ["Fix VAR the existentially quantified variable in "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR."; "Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
   
-|Equals(a, b) -> if goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"Claim VAR by rewriting "^(med name)^" using VAR."]
-  |_->  if  goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"This is trivial."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions."]
+|Equals(a, b) -> if goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"Replace VAR by VAR in the goal"] else ["Replace ("^(print a)^") by ("^(print b)^") in the goal.";"Replace ("^(print b)^") by ("^(print a)^") in the goal."; "Replace ("^(print b)^") by ("^(print a)^") in hypothesis VAR";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"Claim VAR by rewriting "^(med name)^" using VAR."]
+  |_->  if  goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"Replace VAR by VAR in the goal";"This follows from assumptions.";"This is trivial."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions."]
 ;;
 
 print_string (Ast.to_string (parse "∀  n  :  nat,  n  ≠  0"));;

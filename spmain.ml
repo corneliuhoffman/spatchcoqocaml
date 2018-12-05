@@ -199,24 +199,54 @@ let remove_book notebook () =
   done;
   ();;
 
+let rec getlines l1 st list = match list with
+| [] -> if st="" then List.rev (l1) else List.rev (st::l1)
+| hd::tl -> let hhd = (String.trim hd)  in
+  if hhd="" then getlines l1 st tl
+      else if hhd.[String.length hhd - 1] = '.' 
+          then getlines ((st ^"\n"^ hd)::l1) "" tl
+          else getlines l1 (st ^"\n"^ hd) tl
+
+(* let rec getlines l1 st list = match list with
+| [] -> if st="" then List.rev (l1) else List.rev (st::l1)
+| hd::tl -> let hhd = (String.trim hd)  in
+  let ind = String.rindex_opt hhd '.' in
+    match ind with 
+      None -> getlines l1 (st ^"\n"^ hd) tl
+      | Some i -> if  i = (String.length hhd) - 1 
+        then getlines ((st ^"\n"^ hd)::l1) "" tl
+        else getlines l1 (st ^"\n"^ hd) tl *)
 
 let get_first_line str =
+  match (getlines [] "" (String.split_on_char '\n' str)) with
+  |[]->""
+  |h::tl -> h;;
+
+(* let get_first_line str =
   print_string str; flush_all ();
   match (Str.split (Str.regexp "\n") str) with
   | h::t -> h^"\n"
-  |[] -> ""
+  |[] -> "" *)
 let get_tail_lines str =
-  match (Str.split (Str.regexp "\n") str) with
+  match (getlines [] "" (String.split_on_char '\n' str)) with
+  []->""
+  |h::tl -> String.concat "" tl
+
+ (*  match (Str.split (Str.regexp "\n") str) with
   | h::t -> String.concat "\n" t
-  |[] -> ""
+  |[] -> "" *)
 let get_last_line str =
-  let l = (Str.split (Str.regexp "\n") str) in
-  if l !=[] then List.hd (List.rev l)
-  else "";;
+  let l = List.rev (getlines [] "" (Str.split (Str.regexp "\n") str)) in
+  match l with
+  | [] -> ""
+  | hd::tl -> hd
 let get_first_lines str =
-  let l = (Str.split (Str.regexp "\n") str) in
-  if l !=[] then String.concat "\n" (List.rev (List.tl (List.rev l)))
-  else "";;
+  let l = List.rev (getlines [] "" (Str.split (Str.regexp "\n") str)) in
+  match l with
+  | [] -> ""
+  | hd::tl -> String.concat "" (List.rev tl)
+  (* if l !=[] then String.concat "\n" (List.rev (List.tl (List.rev l)))
+  else "";; *)
 let popup x_root y_root txt =
 let window = GWindow.window ~urgency_hint:true ~modal:true ~title:"Spatchcoq" () in
 window#move ~x:x_root ~y:y_root;
@@ -302,7 +332,7 @@ let create_view ~model ~packing () =
 
   (* Column #1: col_name is string column *)
   let col = GTree.view_column 
-      ~renderer:(GTree.cell_renderer_text [], ["markup", col_name; "background", col_color;"font", col_size]) () in
+      ~renderer:(GTree.cell_renderer_text [], ["text", col_name; "background", col_color;"font", col_size]) () in
   ignore (view#append_column col);
   view#set_headers_visible false;  
 
@@ -385,14 +415,14 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
     let start = win10#buffer#start_iter in
     let stop = start#forward_sentence_end  in
    
-     let xx = win10#buffer#get_text ~start ~stop () in
+    (*  let xx = win10#buffer#get_text ~start ~stop () in *)
      
-(*     let xx=(get_first_line (win10#buffer#get_text ())) in 
- *)    
+    let xx=String.trim (get_first_line (win10#buffer#get_text ())) in 
+    
 
 (*     Printf.printf "|%s| \n " xx; flush_all ();
  *)
-    if (try (Str.search_forward (Str.regexp "Axiom \| Definition \|Inductive\|Notation\|Variable") xx 0 )>=0  with _-> false) then 
+    if (try (Str.search_forward (Str.regexp "Axiom \| Definition \|Inductive\|Notation\|Record\|Eval\|Load\|Locate\|Variable\|Section\|End\|Module") xx 0 )>=0  with _-> false) then 
     (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}];}]; leaving_tactic=xx; values =[||]}]; 
     current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
     current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=xx; values =[||]});
@@ -442,18 +472,20 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
              current_head := Processresults.emptygoal;
           current_tree := LEAF Processresults.emptygoal;
    
-             win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+             win00#buffer#set_text  (String.trim((String.trim (win00#buffer#get_text ()))^"\n"^xx));
              (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
              win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ())); 
              win11#buffer#set_text (String.trim messages)))
           else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
-               (listoftheorems := ({state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}::!mainobj)::!listoftheorems;
+               (listoftheorems := ((* {state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}:: *)!mainobj)::!listoftheorems;
                 listoftrees:=!current_tree::!listoftrees;
+                current_tree := LEAF Processresults.emptygoal;
 
                 
                 mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
              current_head := Processresults.emptygoal;
-             win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^(String.trim xx));
+             let w00txt=  ((String.trim (win00#buffer#get_text ()))^"\n"^(String.trim xx)) in
+             win00#buffer#set_text (String.trim w00txt);
 (*                 set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
  *)                (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
 (*                 win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
@@ -464,7 +496,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
              else (completionindex:=0;
                    completionlist:=[];
 
-                   win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+                   win00#buffer#set_text  (String.trim ((String.trim (win00#buffer#get_text ()))^"\n"^xx));
                    (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
                    win10#buffer#set_text (String.trim (get_tail_lines (win10#buffer#get_text ())));
                    win11#buffer#set_text (String.trim messages);
@@ -1075,19 +1107,22 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
       let start = stop#backward_line in
 (*       let last = win00#buffer#get_text ~start ~stop () in
  *)      let last=get_last_line (win00#buffer#get_text ()) in 
- win00#buffer#set_text (String.trim (get_first_lines (win00#buffer#get_text ())));
+          let thefirst = String.trim (get_first_lines (win00#buffer#get_text ())) in 
+          print_string ("the last is: "^last ^ "\n the first is :"^thefirst); flush_all ();
+ win00#buffer#set_text thefirst;
+ (* (String.trim (get_first_lines (win00#buffer#get_text ()))); *)
  
 (*    win00#buffer#delete ~start ~stop;
 (*  *)      print_string ("the string is"^(String.trim last)^"ha"); flush_all ();
  *)      if (String.trim last) ="" then ()
       else
-        win10#buffer#set_text ((String.trim last)^"\n"^(win10#buffer#get_text ()));
+        win10#buffer#set_text  ((String.trim last)^"\n"^(win10#buffer#get_text ()));
       let after = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
       let messages = (win11#buffer#get_text ()) in
       logs :=  (UNDO (gettime (), before, after, messages ))::!logs;
       id := 
       (if win00#buffer#get_text () = "" then
-       "33"
+       "35"
       else    
 
       (* let first=get_first_lines (win00#buffer#get_text ()) in 
@@ -1099,10 +1134,12 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
      
 
         h::t::l->
-        print_string "htl";flush_all();
+        print_string "htl \n ";flush_all();
         (* let newid = Coqstuff.fstid  ic oc !id in *)
         let gls = t.goals in
-        current_head := List.hd gls ;
+        Printf.printf "the gls is %i \n" (List.length gls);flush_all ();
+
+        current_head := if (gls = []) then Processresults.emptygoal else List.hd gls ;
         current_tree := Treestuff.removetree !current_head !current_tree;
        
         mainobj:=t::l;
@@ -1125,7 +1162,7 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
         ( print_string " te ";flush_all();
           mainobj:=[];
           match !listoftheorems with
-          []-> "33"
+          []-> "35"
           |h::t ->(listoftheorems:=t;
             current_tree:= List.hd !listoftrees;
             current_head := emptygoal;
@@ -1134,7 +1171,7 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
 
            mainobj := h;
 
-          print_int (List.length !mainobj);flush_all ();
+          Printf.printf " the list is %i \n" (List.length !mainobj);flush_all ();
 
            (List.hd h).state_id))
       |[] -> 

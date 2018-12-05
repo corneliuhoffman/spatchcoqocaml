@@ -1,5 +1,5 @@
 \chapter{Basic proof techniques.}\label{chap:Basicproof}
-\epigraph{Nothing goes over my head. My reflexes are too fast, I would catch it.}{ Drax.}
+\epigraph{Nothing goes over my head. My reflexes are too fast, I would catch it and I would kill it. }{ Drax.}
 
 \section{Motivational Speeches}
 We start the book with a  few sections on Mathematical logic. This is usually a hard thing to grasp at the first sight so we hope to give enough examples to help the reader.
@@ -8,9 +8,7 @@ One of the issues is the fact the English language is more nuanced than mathemat
 The phrase
 ``I never said she stole my money.'' has 7 different meanings depending on the emphasis. For example ``{\bf I } never said she stole my money'' means that perhaps somebody else said it, ``I never said {\bf she} stole my money'' means that I said that somebody else stole it  while ``I never said she stole my {\bf money}.'' means that perhaps she stole something else.
 
- Mathematical logic is a lot more precise than that. Every statement has to be either true or false. Nuances have no place in this. You have to formulate statements in such a way that there is only one interpretation. However, as we will see later, there are some subtleties about the meaning of negation.
-
-
+ Mathematical logic is a lot more precise than that. Every statement has to be either true or false. Nuances have no place in this. You have to formulate statements in such a way that there is only one interpretation. 
 
 \section{Propositional Calculus}
 
@@ -38,6 +36,19 @@ However, the day to day language is much richer than mere logic. We can give  ma
 \item It will rain tomorrow.
 
 \end{itemize}
+
+\paragraph{\bf Of paradoxes }
+In Titus 1:12-13, Paul states:
+``One of themselves, even a prophet of their own, said, The Cretians are alway liars [...] This witness is true''. Of course if this witness is true, then, since he is a Cretan, he must be a liar and therefore it cannot be true. This is a paradox due to the Cretan Philosopher  Epimenides. Its most condensed logical form is ``This statement is a lie'' if the statement is true then must be false and if it is false then it is true. There are various similar variations of. This paradox, from Pinnochio's ``My nose is growing!'' to the I paradox.
+
+'' Once upon a time there was a. Small island with extremely radical trespassing laws. Everyone caught trespassing was interrogated and if they weer found truthful they were shot and if they were found lying they were hanged. A logician is caught trespassing and his sole statement during  the interrogation is ``I will be hanged!''. Of course, in the classical logic of this island this person is either shot or hanged. If he is hanged then his statement is truthful and so he should have been shot. If he is shot then his statement is not truthful and so  the law in question seems to be paradoxical (inconsistent).
+
+
+
+
+Consider the following statement ``This proposition is false''\footnote{This is a very old story, it first occurred in the form of the liar paradox, in which the philosopher of Crete said ``All Cretans are liars.''}. Is this true or false? If it is true then it must be false, if it is false then it must be true. This is the kind of self referential paradox that lead to Russell type paradoxes (see Subsection~\ref{subs:Constructive vs Classical} and 
+ Chapter~\ref{ch:settheory} as well as Appendix~\ref{chap:setsvstypes})
+
 
   \subsection{Connectors}
 Just like other mathematical concepts, there is a ``calculus'' for dealing with  propositions. Some versions of this date back to Aristotle but they have been slightly modified thorough the ages. There are five connectors (operators) on the set of propositions. There are: and ($\land$), or ($\lor$),  implication ($\rightarrow$),   iff ($\leftrightarrow$) and  negation( $\neg$). The first four are so called ``binary operators'', that is they combine two propositions into one and the last one is a ``unary operation''  much like minus is for numbers. Most of these notions will seem familiar to you, our approach will however be a little bit more formal. Note also that the symbols are not indempendent, one can express some of the symbols using the others.
@@ -113,7 +124,7 @@ A proposition that is equivalent to the proposition True (i.e one that is True r
 
 \subsection{Translation between english and propositional calculus}
 
-\subsection{Inference rules}
+\subsection{Inference rules}\label{subset:inference}
 
 Of course any argument in propositional logic can be solved with a truth table. However this is quite tedious and hard to extend to more general notions. We prefer to use methods of proof called "inference rules".
 Each connector has two rules, an introduction and an elimination rule. We will also describe them using the standard logic notation. More precisely, the notation
@@ -151,7 +162,7 @@ In SpatchCoq we use the tactic ``Apply result (H H1)'' or ``Apply result H1.'' f
 
 
 
-Most of the rpoofs you have seen written in textbooks are written in a style called ``direct proof''. Suppose you have a set of hypotheses and you want to prove a conclusion. You then start from the hypotheses and prove a series of intermediate results that then get added to you hypotheses until you can prove the conclusion. Most of the time in practice however the way you arrive to a proof is using a method called ``backward proof''. 
+Most of the proofs you have seen written in textbooks are written in a style called ``direct proof''. Suppose you have a set of hypotheses and you want to prove a conclusion. You then start from the hypotheses and prove a series of intermediate results that then get added to you hypotheses until you can prove the conclusion. Most of the time in practice however the way you arrive to a proof is  combining that method with another method called ``backward proof''. 
 
 To fix the details we will prove one example, the famous Aristotelian syllogism:
 
@@ -216,7 +227,8 @@ and \inp{This follows from assumptions.}
 to finish the proof.
 
 The second method is a ``backward proof'', this is a method preferred by Coq and therefore by SpatchCoq.
-
+\begin{proof}\label{backward Socrates}
+ 
  \inp{Apply result A2.}
  
  to get
@@ -233,7 +245,7 @@ Now we do
  which follows by assumption, that is
  \inp{This follows from assumptions.}
  
- 
+ \end{proof}
  Of course this is such a simple example that one can do directly 
  \inp{Apply result (A2 (A1 Hyp)).}
  
@@ -257,7 +269,8 @@ to get
 \texttt{
 soc =$ \lambda$ Hyp : Socrates, A2 (A1 Hyp) \\
      : Socrates $\rightarrow$ Mortal}
- Which signifies that soc is a function  that takes the witness Hyp of the truth of Socrates and produces a witness A2 (A1 Hyp) of the truth of Mortal.
+
+This tells you  that soc is a function  that takes the witness Hyp of the truth of Socrates and produces a witness A2 (A1 Hyp) of the truth of Mortal.
  We will return to types later.
 
 
@@ -359,9 +372,10 @@ This follows from assumptions.}
 
 
 \paragraph{Inference rules for negation}
-The negation introduction's logic statement is
+
+Perhaps this is a little hard to digest at first but the negation of $P$ is the same thing as $P\rightarrow False$. Therefore the inference rules for negation are the same as those for implication. In particular, the negation introduction's logic statement is
 $$\infer{\neg P}{\infer{False}{P}}.$$
-In other words, the negation of $P$ is the same thing as $P\rightarrow False$. This is an important statement to make and, indeed in SpatchCoq in order to deal with negation you will need to use ``Rewrite goal using the definition of not.'' respectively ``Rewrite hypothesis	H using the definition of not.''. To give an example we shall prove 
+Therefore th This is an important statement to make and, indeed in SpatchCoq in order to deal with negation you will need to use ``Rewrite goal using the definition of not.'' respectively ``Rewrite hypothesis	H using the definition of not.''. To give an example we shall prove 
 $$P \rightarrow \neg \neg P$$
 We of course first assume $P$ and then prove $\neg \neg P$. To do this we first note that this is the same thing as $(P->False)->False$ and so we assume $P->False$ and try to show $False$. Since now we know $P->False$ and $P$, we can use implication elimination to get False.
 
@@ -380,7 +394,7 @@ Apply result (Hyp0 Hyp).}
 
 \paragraph{Inference rules for equivalence}
 
-We will not inisist here because $P\leftrightarrow Q$ is the same as $P\rightarrow Q \land Q\rightarrow P$ and so the inference rules are derivative. In particular
+We will not insist here because $P\leftrightarrow Q$ is the same as $P\rightarrow Q \land Q\rightarrow P$ and so the inference rules are derivative. In particular
  in spatchCoq we use  tactic :
  
 ``Prove both directions of P iff Q.''  
@@ -666,9 +680,76 @@ and in the second we prove by contradiction
 \inp{Prove by contradiction.\\
 Apply result (Hyp Hyp2).\\
 Qed.}
+\subsection{On the way to the barbershop}\footnote{I'd like to thank Richard Kaye for showing me this}
 
- \paragraph{\bf Exercises}
+In a paper published in 1894 called ``A logical paradox'' Lewis Carroll presents the following situation:
+
+Two uncles want to go the barbershop. There are three barbers, Allen Brown and Carr. We are told that at least one of them has to be in at all times. Also we know that Allen  ``ever since he had that fever he?s been so nervous about going out alone, he always takes Brown with him. '' 
+
+One of the uncles then argues that Carr has to be home. The argument is a proof by contradiction. Suppose that Carr is out.  Then if Allen is out then Brown will have to be in since somebody should be in the shop. On the other hand if Allen is out the Brown will have to be out as well on account of Allen's nervousness. Therefore Carr being out generates two contradictory statements ``if Allen is out then Brown is in'' and ``if Allen is out then Brown is out'' and so Carr must be in.
+
+This is a remarkable statement. It is reasonably easy to see what is wrong in today's terms (we shall write a careful argument in a moment) but  at the end of the 19th century  this was serious stumbling block for logicians. In fact in his 1903 book  ``the Principles of Mathematics'', Bertrand  Russell writes:
+
+{\quote  ``The principle that false propositions imply all propositions solves Lewis Carroll's logical paradox in Mind, N. S. No. 11 (1894). The assertion made in that paradox is that, if p, q, r be propositions, and q implies r, while p implies that q implies not-r, then p must be false, on the supposed ground that q implies r and q implies not-r are incompatible. But in virtue of our definition of negation, if q be false both these implications will hold: the two together, in fact, whatever proposition r may be, are equivalent to not-q. Thus the only inference warranted by Lewis Carroll?s premisses is that if p be true, q must be false, i.e. that p implies not-q; and this is the conclusion, oddly enough, which common sense would have drawn in the particular case which he discusses''.}
+
+Indeed the principle that if $p$ is false then $p\rightarrow q$ is true, as seen in the truth table of the implications  was something that was only formalised by Russell. In fact he states that $p\lor q$ is equivalent to $(p \rightarrow q) \rightarrow q$ (see for example \ref{russel}).
+
+Note that B Russell already suggests the answer to the parable. The two statements only prove that if Carr is out then Allen must be in. Let us prove that ins Spatchcoq.
+
+We will define 3 propositions, Allen, Brown and Carr to mean that the corresponding people are in  and state two axioms, $not Allen->not Brown$ and $Allen \lor Brown \lor Carr$ and we prove that $ not Carr \rightarrow Allen$.
+
+\inp{Variables Allen Brown Carr :Prop.\\
+Axiom some: Allen $\lor$ Brown $\lor$ Carr.\\
+Axiom AB: not Allen ->not Brown.\\
+Lemma A: not Carr -> Allen.}
+
+Now we assume that Carr is out and prove that Allen must be in. We use the axiom some to get $Allen \lor (Brown \lor Carr)$.
+
+\inp{Assume (not Carr) then prove Allen.\\
+Claim (Allen $\lor$ Brown $\lor$ Carr).\\
+Apply result some.}
+
+
+We get
+\coq{Hyp: not Carr\\
+H:Allen \lor Brown \lor Carr}{Allen}
+The next step is to consider the two  cases: either Allen is home or one of Brown or Carr must be home. If Allen is home then we are done. 
+\inp{Consider cases based on disjunction in hypothesis H .\\
+This follows from assumptions.
+}
+
+
+We now have
+\coq{Hyp: not Carr\\
+Hyp1: Brown \lor Carr}{Allen}
+
+
+We will prove this by contradiction:
+\inp{Prove by contradiction.}
+
+To get
+\coq{Hyp: not Carr\\
+Hyp1: Brown \lor Carr\\ H:not Allen }{False}
+
+
+We again consider two cases, either Brown happens or Carr happens. In the first case we use the axiom AB
+
+\inp{Consider cases based on disjunction in hypothesis Hyp1 .\\
+Apply result AB.\\
+This follows from assumptions.
+This follows from assumptions.}
+ 
+We are left with the last case:
+ 
+\coq{Hyp: not Carr\\
+Hyp2:  Carr\\ H:not Allen }{False} 
+
+Ans so we can finish by applying  modus ponies
+
+\inp{Apply result (Hyp Hyp2).}
+ \paragraph{\bf Exercises}\label{prop:exercises}
  \begin{enumerate}
+ 
  \item[assume] $P \rightarrow P$.
  \item[left]$ P \rightarrow P\lor Q$.
   \item[distr] $P\land (Q\lor R) \rightarrow P\land Q)\lor (P\land R).$
@@ -682,46 +763,14 @@ Qed.}
 \item[andimp] $(P\rightarrow(Q\rightarrow R)) \leftrightarrow ((P\land Q) \rightarrow R)$.
 \item[andorimp] $((P \rightarrow R) \land (Q \rightarrow R)) \leftrightarrow ((P \lor Q) \rightarrow R)$
 \item[orandimp] $((P \rightarrow R) \lor (Q \rightarrow R)) \leftrightarrow ((P \land Q) \rightarrow R)$
+\item[triplenot] $\neg (\neg (\neg P))  \leftrightarrow \neg P$
 \item[twoone] $(P \lor Q) \land \neg  P \rightarrow Q$
 \item[twotwo] $\neg Q \land (P \rightarrow Q) \rightarrow  \neg P$
 \item[twothree] $ C \land (A \rightarrow B) \land (C \rightarrow ( A \rightarrow \neg B)) \rightarrow \neg A$
 \item[twofour] $ (P \lor  Q) \land (\neg P \lor R) \rightarrow Q \lor R$.
 
-\item  What can you deduce from the following statements?
-\begin{enumerate}
-\item All babies are illogical.
-\item Nobody is despised who can manage a crocodile.
-\item Illogical persons are despised.
-\end{enumerate}
+\item[Russell] \label{russel} $(P\lor Q)\leftrightarrow ((P\rightarrow Q)\rightarrow Q)$
 
 
-
-\item What can you deduce from the following statements?
-\begin{enumerate}
-\item No ducks waltz.
-\item No officers ever decline to waltz.
-\item All my poultry are ducks.
-\end{enumerate}
-
-
-
-
-\item What can you deduce from the following statements?
-\begin{enumerate}
-\item Things sold in the street are of no great value.
-\item Nothing but rubbish can be had for a song.
-\item Eggs of the Great Auk are very valuable.
-\item It is only what is sold in the street that is really rubbish.
-
-\end{enumerate}
-\item What can you deduce from the following statements?
-\begin{enumerate}
-\item All writers, who understand human nature, are clever.
-\item No one is a true poet unless he can stir the hearts of men.
-\item Shakespeare wrote ``Hamlet''.
-\item No writer, who does not understand human nature, can stir the hearts of men.
-\item None but a true poet could have written ``Hamlet''.
-
-\end{enumerate}
 
 \end{enumerate}

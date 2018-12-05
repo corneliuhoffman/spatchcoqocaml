@@ -1,28 +1,22 @@
 \chapter{The software}\label{ch:thesoftware}
 \section{ Installation}
+\subsection{Online}
+
+
+\begin{enumerate}
+\item Go to  \url{http://app.spatchcoq.co.uk/}
+\item enjoy
+\end{enumerate}
+
 \subsection{Mac OSX}
 \begin{enumerate}
-\item Download and install  the latest version of Coq (it needs to be at least 8.6) from :
-
-\href{https://coq.inria.fr/download}{https://coq.inria.fr/download}
-
-Move it to your apps folder.
 
 
-\item  Download and unpack spatchocq.app from 
-move the spatchcoq.app to Applications and start it. 
 
-\item when prompted find the Coq installation you have just move above. Navigate to 
-\begin{verbatim}
-/Applications/CoqIDE_8.6.app/Contents/Resources/bin/
-\end{verbatim}
-and choose coqtop. See Figure~\ref{fig:macos}
+\item   You might  need to install gtk, the simplest way to do this is  via homebrew.
 
-You only do this once.
-\item  You only have to do this once. You might also need to install gtk, the simplest way to do this is  via homebrew.
-
-If do not have homebrew installed,  install it
-\href{https://brew.sh}{ here.}
+If do not have homebrew installed,  install it from 
+\url{https://brew.sh}
 
 or  type in the terminal:
 
@@ -31,6 +25,27 @@ or  type in the terminal:
 Next type in terminal:
 
 {\center \texttt brew install gtk+}}
+
+
+\item Download and install  the latest version of Coq (it needs to be at least 8.6) from :
+
+\url{https://coq.inria.fr/download}
+
+
+Move it to your apps folder.
+
+
+\item  Download and unpack spatchocq.app from 
+\url{http://app.spatchcoq.co.uk/} , move the spatchcoq.app to Applications and start it. 
+
+\item when prompted find the Coq installation you have just move above. Navigate to 
+\begin{verbatim}
+/Applications/CoqIDE_8.6.app/Contents/Resources/bin/
+\end{verbatim}
+and choose coqtop. See Figure~\ref{fig:macos}
+
+You only do this once.
+
 \begin{figure}\label{fig:macos}
 \center
 \includegraphics[scale=0.5]{Installation/macos.png}

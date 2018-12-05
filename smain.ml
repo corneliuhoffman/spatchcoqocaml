@@ -47,8 +47,11 @@ any-> stringReadFromCoq();;
 let rec getmessages l =
 let rec sgoal () = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
 let x = stringReadFromCoq () in
+Printf.printf "hello %s" (Bytes.to_string x);flush_all();
 if x!="" then try newparse x with _ -> sgoal() else sgoal () in
  let x = sgoal () in 
+
+
   if (List.mem (to_string x) (List.map to_string l) ) then l else getmessages (l@[x]);;
 
 let rec mygoal str = ignore (Printf.fprintf ic "%s" "<call  val =\"Goal\"><unit/></call>\n";flush_all ());
@@ -232,6 +235,7 @@ let tacticsfactory = new GMenu.factory menubar in
       (begin writeToCoq xx !id;
       let x = getmessages [] in
       let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
+
       let error =try Str.search_forward (Str.regexp "rror") messages  0 with Not_found -> -1 in
       if error <0 then (begin Printf.printf "found\n";
        win00#buffer#insert ~iter:(win00#buffer#get_iter `END) xx;
