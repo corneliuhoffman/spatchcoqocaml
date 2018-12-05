@@ -1,0 +1,319 @@
+ \chapter{Cartesian products, relations, functions}
+
+ In this section we will discuss the cartesian product of two sets  and their subsets with we will call (binary) relations. In most  mathematics textbooks functions are defined to be special kinds of relations.
+Just like in Section~\ref{sec:sets} we  define functions as relations initially in order for the reader to become comfortable with the concept. In order to take advantage of the fact that, from the point of view of type theory, functions are primitive concepts  we will  we will modify the definitions later on.
+ 
+ 
+ \section{Cartesian products, relations} \label{subsec:defin of cartesian}
+ The notion of Cartesian product of two sets is very natural, it is the set of pairs of element one from $A$ and one from $B$.
+ 
+ \begin{definition}
+ If $A$ and $B$ are sets then: $$A \times B=\{ (a,b)\mid a \in A \land B \in B\}$$.
+  \end{definition}
+
+\begin{tikzpicture}[
+    vec/.style={thick,[-)},
+]
+ 
+    \coordinate (A) at (2,0);
+    \coordinate (B) at (0,2);
+    \coordinate (cross prod) at (2,2);
+    \def\tick{0.2}
+
+    \draw [-] (1,0) -- (6,0) node [below] {$U$};
+    \draw [-] (0,1) -- (0,5) node [left]  {$V$};
+
+    \draw [(-),red, thick ] (2,0) -- ++(A) node [midway,below] {$A$};
+    \draw [(-), red, thick ] (0,2) -- ++(B) node [midway,left]  {$B$};
+
+    \fill [gray] (1,1) rectangle ++($(5,4)$) ;
+    \draw (6,4) node  {$U \times V$};
+    
+   \fill [red] (cross prod) rectangle ++($(A)+(B)$);
+    \draw [thick] ($(cross prod)+(A)$) -| ($(cross prod)+(B)$);
+    \draw [thick] ($(cross prod)+(A)$) |- ($(cross prod)+(B)$)
+        node [pos=0.25,left] {$A \times B$};
+\end{tikzpicture} 
+ 
+ 
+ For example if $A =\{1,2,3\}$ and $B = \{a\}$ then  $A\times B =\{(1,a), (2,a), (3,a)\}$.
+ Note that from the point of view described in sections \ref{sec:sets} and \ref{sec:setsincoq},  if $A$ is of type Ensemble $U$ and $B$ is of type Ensemble $V$ then  $A\times B: Ensemble (U*V)$. Note also that $A*B$ is endowed with two projections fst:$A*B\rightarrow A$ and snd :$A*B\rightarrow B$. We use these to define:
+ 
+ \inp{Definition prod ( U V:Type) (A :Ensemble U)(B:Ensemble V): Ensemble (U*V):=fun x=> ((fst x) $\in$ A $\land$ (snd x) $\in$ B) .}
+ 
+ and
+ \inp{Notation "A 'X' B":=(prod \_ \_ A B)( at level 40).}
+ 
+ 
+ 
+ 
+ We also define a (binary relation) $A$ with domain $A$ and range $B$ as subset of $A\times B$. One can think of a relations as a way of associating elements form $A$ and  $B$. For example, assume that $A=\{a,b,c,d\}$ and $B=\{1,2,3,4\}$ and $R=\{(a,2), (a,3), (b,2), (c,3)\}$. We can represent this as:
+ 
+ \begin{figure}
+ \centering
+ \begin{tikzpicture}[ele/.style={fill=black,circle,minimum width=.8pt,inner sep=1pt},every fit/.style={ellipse,draw,inner sep=-2pt}]
+  \node[ele,label=left:$a$] (a1) at (0,4) {};    
+  \node[ele,label=left:$b$] (a2) at (0,3) {};    
+  \node[ele,label=left:$c$] (a3) at (0,2) {};
+  \node[ele,label=left:$d$] (a4) at (0,1) {};
+
+  \node[ele,,label=right:$1$] (b1) at (4,4) {};
+  \node[ele,,label=right:$2$] (b2) at (4,3) {};
+  \node[ele,,label=right:$3$] (b3) at (4,2) {};
+  \node[ele,,label=right:$4$] (b4) at (4,1) {};
+
+  \node[draw,fit= (a1) (a2) (a3) (a4),minimum width=2cm] {} ;
+  \node[draw,fit= (b1) (b2) (b3) (b4),minimum width=2cm] {} ;  
+  \draw[->,thick,shorten <=2pt,shorten >=2pt] (a1) -- (b2);
+  \draw[->,thick,shorten <=2pt,shorten >=2] (a1) -- (b3);
+  \draw[->,thick,shorten <=2pt,shorten >=2] (a2) -- (b2);
+  \draw[->,thick,shorten <=2pt,shorten >=2] (a3) -- (b3);
+ \end{tikzpicture}
+\end{figure}
+
+Relations can represent various real life connections. For example one can think of a relation with domain the set of all people and range the set of all cars where a pair $(a, b)\in R$ if the person $a$ has ever been in car $b$. We can also think of more mathematical relations, for example the relation $R$ with domain $\mathbb{R}$ and range $\mathbb{R}$ given by $(x,y)\in R$ and only if $y=x^2$. We sometimes call this relation the graph of the function $f:\mathbb{R}\rightarrow \mathbb{R}, f(x)=x^2$.
+ 
+ \inp{Definition isrel ( U V:Type) (A :Ensemble U)(B:Ensemble V) (R:Ensemble (U* V)) $ :R\subseteq (A X B).$}
+ 
+ Here is an example, let us define the relation less than with domain natural numbers and range all numbers larger than 1 and prove it is a relation. Note that we will not go into details about natural numbers here as we will do so in Chapter~\ref{ch:numbers}.
+ 
+ \inp{
+ Definition allnat:Ensemble nat: fun x=> True.\\
+ Definition strictlypos:Ensemble nat := fun x=> x>0.\\
+ Definition mylt:Ensemble nat*nat:= fun a => fst a < snd a.}
+ 
+ Let us prove that melt is a relation with domain allnat and range strictlypos.
+ \inp{Lemma a: isrel nat nat allnat strictlypos mylt.
+ }
+ 
+ The first few steps are just unfolding of definitions:
+ \inp{
+Rewrite goal using the definition of isrel.\\
+Rewrite goal using the definition of Included.\\
+Fix an arbitrary element a.\\
+Assume (a $\in$ melt) then prove (a $\in$ (allnat X strictlypos)).\\
+Rewrite hypothesis Hyp  using the definition of (In, mylt).\\
+Rewrite goal using the definition of (In, prod).\\
+Rewrite goal using the definition of (In, allnat).\\
+Prove the conjunction in the goal by first proving True then (strictlypos (snd a)).
+This is trivial.\\
+Rewrite goal using the definition of strictlypos.}
+
+We are now left with the goal
+\coq{a:nat * nat\\
+Hyp: fst\ a < snd\ a
+}{0 < snd \  a}
+
+
+We now try to search for some useful theorem, one that implies that 0 is smaller than something:
+\inp{SearchPattern (( \_ -> 0 <  \_ )).}
+
+The result includes
+
+\mess{Nat.lt\_lt\_0: $\forall n m : nat, n < m \rightarrow 0 < m$}
+
+And so if we do
+
+\inp{Apply result (Nat.lt\_lt\_0  (fst a) (snd a)).}
+
+We only need to use the assumptions.
+
+On the other hand 
+
+On the other hand,  mylt is not a relation with domain strictlypositive.
+
+\inp{Lemma a: not ( isrel nat nat  strictlypos  allnat mylt).}
+
+We can prove this by first unfolding some definitions:
+
+\inp{Rewrite goal using the definition of not.\\
+Assume (isrel nat nat strictlypos allnat mylt) then prove False.\\
+Rewrite hypothesis Hyp  using the definition of isrel.\\
+Rewrite hypothesis Hyp  using the definition of Included.
+}
+
+To get
+
+\coq{Hyp: \forall  x : nat * nat, (x \in mylt) \rightarrow (x \in (strictlypos \times allnat)))}{False}
+
+
+
+Now we choose the element $(0,1)$ and we show that $(0,1) \in mylt$ and $(0,1)\not\in  (strictlypos \times allnat))$ obtaining a contradiction.
+
+The proof of 
+ $(0,1) \in mylt$ is very easy:
+ \inp{Claim ((0,1) $\in$ mylt).
+Rewrite goal using the definition of (In, mylt).
+This is trivial.}
+
+The proof of $(0,1)\not\in $ (strictlypos $\times$ allnat))  is a bit harder:
+
+\inp{Claim (not ((0,1) $\in$ (strictlypos $\times$ allnat))).\\
+Rewrite goal using the definition of (In, prod).\\
+Rewrite goal using the definition of (In, strictlypos).\\
+Rewrite goal using the definition of allnat.\\
+Rewrite goal using the definition of not.\\
+Assume (0  <  fst  (0,  1)  $\land$  True  ) then prove False.\\
+Eliminate the conjuction in hypothesis Hyp0.\\
+Claim (0<0) by rewriting H0 using (fst (0,1)).}
+At this point we have:
+
+\coq{Hyp: (\forall x : nat * nat, (x \in mylt) \rightarrow (x \in (strictlypos \times allnat)))\\
+H:(0,1) \in mylt \\
+H0: 0 <fst (0,1)\\
+H1:True\\
+H2:0 < 0}{False}
+
+And we look for a theorem about not (\_<\_)
+
+\inp{SearchPattern (not (\_< \_))}.
+
+To get \mess{Nat.nlt\_0\_r: $\forall$ n : nat, $\neg n < 0$}
+
+We then apply this theorem and the rest is straightforward.
+\inp{Apply result  (Nat.nlt\_0\_r  0 H2).\\
+Apply result H0 .\\
+Apply result Hyp .\\
+This follows from assumptions.}
+
+\section{Binary relations on a set}\label{sec:binaryrelations}
+
+There is an especially important subclass of general relations. If A is a type, a binary relation on $A$ is a subset of $A\times A$. This concept includes many examples you already know. Here are some natural examples:
+\begin{enumerate}
+\item  if $A$ is any set the relation of equality can be viewed as the set $$\{ (a,a) | a \in A\}$$.  
+\item If the set $A$ is some subset of real numbers you can define the relation of order $$\{ (a, b) \mid a , b \in A \land a<b\}$$. 
+\item If $A= \mathbb{Z}$ you can define divisibility  relation $$\{ (a, b) \mid a, b \in \mathbb{Z} \land  a | b \}$$
+\item if $A= \mathbb{Z}$  you can define the ``= mod 3'' relation as the set:
+$$\{(a, b) \mid alb \in \mathbb{Z} \land 3 | a-b \}$$
+\item if $A$ is the set of all people you define two people to be related if they are from the same family.
+\end{enumerate}
+We now describe things in Spatchcoq. For simplicity, in this section the set $A$ will be fixed and we will see relations not as in \ref{subsec:defin of cartesian}  but as predicates of two variables, that is as elements of type $A \rightarrow A \rightarrow Prop$. For that end we will use directly the package Relations in Coq.
+
+\inp{Require Import Relation}
+
+For example, we can define the equality relation on a  type $A$ as
+\inp{Definition eq (A:Type): relation A: fun a b => a=b.}
+
+You can (re)define  the order on natural numbers as :
+\inp{Definition mylt:relation nat: fun a b => a<b.}
+
+Divisibility can be defined as:
+\inp{Local Open Scope Z\_scope.\\
+Definition div:relation Z: fun a b => exists c:nat,  b= a*c.}
+
+And we can define the mod 3 on $\mathbb Z$ as
+
+\inp{Definition mod3:relation Z: fun a b => div 3 (a-b).}
+
+\warn{Note that for the definitions above I needed the integers and not the natural numbers, if we defined this in the natural numbers you will run into troubles regarding  minus as in in \ref{subsec:warnings} }
+
+For simplicity very often we will also use the following common notation: if $R$ is a relation on the set $A$ and $(a,b)\in R$ we will write $a R b$.
+
+Some relations have certain properties that are useful. We list them in the definition bellow. 
+\begin{definition}[reflexive]
+A relation $R \subseteq A\times A$ is {\it reflexive} if $\forall a \in A, a Ra$, that is any element is related to itself.
+\end{definition}
+
+Note that this definition is already there
+\inp{Print reflexive.} 
+gives
+
+\mess{reflexive = 
+$\lambda$ (A : Type) (R : relation A), $\forall$  x : A, R x x
+}
+
+For example equality and =mod3  are reflexive relation but `` < '' is not. Here is a proof for mod3
+
+\inp{Lemma a:reflexive Z mod3.}
+\begin{proof}[informal]
+We need to show that $forall x \in \mathbb{Z}, mod3 x x$. We fix a $x$ and rewrite the definition of mod3. We therefore need show that $div 3 (x-x)$. If we rewrite  the definition of divide we need to show that $\exists c \in \mathbb{Z}, (x-x) = 3c$. It remains to pick $c=0$.
+\end{proof}
+\begin{proof}[formal]
+\inp{
+Rewrite goal using the definition of reflexive.\\
+Fix an arbitrary element x.\\
+Rewrite goal using the definition of mod3.\\
+Rewrite goal using the definition of div.\\
+Prove the existential claim is true for 0.\\
+True by arithmetic properties.\\
+}\end{proof}
+
+ \begin{definition}[symmetric]
+A relation $R\subseteq A\times A$ is {\it symmetric} if $\forall a b\in A, a R b \rightarrow b R a$.
+\end{definition}
+
+As before:
+\inp{Print symmetric.}
+
+Gives
+\mess{symmetric = $\lambda$ (A : Type) (R : relation A), $\forall$ x y : A, R x y $\rightarrow$ R y x}
+
+
+We will now prove that mod3 is also symmetric:
+\inp{
+Lemma a:symmetric Z mod3.}
+\begin{proof}[informal]
+We need to show that $forall x y \in \mathbb{Z}, mod3 x y \rightarrow mod3 y x$. To do so we fix $x$ and $y$ and use the definitions of mod3 respectively div. We are left to prove that $\exists c : Z, x - y = 3 * c\rightarrow \exists c : Z, y - x = 3 * c$ and so we assume that $\exists c : Z, x - y = 3 * c$ and prove that $\exists c : Z, y- x = 3 * c$ if we pick the c so that $x-y =3c$ then it is not too hard to see that $y-x = 3(-c)$.
+\end{proof}
+The formal proof is slightly harder.
+
+\begin{proof}[formal]
+
+
+\inp{
+Rewrite goal using the definition of symmetric.\\
+Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Rewrite goal using the definition of mod3.\\
+Rewrite goal using the definition of div.\\
+Assume ($\exists$ c : Z, x - y = 3 * c) then prove ($\exists$ c : Z, y - x = 3 * c).\\
+Fix c the existentially quantified variable in Hyp .\\
+Prove the existential claim is true for (-c).\\
+Replace (3 * c) by (x - y) in the goal.\\
+Claim (3*(-c)= -(3*c)).\\
+True by arithmetic properties.\\
+Rewrite the goal using H .\\
+Replace (3 * c) by (x - y) in the goal.\\
+True by arithmetic properties.}
+ \end{proof}
+ 
+ Note that the ``Claim (3*(-c)= -(3*c)).'' is needed here while it was implicitely used in our informal proofs.
+ 
+ 
+ 
+  \begin{definition}[transitive]
+A relation $ R \subseteq A\times A$is {\it transitive} if $\forall a b c\in A, a R b \land b R c \rightarrow a R c$.
+\end{definition}
+
+However 
+\inp{Print transitive.}
+
+Gives
+\mess{transitive= $\lambda$ (A : Type) (R : relation A), $\forall $ x y z : A, R x y $\rightarrow$ R y z $\rightarrow$ R x z}
+
+This looks a bit different but the two are equivalent. See for example exercise andimp ar page \pageref{prop:exercises}.
+
+
+Let us prove that mod3 is transitive
+\inp{Lemma trans: transitive Z mod3.}
+\inp{
+Rewrite goal using the definition of transitive.\\
+Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Fix an arbitrary element z.\\
+Rewrite goal using the definition of mod3.\\
+Rewrite goal using the definition of div.\\
+Assume ($\exists$ c : Z, x - y = 3 * c) then prove \\ (($\exists c : Z, y - z = 3 * c) \rightarrow (\exists c : Z, x - z = 3 * c)).$\\
+Assume ($\exists$ c : Z, y - z = 3 * c) then prove ($\exists$ c : Z, x - z = 3 * c).\\
+Fix c the existentially quantified variable in Hyp .\\
+Fix d the existentially quantified variable in Hyp0 .\\
+Prove the existential claim is true for (c+d).\\
+Claim (3*(c+d)= 3*c+3*d).\\
+True by arithmetic properties.\\
+Replace (3 * (c + d)) by ((3 * c) + (3 * d)) in the goal.\\
+Replace (3 * c) by (x - y) in the goal.\\
+Replace (3 * d) by (y - z) in the goal.\\
+True by arithmetic properties.}
+ 
+ \section{Functions}\label{sec:functions}
+ 

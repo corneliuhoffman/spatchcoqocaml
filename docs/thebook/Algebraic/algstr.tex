@@ -1,0 +1,127 @@
+\chapter{Algebraic Structures}\label{ch:algstr}
+
+\section{Groups}
+
+We will briefly define abstract groups. 
+\begin{definition}\label{def:group}
+A group is a triple $(G, mult, id, inv)$ where $G$ is a set, mult is a binary operation that associates to every pair of elements $ a b $ an element $mult\ a\ b$,  $id$ is an element of  $G$ and $inv:G\rightarrow  G$ is a function such that.
+\begin{itemize}
+\item[mult\_closure] 
+G is closed under multiplication, that is $\forall a b \in G, mult \ a \ b \in G$.
+\item {\bf assoc} $\forall x\  y\ z,  mult\ (mult\ x\ y) z = mult \  x (mult\  y z)$
+ \item {\bf right\_id} $ \forall x,  mult\  x\  id = x$
+ \item {\bf inv\_closure} $\forall x\in G,  (inv\ x) \in G$
+   \item {\bf right\_inverse} $\forall x,  mult\ x (inv\ x) =  id$
+\end{itemize}
+
+
+\end{definition}
+
+Note that we gave been deliberately vague in assoc, right\_id and right\_inverse. This is because we will be somewhat light on this in our definition. We also did not require left inverses or left identity, we shall prove these later.
+
+To introduce the definition of a group we will use some new Coq notions, modules and  records.  
+We start by Importing sets and  recalling the set notations
+\inp{
+Require Import Ensembles.\\
+Notation "x $ \in $ A":= (In \_ A x) (at level 10).\\
+Notation "A $ \subseteq $ B":= (Included \_  A B)(at level 10).\\
+Notation "A $\cup$ B":= (Union \_  A B)(at level 8).\\
+Notation "A $ \cap $ B" := (Intersection \_  A B) (at level 10).}
+We now start a module. This is convenient for polymorphisms.
+\inp{
+Module gps.}
+
+The definition of a groups resembles Definition~\ref{def:group} closely. 
+\inp{ 
+Record Group : Type := group\\
+  \{U:Type;\\
+setG : Ensemble U;\\
+   mult : U -> U -> U;\\
+   inv : U -> U;\\
+   id : U;\\
+   mult\_closure : $\forall x y:U,  x \in setG \rightarrow y \in setG  \rightarrow  (mult x y) \in setG ;$\\
+   assoc : $\forall x y z:U,  mult\ (mult\ x\ y)\ z = mult\  x (mult\ y\ z);$\\
+   id\_closure : id $\in$ setG;\\
+   right\_id :$\forall x:U, mult\ x\  id = x;$\\
+   inv\_closure : $\forall x:U,  (inv\ x) \in setG;$\\
+   right\_inverse: $\forall x:U, mult\ x (inv\ x) =  id;$
+  \}.}
+  
+Note the format, this is in fact an inductive constructor, not unlike $nat$. 
+
+We introduce some convenient notations:
+\inp{
+Notation "x \{*\}  y":=(mult  \_ x y) (at level 50).\\
+Notation "'e'":=(id  \_ ) (at level 50).\\
+Notation "x \textasciicircum-1'":=(inv \_ x) (at level 30).}
+
+And we are now ready to prove the first group theory lemma, the uniqueness of identity (we shall prove the theorem inside the module gps so we can use it with any group.
+
+\inp{
+Lemma unit\_uniq (U:Type)(G:Group): forall x:gps.U G, x \{*\} x = x -> x = e.}
+The ``gps:U G'' notation looks a bit strange but this automatically generated.
+
+The resulting goal is 
+\coq{U:Type\\ G:Group}{\forall   x  :  gps.U \ G,  x  \{*\}  x  =  x  \rightarrow  x  =  e )}
+The first two moves are standard.
+\inp{
+Fix an arbitrary element x.\\
+Assume (x  \{*\}  x  =  x ) then prove (x=e).}
+
+And we arrive at 
+\coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp: x  \{*\}  x  =  x}{   x  =  e }
+We will now use the fact that $x = x*e$ and we replace it in the goal (and prove it later)
+
+\inp{
+Replace x by (x {*} e)  in the goal.}
+\coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{   x\{*\} e =  e }
+ Respectively
+ \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{   x\{*\} e =  x }
+  We now know that  x \{*\} x \textasciicircum -1 = e and so 
+ \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{x  {*}  (x  {*}  x  \mbox{\textasciicircum}-1)  =  x  {*}  x  \mbox{\textasciicircum}-1 }
+ 
+ Respectively 
+  \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{x  {*}  x  \mbox{\textasciicircum}-1  =  e }
+\inp{
+Replace (id G) by (x {*} x \mbox{\textasciicircum} -1) in the goal.}
+
+We now apply associativity and Hyp. 
+\inp{
+Rewrite the goal using (assoc G).\\
+Rewrite the goal using Hyp .\\
+This follows from reflexivity.}
+
+And we now only need to show the two goals that we introduced.
+\inp{
+Apply result (right\_inverse).\\
+Apply result (right\_id G).\\
+Qed.\\
+End gps.}
+
+
+Now we show how to prove that $Z$ is a group under addition:
+\inp{
+Open Scope Z\_scope.\\
+Import gps.\\
+Definition gZ:Group.\\
+Apply result (group Z (fun x=> True) Z.add Z.opp 0).\\
+Rewrite goal using the definition of In.\\
+This is trivial.\\
+Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Fix an arbitrary element z.\\
+True by arithmetic properties.\\
+Rewrite goal using the definition of In.\\
+This is trivial.\\
+Fix an arbitrary element x.\\
+True by arithmetic properties.\\
+Rewrite goal using the definition of In.\\
+This is trivial.\\
+Fix an arbitrary element x.\\
+True by arithmetic properties.\\
+Qed.}
+And we can see that one can apply unit\_uniq immediately.
+\inp{
+Lemma b: forall x:gps.U gZ, x {*} x = x -> x = e.\\
+Apply result (unit\_uniq  Z s).\\
+Qed.}

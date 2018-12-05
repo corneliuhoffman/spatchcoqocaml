@@ -1,0 +1,779 @@
+\chapter{Number Theory}\label{ch:numbers}
+\epigraph{Mathematics is the queen of the sciences and number theory is the queen of mathematics.}{ C.F. Gauss.}
+
+\section{Natural numbers, operations, order}
+
+Number Theory is one of the oldest branches of Mathematics. We have some evidence of  prime numbers are as old as the Ishango bones, 22000 years ago. A formal definition of natural numbers however was only done rather recently. Surprisingly, it is not different to the intuition that you get all natural numbers by keep adding ones to  0 (or 1). Our approach will be quite formal, following Peano  and some of the questions will feel a bit strange. 
+
+We will definitely the natural numbers as a set $\mathbb{N}$ containing an element $0$\footnote{Note that Peano himself considered 1 instead of zero as the first natural number. That might have been historically accurate (humankind too a long time to discover zero) but created a lot of inconsistency. We made the more modern choice here, partly influenced by Coq.} and with a map (called the successor map) $S:\mathbb{N}\rightarrow \mathbb{N}$ so that 
+
+
+\begin{enumerate}
+
+
+\item $\forall x \in \mathbb{N}, S(x)\ne 0$. (0 is not the successor of any number)
+
+\item $\forall x, y \in \mathbb{N}, S(x)=S(y)\rightarrow x=y$. (S is injective)
+
+\item  (induction axiom.) If $A\subseteq \mathbb{N}$ is such that $o \in A$ and $S(A) \subseteq A$ then $A=\mathbb{N}$.
+\end{enumerate}
+
+Note that a few other properties are implicit. For example $S$ being a function will tell you that $x=y \rightarrow  S x = S y$\footnote{ this is called eq\_S in Coq/spatchcoq.}. 
+
+We also employ syntactic sugar in denoting $1:=S\  0, 2:= S\  (S\  0), 3:= S\ ( S\  (S\ 0 )), \cdots$.
+
+
+Axiom 3 allows us to prove things by induction. More precisely if we are trying to prove a statement of the type $\forall x \in \mathbb{N}, P(x)$ and we consider (as in Section\ ref{ch:settheory}) the set $A\subseteq \mathbb{N}$ given by $P$ then the statement is equivalent to showing that $A=\mathbb{N}$ and, by Axiom 3, it is enough to show that $0\in p$ (or in other words P(0) holds) and then if $k \in A$ (I.e. P(k) holds) then $S(k) \in A$ (i.e. P(S(k)) holds). This is the usual way of doing induction
+
+\begin{enumerate}
+\item[\bf First Step] Prove P(0)
+\item[\bf Induction step] Assume P(k) holds and show P(k+1) holds.
+\end{enumerate}
+
+Before giving some examples, we need to define some more concepts. The first thing to define is the concept of addition. Addition in $\mathbb{N}$ is defined inductively, as follows  
+\begin{enumerate}
+\item $0+m=m,$\footnote{this is called plus\_O\_n in Coq/spatchcoq}
+\item $S(n) +m = S(n+m)$.\footnote{this is called plus\_Sn\_m in Coq/spatchcoq}
+\end{enumerate}
+
+In Coq the corresponding definition looks a bit strange but quite readable (aside from the ``fix''  which represents the fact that the definition is inductive):
+
+\begin{verbatim}
+Nat.add = 
+fix add (n m : nat) {struct n} : nat :=
+  match n with
+  | 0 => m
+  | S p => S (add p m)
+  end
+  \end{verbatim}
+  \warn{Note that this definition is not a set in the sense of Section~\ref{ch:settheory}. It is an inductively defined type. We will allow ourself a bit of liability here, we view the set nat as the universe for much of the section. All subsets of natural numbers will be subsets of $\mathbb{N}$ as before.}
+
+This definition has introduced two properties that  tell us how to add integers, we will use those very often:
+
+{\bf plus\_O\_n:} $\forall$ n : nat, 0 + n = n
+
+
+and
+
+{\bf plus\_Sn\_m:} $\forall$ n m : nat, S n + m = S (n + m)
+
+This tells us how to add two numbers. If we want to compute $n+m$ we first look at n. If it is zero, we use the first method and get m as the sum.  If n is not zero then it can be obtained as  the successor of somebody else say $n = S \ p$. To obtain the result we now add p and m and then take the successor of the result.
+
+If you forget the name of the statements perhaps it is time you learn how to search for them. First try
+  
+  \inp{Search (0+\_=\_). }
+  
+  That is search for statements that look like $0 + ? = ?$.  The result will be longer than you want:
+   
+   \begin{verbatim}
+   Nat.add_0_l: forall n : nat, 0 + n = n
+
+plus_O_n: forall n : nat, 0 + n = n
+\end{verbatim}
+ Similarly if you need to find things that look like $S \ ? + ? =?$ you use ``''
+    \inp{Search (S \_+\_). }
+ 
+ To obtain``''
+  
+  \begin{verbatim}
+  Nat.add_1_l: forall n : nat, 1 + n = S n
+
+Nat.add_succ_comm: forall n m : nat, S n + m = n + S m
+
+Nat.add_succ_l: forall n m : nat, S n + m = S (n + m)
+
+plus_Sn_m: forall n m : nat, S n + m = S (n + m)
+========================
+plus_Snm_nSm: forall n m : nat, S n + m = n + S m
+  \end{verbatim}
+  
+  
+  
+  
+  Without further ado let us prove the thing you always wanted to prove:
+
+\inp{Lemma first: 1+1=2.}
+
+Note that if we wrote the lemma as
+
+\inp{Lemma first:1+1= S ( S 0).}
+
+The result would have been the same. 
+
+\begin{proof}[informal]The proof is indeed very simple once we understand what we need to show. We first note that 1+1 means in fact that $(S 0) + 1$. The statement  plus\_Sn\_m, tells us how to add those two, that is we need to add 0 and 1 and take the successor. That is $1+1=S (0+1)$. Now  plus\_O\_n tells us that $0+1=1$ and so becomes $1+1= S\ (0+1) =S\ 1= S \ (S \ 0) =2$ which finishes the proof.\end{proof}
+
+To follow the proof in Spatchcoq do:
+
+
+  \inp{
+  Lemma first:1+1=2.\\
+Rewrite the goal using plus\_Sn\_m.\\
+Rewrite the goal using plus\_O\_n.\\
+This follows from reflexivity.\\
+Qed.}
+  
+Note that if we had to do such a complicated proof each time we would never achieve anything.  Note the following :
+
+\inp{
+Lemma b: 3+4=7.\\
+Rewrite goal using the definition of Nat.add.\\
+This follows from reflexivity.}
+
+
+or even
+
+\inp{
+Lemma b: 3+4=7.\\
+This is trivial.}
+
+
+
+  
+  We will now prove the first theorem that is based by induction, the associativity of addition:
+  
+  \inp{Lemma add\_assoc (n m p:nat ): n+(m+p ) = (n+m)+p.}
+  
+  
+  
+To prove that we will use induction on n. Therefore we need to show
+  
+  
+  
+  
+  \begin{enumerate}
+  \item[\bf First Step] $0+(m+p)= (0+m)+p$
+  Here we first use plus\_O\_n to show that the left hand side equals $m+p$ and then again to show the right hand side also equals $m+p$.
+  
+  
+  
+  
+  \item [\bf Induction Step] Assume $n+(m+p)=(n+m)+p$ and prove $S\ n +(m+p) = ( S\ n+m)+p$.
+  \end{enumerate}
+  
+We now use plus\_Sn\_m  to show the left hand side can be written as $S\ (n +(m+p))$ then use the induction hypothesis to show you can write than as  $S \ ((n+m)+p)$ Using plus\_Sn\_m we rewrite the latter as $S \ ((n+m))+ p $ and using it again we can write it as $(S \ n +m) +p$ which equals the right hand side.
+
+The complete proof is bellow\footnote{This is a standard lemma, we will use it henceforth as Nat.add\_assoc}.
+
+  
+  
+  \inp{
+  Lemma add\_assoc (n m p:nat ): n+(m+p ) = (n+m)+p.\\
+Apply induction on n.\\
+Rewrite the goal using plus\_O\_n.\\
+Rewrite the goal using plus\_O\_n.\\
+This follows from reflexivity.\\
+Rewrite the goal using plus\_Sn\_m.\\
+Rewrite the goal using IHn .\\
+Rewrite the goal using plus\_Sn\_m.\\
+Rewrite the goal using plus\_Sn\_m.\\
+This follows from reflexivity.
+}
+
+We also note the following lemma for further use\footnote{This is a standard Lemma, we will use it as Nat.add\_1\_r}. Note the use of the new tactic Replace (n + 1) by (S n) in the goal, in this tactic it is assumed that one of the statements (a=b) or (b=a) are among your hypotheses. It can be used in a more general form but it will hurt latex export.
+
+\inp{Lemma add\_1\_r: $\forall$ n : nat, n + 1 = S n.\\
+Fix an arbitrary element n.\\
+Apply induction on n.\\
+Rewrite the goal using plus\_O\_n.\\
+This follows from reflexivity.\\
+Rewrite the goal using plus\_Sn\_m.\\
+Replace (n + 1) by (S n) in the goal.\\
+This follows from reflexivity.\\
+Qed.}
+
+
+We are nor ready to prove commutativity\footnote{This is a standard Lemma, we will use it as Nat.add\_comm}.:
+
+\inp{
+Lemma comm(n m:nat):n+m=m+n.\\
+Apply induction on n.\\
+Rewrite the goal using plus\_O\_n.\\
+Apply induction on m.\\
+Rewrite the goal using plus\_O\_n.\\
+This follows from reflexivity.\\
+Rewrite the goal using plus\_Sn\_m.\\
+Replace (m + 0) by (m) in the goal.\\
+This follows from reflexivity.\\
+Rewrite the goal using plus\_Sn\_m.\\
+Replace (n + m) by (m + n) in the goal.\\
+Rewrite the goal using Nat.add\_1\_r.\\
+Rewrite the goal using Nat.add\_assoc.\\
+Rewrite the goal using Nat.add\_1\_r.\\
+This follows from reflexivity.
+}
+
+Hopefully by now you are starting to get used to such exercises. Any of the Lemmas above could have be proved in one line using the tactic
+True by arithmetic properties. We proffered to use the longer way in order to show you some easy examples of induction.
+
+The next thing we will define is the subtraction. If you try 
+\inp{Print Nat.sub} in spatchcoq you will se the construction:
+
+\begin{verbatim}
+Nat.sub = 
+fix sub (n m : nat) {struct n} : nat :=
+  match n with
+  | 0 => n
+  | S k => match m with
+           | 0 => n
+           | S l => sub k l
+           end
+\end{verbatim} 
+
+We can slowly decipher the above. The first rule says that $0-m =0$ regardless on what $m$ is. This is perhaps surprising but a moment thought will suffice to see that there is no other choice since we do not have negative numbers.
+The second rule said that if $n= S k$ then we look at $m$. If $m=0$ we get the familiar $n-0=n$. Otherwise $m= S l$ and so we can compute $n-m = k-l$. Note the following useful properties of subtraction:
+
+
+Nat.sub\_0\_l: $\forall$ n : nat, 0 - n = 0 
+
+Nat.sub\_0\_r: $\forall$  n : nat, n - 0 = n
+
+Nat.sub\_succ: $\forall$ n m : nat, S n - S m = n - m
+
+minus\_plus: $\forall$ n m : nat, n + m - n = m
+
+minus\_plus\_simpl\_l\_reverse: $\forall$ n m p : nat, n - m = p + n - (p + m)
+
+
+Here is a proof of the third based on the first two:
+\inp{
+Lemma minus\_plus: $\forall$ n m : nat, n + m - n = m.\\
+Fix an arbitrary element n.\\
+Fix an arbitrary element m.\\
+Apply induction on n.\\
+Rewrite the goal using plus\_O\_n.\\
+Rewrite the goal using Nat.sub\_0\_r.\\
+This follows from reflexivity.\\
+Rewrite the goal using plus\_Sn\_m.\\
+Rewrite the goal using Nat.add\_comm.\\
+Rewrite the goal using Nat.sub\_succ.\\
+Rewrite the goal using Nat.add\_comm.\\
+Apply result IHn .
+}
+
+  Note also that the definition of subtraction limits the use of the tactic ``True by arithmetic properties.''. Indeed almost no step from the Lemma above can be solved by that tactic.
+  
+  
+  We now define the multiplication.  We define it inductively as before, we have two rules:
+ 
+  Nat.mul\_0\_l: $\forall$ n : nat, 0 * n = 0
+  
+  and
+  
+  Nat.mul\_succ\_l: $\forall$ n m : nat, S n * m = n * m + m
+ 
+ 
+ Indeed the definition of multiplication has a first step that tells you that $0*n=0$ and another that says that $(n+1)*m = n*m+m$.
+ 
+ Let us prove that $n*0=0$ as well.
+ 
+ 
+ To do so we will use induction on n. If $n=0$ we need to show $0*0=0$ and that follows from  Nat.mul\_0\_l. The induction step assumes that $n*0=0$ and we will need to show that $S\ n * 0=0$. Now we do know from   Nat.mul\_succ\_l:  that $S\ n * 0 = n*0 +0$ and so using the induction hypothesis we only need to show that $0+0=0$.
+ 
+ \inp{
+ Lemma a(n:nat): n*0=0.\\
+Apply induction on n.
+Rewrite the goal using Nat.mul\_0\_l.\\
+This follows from reflexivity.\\
+Rewrite the goal using Nat.mul\_succ\_l.\\
+Rewrite the goal using IHn .\\
+This follows from reflexivity.}
+
+
+We will also have the right hand  property of Successor:
+
+\mess{Nat.mul\_succ\_r: $\forall$ n m : nat, n * S m = n * m + n}
+
+We leave this to the reader and use it to prove commutativity of multiplication.
+
+\inp{
+Lemma mul\_comm ( n m : nat): n * m = m * n.\\
+Apply induction on n.\\
+Rewrite the goal using Nat.mul\_0\_l.\\
+Rewrite the goal using Nat.mul\_0\_r.\\
+This follows from reflexivity.\\
+Rewrite the goal using Nat.mul\_succ\_l.\\
+Replace (n * m) by (m * n) in the goal.\\
+Rewrite the goal using Nat.mul|\_succ\_r.\\
+This follows from reflexivity.}
+
+
+
+
+Finally we will define the order relation on $\mathbb{N}$. We will define ``$\le$'' the less than or equal relation first. We define this also inductively, that is we ask that $n\le n$ and that  if $n\le m$ then $n\le S \ m$.
+\mess{
+Inductive le (n : nat) : nat $\rightarrow$ Prop :=
+   $ le\_n : n \le n | le\_S : \forall m : nat, n \le m \rightarrow n \le S m$
+}
+ 
+Let us prove the antisymmetry of le.
+
+\begin{lemma}[antisym]
+$$\forall a b \in \mathbb{N}, a \le b \land b \le a \rightarrow a=b.$$
+\end{lemma}
+ 
+ 
+    
+ And of course the relation $<$ is defined as $n<m$ if $S n \le m$.
+ 
+ 
+ We have an equivalent definition of the $\le$ relation
+ 
+ 
+Nat.sub\_0\_le: $\forall$ n m : nat, n - m = 0 $\leftrightarrow$ n $\le$ m.
+
+
+
+\section{More induction}\label{more induction}
+
+The previous section gave some easy examples of induction. This section will have some more involved examples. We will start with some strange examples. We will have various definitions of even and odd numbers and prove that a number is either even or odd.
+
+The first definition will be
+
+\begin{definition}
+A natural  number n is even if there its a natural number $k$ with $n =2k$.
+\end{definition}
+
+\inp{Definition Nat.Even (n:nat):= exists k, n=2*k\\
+Definition Nat.odd (n:nat):= exists k, n=2*k+1}
+\inp{
+Lemma even\_or\_odd(n:nat): Nat.Even n $\lor$ Nat.odd n.}
+
+\begin{proof}[informal]
+We will prove this by induction on $n$.
+The first step is quit easy, we need to prove Nat.Even 0 $\lor$ Nat.odd 0. We in fact prove 0 is even, by noting that $0 = 2*0$.
+
+The induction step assumes
+ Nat.Even n $ \lor$ Nat.odd n and tries to prove  Nat.Even ( S n) $\lor$ Nat.odd (S n). To do so we consider the two cases in the
+
+To show this we consider the two cases in the induction hypothesis:
+
+Case 1 Nat.Even n
+
+This means that there exists $k$ so that $n = 2k$. We then note that $S n = 2k+1$ and so  S n is odd and Nat.Even (S n) $\lor $ Nat.odd  (S n) holds.
+
+Case 2 Nat.odd n 
+
+In this case there exists a $k$ so that $n = 2k+1$ and so $S n = 2k+2 = 2(k+1)$ and so S n is even and Nat.Even (S n) $\lor $ Nat.odd  (S n) holds.
+
+
+\end{proof}
+
+The formal proof is slightly longer but follows the same structure.
+
+\inp{
+Apply induction on n.\\
+Prove left hand side.\\
+Rewrite goal using the definition of Nat.Even.\\
+Prove the existential claim is true for 0.\\
+True by arithmetic properties.\\
+Consider cases based on disjunction in hypothesis IHn .\\
+Rewrite hypothesis H  using the definition of Nat.Even.\\
+Prove right hand side.\\
+Rewrite goal using the definition of Nat.odd.\\
+Fix k the existentially quantified variable in H .\\
+Prove the existential claim is true for k.\\
+Replace (2 * k) by (n) in the goal.\\
+This is trivial.\\
+Rewrite hypothesis H  using the definition of Nat.odd.\\
+Fix k the existentially quantified variable in H .\\
+Prove (Nat.Even (S n)) in the disjunction.\\
+Rewrite goal using the definition of Nat.Even.\\
+Prove the existential claim is true for (k+1).\\
+Replace (n) by ((2 * k) + 1) in the goal.\\
+True by arithmetic properties.}
+
+We now arrive at the first standard induction proof you probably see in a textbook:
+
+\begin{lemma}
+$$\forall n \in \mathbb{N},  \sum_{I=0}^{n} i = \frac{n(n+1)}2$$
+\end{lemma}
+
+In order to prove this we will need first to define the above sum. This is a little strange in Spatchcoq, we will define it as:
+
+\inp{Fixpoint sum (n : nat) : nat :=\\
+  match n with\\
+  | 0 => 0\\
+  | S p => n + (sum p)\\
+end.}
+Which allows out to prove things by induction. Since dividing by two presents complications we shall in fact prove:
+
+\begin{lemma}
+$$\forall n \in \mathbb{N},  2\sum_{I=0}^{n} i = n(n+1)$$
+\end{lemma}
+
+
+
+Then we prove the Lemma:
+\begin{proof}[informal]
+We will prove this by induction on $n$. Recall that the statement we shall prove is
+$$P(n): 2\sum_{I=0}^{n} i = n(n+1)$$
+{\bf First Step}
+
+We need to prove $$P(0) = 2\sum_{i=0}^{0} i = 0*(0+1)$$
+Which is quite trivial.
+
+{\bf Induction step}
+
+We now assume that
+$$P(n): 2\sum_{i=0}^{n} i = n(n+1)$$
+Holds and we prove
+$$P(n+1): 2\sum_{i=0}^{n+1} i = (n+1)(n+1+1).$$
+
+Now note that, by definition and then by distributivity of multiplication,
+$$2\sum_{I=0}^{n+1} i = 2((n+1) +  \sum_{i=0}^{n})  =2(n+1) +  2\sum_{i=0}^{n}$$
+
+Using the induction hypothesis we get that
+$$2(n+1) +  2\sum_{i=0}^{n} = 2(n+1) + n(n+1) = (n+1(n+2)$$
+
+Which is what we needed to prove.
+\end{proof}
+
+The formal proof is very similar. Note the fact that we use Nat\.mul\_add\_distr\_l which states
+\mess{Nat\.mul\_add\_distr\_l
+     : $\forall$ n m p : nat, n * (m + p) = n * m + n * p} 
+     and which can be found using the pattern (\_*(\_+\_)=\_). We also use the tactic ``True by arithmetic properties.'' To finish the computations.
+
+\inp{
+Lemma a (n:nat): 2*(sum n) = n*(n+1).\\
+Apply induction on n.\\
+This is trivial.\\
+Rewrite goal using the definition of sum.\\
+Rewrite the goal using Nat\.mul\_add\_distr\_l.\\
+Replace (2 * (sum n)) by (n * (n + 1)) in the goal.\\
+Replace (S n) by (n+1) in the goal.\\
+True by arithmetic properties.\\
+This is trivial.}
+
+Here is another example:
+
+\begin{lemma}
+$$\forall n\in \mathbb{N}, \sum_{i=0}^{n} 2^{i}= 2^{(n+1)}-1$$
+\end{lemma}
+
+This is again a slightly complicated problem because of the minus in the story. At one point  in the proof we will need to use the result
+
+\mess{
+Nat.add\_sub\_assoc     : $\forall n m p : nat, p \le m \rightarrow n + (m - p) = n + m - p$}
+For that reason we will start by proving the following Lemma (which is another example of induction)
+\begin{lemma}[onepow]\label{onepow}
+$$\forall a \ n\in \mathbb{N}, a\ne 0 \rightarrow  1\le a\mbox{\textasciicircum }{n}$$
+\end{lemma}
+
+Recall that the definition of exponential in the natural numbers is also inductive:
+\inp{Nat.pow = fix pow (n m : nat) {struct m} : nat :=\\  match m with\\  | 0 => 1\\  | S m0 => n * pow n m0\\  end}
+
+That is we know that $a\mbox{\textasciicircum }0=1$ and that $a \mbox{\textasciicircum }{S n}= a* a\mbox{\textasciicircum }{n}$.
+
+So in order to prove Lemma \ref{onepow} we again need to use induction on $n$.
+
+\begin{proof}[informal]
+Let us fix $a$ and assume $a \ne 0$.The statement we need to show is
+$$P(n): 1\le a\mbox{\textasciicircum }{n}.$$
+{\bf Step one}
+
+The case $n=0$ is rather easy
+$$P(0) : 1\le a\mbox{\textasciicircum }{0}$$  and  since, by definition $a\mbox{\textasciicircum }{0}=1$ this is equivalent to showing $1\le 1$ which is trivial.
+
+{\bf Induction Step}
+
+Let us assume that
+$$P(n) : 1\le a\mbox{\textasciicircum }n$$ holds and prove
+
+$$P(n+1): 1\le a\mbox{\textasciicircum }{(S n)}.$$
+
+By definition, $a\mbox{\textasciicircum }{(S n)} = a* a\mbox{\textasciicircum }{n}$ and we now employ the result 
+\mess{Nat.pow\_le\_mono\_r
+     : $ \forall a b c : nat,
+       a \ne 0 \rightarrow b \le c -> a \mbox{\textasciicircum } b \le  a \mbox{\textasciicircum } c$}
+
+In order to prove that $a\mbox{\textasciicircum }{n}\le a\mbox{\textasciicircum }{S n}$ an then use transitivity of $\le$.
+
+\end{proof}
+The formal proof is not much more difficult.
+\inp{
+Lemma onepow(a n:nat): $(a<>0)-> 1<= a\mbox{\textasciicircum }n$.\\Assume (a $\ne$ 0)  then prove $(1\le a\mbox{\textasciicircum }n)$.\\Apply induction on n.\\This is trivial.\\Rewrite goal using the definition of Nat.pow.\\Claim $( a\mbox{\textasciicircum } n   \le   a  \mbox{\textasciicircum } {(S n)} )$.\\Apply result Nat.pow\_le\_mono\_r.\\This follows from assumptions.\\This is trivial.\\Apply result (Nat.le\_trans \ 1$ (a\mbox{\textasciicircum }n) (a \mbox{\textasciicircum }(S n)))$.\\This follows from assumptions.\\This follows from assumptions.\\
+Qed.}
+
+Do not forget the Qed so we can use the Lemma.
+
+We are now ready for the other lemma. First define the other sum:
+
+\inp{
+Fixpoint sum2 (n : nat) : nat :=\\match n with\\| 0 => 1\\| S p => $2\mbox{\textasciicircum }n$ + (sum2 p)\\end.}
+ And state the Lemma.
+ \inp{
+ Lemma s2 (n:nat): sum2 n = $2\mbox{\textasciicircum }{(S\  n)}$-1}
+ 
+ We will not give an informal proof but rather a annotated formal proof. We start by using induction. 
+ 
+\inp{Apply induction on n.}
+
+The first step is of course
+\coq{ }{(sum2\  0 = (2\mbox{\textasciicircum } 1) - 1)}
+Which is trivial\inp{This is trivial.}
+
+We now need to look at the indiction step
+\coq{n: nat\\ IHn: sum2\ n = (2\mbox{\textasciicircum }(S n)) - 1}{sum2 S\ n = (2\mbox{\textasciicircum }(S (S \ n ))) - 1}
+
+We use the definition of sum2 to modify the goal:
+\inp{Rewrite goal using the definition of sum2.}
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{((2\mbox{\textasciicircum }(S \ n )) + (sum2\  n) = (2\mbox{\textasciicircum }(S (S \ n ))) - 1)}
+
+We can now use the induction hypothesis IHn.
+\inp{Replace (sum2\  n) by ((2\mbox{\textasciicircum }(S \ n )) - 1) in the goal.}
+
+To get
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{((2\mbox{\textasciicircum }(S n)) + ((2\mbox{\textasciicircum }(S n)) - 1) = (2\mbox{\textasciicircum }(S (S n))) - 1)}
+
+We now manipulate the right hand side of the equality by using
+
+\mess{Nat.pow\_succ\_r': $\forall a b : nat, a \mbox{\textasciicircum } S b = a * a \mbox{\textasciicircum } b$}
+\inp{Rewrite the goal using (Nat.pow\_succ\_r' 2 (S n)).}
+
+to obtain 
+
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{((2\mbox{\textasciicircum }(S n)) + ((2\mbox{\textasciicircum }(S n)) - 1) = (2 * (2\mbox{\textasciicircum }(S n))) - 1)}
+
+Toi clean up a bit we will use
+\inp{Denote (2\textasciicircum ( S n)) by x.}
+
+The result is
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{ x+(x-1)= (2*x)-1}
+Which seems that it should be immediate but we run into a bit of troubles because of the minus. We rewrite using
+\inp{Rewrite the goal using Nat.add\_sub\_assoc.}
+
+This changes the goal to
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{ (x+x)-1= (2*x)-1}
+ But also creates a new goal:
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{ 1\le x}
+
+The first goal is easily solvedd by
+
+\inp{
+Replace (x+x) by (2*x) in the goal.
+This follows from reflexivity.
+This is trivial.}
+
+And we are left with 
+\coq{n: nat\\ IHn: sum2\  n = (2\mbox{\textasciicircum }(S \ n )) - 1}{ 1\le x}
+
+
+We remember what $x$ is and apply onepow:
+\inp{
+Replace (x) by (2\textasciicircum (S n)) in the goal.
+Rewrite the goal using onepow.}
+
+And we are left to show that $1\le 1$ and $not (0=2)$ both of which are trivial tasks.
+\inp{This is trivial.
+This is trivial.}
+
+
+\paragraph{\bf Exercises:} 
+Prove by induction:
+\begin{enumerate}
+\item The product of two consecutive integers is even.
+\item The sum of two consecutive integers is odd.
+ \item $\forall n \ x \in\mathbb{N},  1+nx\le  (1+x)^n.$(Hint: you might want to use Nat.pow\_mul\_l, Nat.mul\_le\_mono\_l,  Nat.le\_trans and le\_plus\_trans)
+ \item $\forall n \ m\in \mathbb{N},  2^{n+m}= 2^{n}2^{m}$ 
+ \item $\forall n \ m\in \mathbb{N},  2^{n*m}= (2^{n})^{m}$ (Hint: you might want to use Nat.mul\_succ\_l, Nat.pow\_add\_r  Nat.pow\_mul\_l.)
+
+\item $\forall n\in \mathbb{N}, n\le 2^{n}$ (Hint: you might want to use Nat.add\_le\_mono).
+
+\item $\forall n\in \mathbb{N}, \sum_{i=1}^{n}i^{3} = (\sum_{i=1}^{n}i^{2})^{2}.$
+
+
+\end{enumerate}
+
+
+\section{Divisibility}
+
+
+We start with a definition and a notation
+
+\inp{Definition div a b := (exists n, b = a*n).\\
+Notation "a | b" := (div a b) (at level 10).}
+
+Let us first show something easy:
+\inp{
+Lemma a: forall n, n |0.\\
+Fix an arbitrary element n.\\
+Rewrite goal using the definition of div.\\
+Prove the existential claim is true for 0.\\
+This is trivial.\\
+Qed.}
+
+And also
+\inp{
+Lemma a: forall, 1| n.\\
+Fix an arbitrary element n.\\
+Rewrite goal using the definition of div.\\
+Prove the existential claim is true for n.\\
+This is trivial.}
+
+Let us prove an induction statement about divisibility:
+\begin{lemma}
+$$\forall n\in \mathbb{N}, 3 | 4 \mbox{\textasciicircum } n-1$$
+\end{lemma}
+
+
+\inp{
+Lemma c(n:nat) : 3 | (4\textasciicircum n -1).\\
+Apply induction on n.
+}
+
+The first induction step is easy to do, you quickly unfold the definitions and it becomes trivial.
+\inp{
+Rewrite goal using the definition of Nat.pow.\\
+Rewrite goal using the definition of div.\\
+Prove the existential claim is true for 0.\\
+This is trivial.}
+
+We are now left with the induction step:
+
+\coq{n:nat \\
+IHn: 3 | 4\mbox{\textasciicircum } {n}-1}{3 | 4\mbox{\textasciicircum } {( S\ n)}-1}
+ We unfold the definition of divides in IHn and find the s so that $4^{n}-1 = 3s$
+ 
+\inp{
+Rewrite hypothesis IHn  using the definition of div.\\
+Fix s the existentially quantified variable in IHn .}
+
+We now unfold de definition of power :
+
+\inp{Rewrite goal using the definition of Nat.pow.}
+
+To get
+\coq{n\  s:nat \\
+IHn: 4\mbox{\textasciicircum }{n}-1 = 3s}{3 | ( 4* 4^n)-1}
+
+
+We now modify a bit the statement IHn to be useful. That is we try to show $3s = 4^n+1$. 
+\inp{
+Claim ( 3*s+1 = 4 \textasciicircum n ).\\
+Replace (3 * s) by ((4 \textasciicircum n) - 1) in the goal.
+}
+
+We therefore need to show
+
+\coq{n\  s:nat \\
+IHn: 4\mbox{\textasciicircum }{n}-1 = 3s}{(((4\mbox{\textasciicircum } n) - 1) + 1 = 4 \mbox{\textasciicircum } n)}
+This, sadly is not completely trivial. We need to use our old friend:
+
+\inp{Apply result Nat.sub\_add.}
+
+And we still have to show
+\coq{n\  s:nat \\
+IHn: 4\mbox{\textasciicircum } {n}-1 = 3s}{1\le  4 \mbox{\textasciicircum } n}
+
+Which is exactly the statement of onepow (and the trivial statement that $not(0=4)~$.
+\inp{Apply result onepow.\\
+This is trivial.}
+
+We now make use of our newfound equality
+
+\inp{Replace (4 {\textasciicircum }n) by ((3 * s) + 1) in the goal.}
+To get
+
+\coq{n\  s:nat \\
+IHn: 4\mbox{\textasciicircum } n-1 = 3s\\ H: (3*s)+1 = 4\mbox{\textasciicircum } n}{3 | 4*( 3s+1)-1 }
+
+We now unfold the definition of div
+\inp{
+Rewrite goal using the definition of div.}
+
+And do some calculations (to be proved later) in the goal.
+\inp{
+Replace (4 * ((3 * s) + 1)) by (4 * (3 * s) + 4) in the goal.}
+
+
+Now we make Ann educated guess was to what the value of $n0$ should be:
+\inp{Prove the existential claim is true for (4*s+1).}
+
+And we start proving that equality.
+\inp{
+Replace (3 * (4 * s + 1)) by (4*(3*s) +3) in the goal.}
+Clean the computation a bit with a notation
+\inp{
+Denote (4 * (3 * s)) by x.}
+And a few standard moves 
+\inp{
+Replace 4 by (3+1) in the goal.\\
+Rewrite the goal using plus\_assoc.\\
+Rewrite the goal using Nat.add\_sub.\\
+This follows from reflexivity.}
+finishes the main goal. We still have to show a few easy assertions that we made on the way: 
+
+$3+1=4$, 
+\inp{This follows from reflexivity.}
+
+$((4 * (3 * s)) + 3 = 3 * ((4 * s) + 1))$
+\inp{True by arithmetic properties.}
+And finally $((4 * (3 * s)) + 4 = 4 * ((3 * s) + 1))$
+\inp{
+True by arithmetic properties.}
+
+
+Note that most of our troubles stemmed from the subtraction issues.
+
+Let us prove another standard statement. 
+\begin{lemma}
+The product of any 3 consecutive natural numbers is divisible by 3.
+\end{lemma}
+
+\inp{Lemma consecutive (n:nat): 3 | n*(n+1)*(n+2).}
+We unfold the definition of div, start an induction and easily eliminate the first case:
+\inp{
+Rewrite goal using the definition of div.\\
+Apply induction on n.\\
+Prove the existential claim is true for 0.\\
+True by arithmetic properties.}
+
+We are left with
+\coq{n:nat \\ IHn:\exists n0 : nat, (n * (n + 1)) * (n + 2) = 3 * n0)}{(\exists n0 : nat, ((S n) * ((S n) + 1)) * ((S n) + 2) = 3 * n0)}
+
+
+This is really hard to read and so we fix the value of $s$ in IHn and replace $S\ n $ by $n+1$ (to be shown later).
+\inp{
+Fix s the existentially quantified variable in IHn .\\
+Replace (S n) by (n+1) in the goal.}
+
+
+We now make some more trivial replacement to be proved later:
+\inp{
+Replace (n+1 + 1) by (n+2) in the goal.
+Replace (n + 1 +2) by (n+3) in the goal.}
+and one slightly more complicated:
+\inp{
+Replace (((n + 1) * (n + 2)) * (n + 3)) by (n*(n + 1) * (n + 2) + 3*(n+1)*(n+2)) in the goal.}
+
+Now we can use the induction Hypothesis:
+\inp{
+Rewrite the goal using IHn.}
+
+To get 
+\coq{n\ s :nat \\ IHn: (n * (n + 1)) * (n + 2) = 3 * s)}
+{\exists n 0 : nat, (3 * s) + ((3 * (n + 1)) * (n + 2)) = 3 * n0}
+
+W can now guess what $n0$ should be:
+\inp{
+Prove the existential claim is true for (s+ (n+1)*(n+2)).}
+The rest of the proof is rather trivial:
+\inp{
+True by arithmetic properties.\\
+True by arithmetic properties.\\
+True by arithmetic properties.\\
+True by arithmetic properties.\\
+True by arithmetic properties.}
+
+\paragraph{\bf Exercises:} 
+\begin{enumerate}
+\item Prove by induction the product of 4 consecutive integers is divisible by 4.
+\item Prove by induction that for any $n\in \mathbb{N}$, $5 | 6^{n}-1$.
+\item Prove by induction that for any $n\in \mathbb{N}$, $5 | 7^{n}-2^{n}$.
+\item Prove that if $a, b, c \in \mathbb{N}$ then $a | b$ and $a | c$ implies that $a | b+c$.
+\item prove or disprove the converse of the previous question, that is if $a, b, c \in \mathbb{N}$ then $a | b +c$ implies that $a | b$ and $a | c$ .
+\item Prove or disprove the following if $a, b, c \in \mathbb{N}$  and $a | bc $  then $a | b$ and $a | c$.
+
+
+
+\end{enumerate}

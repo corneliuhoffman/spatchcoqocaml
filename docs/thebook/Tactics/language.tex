@@ -1,0 +1,147 @@
+\chapter{ A brief overview of the notations in the language}
+
+
+
+We will list the formats of the various constructions we use. For more details see 
+\url{https://coq.inria.fr/refman/language/gallina-specification-language.html}.
+\paragraph{\bf Check}{
+\inp{Check X.}
+
+This will print the type of the statement $X$. For example the command
+\inp {Check le.}
+
+Will produce
+\mess{le
+     : nat $\rightarrow$ nat $\rightarrow$ Prop}
+
+}
+\hrulefill
+\paragraph{\bf Print}{
+
+\inp{Print X.}
+
+This will print the full definition (proof) of of the statement $X$. For example the command
+\inp {Print le.}
+
+Will produce
+\mess{le
+     inductive le (n : nat) : nat $\rightarrow$ Prop :=
+    le\_n : n $\le$ n $\mid$ le\_S : $\forall$ m : nat, n $\le$ m $\rightarrow$ n $\le$ S m}
+
+Which describes the two ways to check that $n\le m$,
+\begin{enumerate}
+\item if $n=m$ then $n \le m$.
+\item otherwise you look at the predecessor of m and retry.
+\end{enumerate}}
+\hrulefill
+\paragraph{\bf Varible/Axiom}
+{\inp{Variable name:Type.}
+
+The two keywords can be used interchangeably but, to keep with normal mathematical notation, one should use Axiom to define variables of type Prop and Variable for all other types. For example one can use 
+\inp{Variable myax:3=1+2.}
+or {Axiom myax:3=1+2.}
+To mean that max is a ``proof'' of 3=1+2. However in practice we should only use the latter. Similarly we can use
+\inp{Variable n:nat.}
+or \inp{Axiom n:nat}
+
+To introduce a natural number $n$ but we should really only use the former.
+}
+
+\paragraph{\bf Definition}{
+\inp{Definition name vars := term.}
+or 
+\inp{definition name vars : Type:= term.}
+This names an object of a certain type. 
+\inp{
+Definition thenumber3:=3.}
+or 
+\inp{
+Definition thenumber3:nat:=3.}
+
+Both define the object thenumber3 to be the natural number 3. The second one is more precise since it forces Spatchcoq to verify that it has the type you want. For example
+
+\inp{Definition thenumber3:Prop:=3.}
+
+Will give the message
+
+\mess{Error: The term "3" has type "nat" while it is expected to have type "Prop".}
+
+Definitions can of course depend on parameters. For example
+
+\inp{Definition mult a b:= a*b.
+}
+
+Defines the multiplication of two numbers, it does assume that the numbers are natural numbers so if you do 
+
+\inp{ Check mult.}
+
+You will get
+\mess{mult: nat $\rightarrow$ nat $\rightarrow$ nat}
+Of course you can be precise:
+
+\inp{Definition mult a b :Z:= a*b.
+}
+     To get
+     
+\mess{mult
+     : Z $\rightarrow$ Z $\rightarrow$ Z}
+     
+ Definitions are useful for writing shorter text and can be unfolded using the tactics ``Rewrite goal using the definition of VAR.''
+ or ``Rewrite hypothesis VAR using the definition of VAR.''
+ 
+    
+     
+     }
+     
+ \paragraph{\bf Notation}{  
+ \inp{ Notation `` notation '':= (term)( at level x). 
+ }
+ This introduces notations. For example we might want to write things nicely let us assume that we have two predicates on the type U one is called P and the other Q.
+ \inp{Variables U:Type
+ Variables: P Q:U $\rightarrow$ Prop}
+ 
+ We now decide to say that $U$ is the set of beings  and that $P x$ means that ``x is human'' and  $Q x $ means that ``x will eventually die'' then
+ We can have the following notations:
+ 
+\inp{
+Notation " 'beings' ":= U.\\
+Notation "x 'is' 'a' 'human' ":= (Q x) (at level 10).\\
+Notation "x 'will' 'eventually' 'die' ":= (Q x) (at level 10).}
+
+Now let us assume we want to prove that $\forall x, P x \rightarrow Q x$.
+
+
+\inp{Lemma z:forall x,  P x $\rightarrow$ Q x.}
+Note that the response is
+
+\coq{ }{\forall x : \mbox{beings, (x is a human)} \rightarrow \mbox{(x will eventually die)}}
+
+Which reads a quite a bit better.
+
+ 
+ 
+ 
+  }
+  
+  
+     
+  
+\paragraph{\bf Lemma/Proposition/Theorem}
+{
+\inp{Lemma name (vars1: Type)(Vars2:Type2)$ \cdots$ : statement .}
+
+A lemma, proposition or theorem is a statement that needs to be proved. They all have the same shape. You start with a either Lemma, Proposition or Theorem. The next entry is the name of the theorem. This can be anything. Here is a very easy example:
+
+\inp{Theorem the\_easiest\_theorem: 1=1.}
+
+
+
+
+Note that this theorem does not depend on any variables. This is perfectly ok, in fact in mathematics we are used with not defining theorems that have parameters.
+
+By comparison, the statement
+
+\inp{Theorem the\_second\_easiest\_theorem (n:nat): n=n.}
+
+Is a theorem that contains the parameter $n$ which is defined to be a natural number. }
+

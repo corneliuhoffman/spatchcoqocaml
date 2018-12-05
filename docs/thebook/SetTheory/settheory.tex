@@ -1,0 +1,664 @@
+\chapter{Set Theory}\label{ch:settheory}
+\section{Introduction}
+
+The topic of Set Theory is at the very heart of Foundation of Mathematics. It is just about the simples construction in the world, a set is just a bunch of object right? Indeed, before the 20th century a set was rather informally considered to be just any collection of elements. This approach is now described as ``naive set theory''. The problem with this approach is that it allows for self referential definitions that  quickly run into paradoxes.  These paradoxes were first introduced by Bertrand Russell, based on the ancient Liar's paradox.  
+
+The paradoxes in the story mainly deal with constructions related to the ``set of all sets''. The commonly accepted solution is due to Ernst Zermelo and Abraham Fraenkel (and it is now called ZF (or ZFC) theory) and proposes an ``axiomatic set theory''. This means that we only allow sets that are built via a certain collection of axioms. We will describe this briefly bellow a little below but introducing all  the subtleties of Axiomatic Set Theory would warrant a separate book. We choose to avoid such details by restricting  to  subsets of a given ``predefined'' set U.  This avoids issues with any self referential sets and all paradoxes below. The interested reader is referred to {\color{red} citations for ZFC}.
+
+As a side remark, Russell's own solution to the problem that arose from ``the set of all sets'' type paradoxes  was quite different from the ZFT  approach. He proposed a ``type theory'' {\color{red} cite for types} which introduced a theory of ever increasing Universes so that the objects of a type n are sets of objects of type n-1. His constructions were simplified over the years especially with the development Computer Science. They form the basis of most of the modern type systems, in particular of  Thierry Coquand's calculus of constructions (CoC)which is the basis of  Coq's (and SpatchCoq's) own construction of types.  A more detailed exposure of this in Appendix~\ref{chap:setsvstypes}.
+
+Our formal approach in SpatchCoq is developed in two steps. The first one (Section~ \ref{sec:sets}) uses bespoke definitions based on a small modification of the Library Ensembles from Coq. To keep up with the library we will call our formal versions of sets Ensembles (the French word for set). This uses direct definitions and it is very useful to understand the definitions and the connections between Sets and propositional calculus. Nevertheless it gets quite unruly if you need to do longer proof and so the second step is to use the library Ensembles and its inductive definitions.
+\warn{Note that the definitions that we give in Section~\ref{sec:sets} are different from those in Section~\ref{sec:setsincoq} . We use these definitions initially because they are slightly better for understanding the ideas behind some of our tactics. See the discussions in Section~\ref{sec:setsincoq} }
+
+Note that C Simpson and J Grim have formalised the Bourbaki version of Axiomatic Set theory in Coq. This is beyond the scope of this text but the interested reader can look at  \cite{simp04} and \cite{grimm}.
+ \paragraph{\bf Paradoxes}\label{sec:paradoxes} 
+ \epigraph{Only a Sikh deals in absolutes. }{ ObiWan.}
+ 
+ Consider the popular version of Russell's paradox: In a village there is a barber who shaves those, and only those that do not shave themselves. The question is ``Who shaves the barber?''. 
+ 
+ There are only two possibilities:
+ \begin{enumerate}
+ \item If he shaves himself then he should not shave himself because he only shaves those that do not shave themselves.
+ \item If he does not shave himself the he should because he shaves all those that do not shave themselves.
+ \end{enumerate}
+ 
+ This is a modern version of an ancient paradox. It appears in various guises in the work of  Epimenides (600 BC), St Jerome (400Ad), Bhart?hari (400AD), Ath?r al-D?n Mufa??al (10th century AD) and so on. Int its simplest form the  paradox deals with the sentence: ``This sentence is false''. The question is wether this is a Mathematica proposition.
+ Again there are two cases
+ \begin{enumerate}
+ \item The sentence is true in which case it is false
+ \item The sentence is false in which case it is not not true which means it is true.
+ \end{enumerate}
+ 
+ 
+These paradoxes can be modified to show   what is wrong with the naive idea of sets. Suppose we define a set as a collection of elements. We also have a predicate $a\in B$ to mean that $a$ is an element of the set $B$. There are two kind of sets.
+
+ For most sets the proposition $X \in X$ is obviously false (note that we use $\in$ and not $\subseteq$ see the difference bellow) for example $\{1,2,3\}\not \in \{1,2,3\}$. 
+
+However since any collection of objects is a set we can form ``sets of sets'' and for example if $X$ is the set of all sets that have at least 3 elements must be a set. Now of course $X$ is an infinite set and so it has a lot more than 3 elements. This means in particular that $X\in X$.
+
+ We shall then consider $B$ to be the set of all sets that do not contain themselves as an element. In set notation:
+$$B= \{A \mid A\not\in A\}.$$
+
+There are now again two possibilities:
+
+\begin{enumerate}
+\item If $B\in B$ then, by the definition of $B$, we get that $B\not\in B$, a contradiction.
+\item If $B\not\in B$ then, again by the definition of $B$, we get that $B \in B$, a contradiction.
+
+\end{enumerate}
+
+This means that the ``naive`` version of set theory cannot be consistent.
+ 
+\section{Sets}\label{sec:sets}
+\subsection{First definitions}
+Despite the above mentioned issues, from now on a set will be a collection of elements. In order to do so we shall consider an ``universal'' set $U$ and for the most part, our sets will be subsets of $U$. More precisely, we a set $U$ which either has some formal construction via ZFT or it is a concretely constructed set such as the set of all people. A set will now be a collection of element of $U$.  We normally try to use lower letters for elements and capital letters for sets. We denote by $x\in A$ the fact that $x$ is an element of the set $A$ and by $x \not \in A$ the fact that $x$ is not an element of $A$. Note that if $x$ is a fixed element and $A$ is a fixed set then both $x\in A$ and $x \not\in A$ are propositions and $\neg (x \in A) $ is the same as $x \not \in A$. We will also use the notation $\{a, b, c\}$ for the set whose elements are $a,b$ and $c$. Another common notation is (here $P:U\rightarrow Prop$ is a predicate ):
+$$A=\{x\in U \mid P(x)\}$$
+This means that $A$ is the set of all elements (in U) that satisfy the property $P$. In fact if the universe $U$ can be deduced from the context then we ignore it in the notation. Here are some examples noting that these representations are not unique:
+$$\{0, 1,2\}= \{  x \in \mathbb{N} \mid x< 3\}= \{  x \in \mathbb{N} \mid x\le2\}$$
+$$ \{x \in \mathbb{R}| x\ge 0\}=  \{x \in \mathbb{R}| |x|=x\}= \{x \in \mathbb{R}| \exists y \in \mathbb{R}, x=y^{2}\}  $$
+
+
+Note that while set $A$ is defined by the predicate $P$, the converse is also true. Indeed  $P(x)$ is the predicate $x \in A$\footnote{In particular, the following two predicates $P:\mathbb{R}->Prop, P(x)= x>0$ and $Q:\mathbb{R}->Prop, P(x)=exist y \in \mathbb{R}, x=y^{2}$ are logically equivalent.
+} and so the notation $A=\{x \mid P(x)\}$ is not a special case, it includes all subsets of $U$. 
+
+
+
+
+As a consequence,  in Spatchcoq we identify the two. More precisely we define a set as a function $A:U \rightarrow \mbox{Prop}$, the function that take the value True if $x \in A$ and False otherwise.  For example if $U=\mathbb{N}$ then the set $\{0,1,2\}$ is identified with the function $A:\mathbb{N}\rightarrow Prop$ so that $A(0)=A(1)=A(2)=$True and $A(x) =$ False otherwise (or by the function $A(x)=x<3$. Here are the precise definitions. Note that $U$ is a  type and not a set,  a subtlety that we do discuss here.
+
+\inp{Variable U : Type.\\
+Definition Ensemble := U -> Prop.\\
+Definition In (A:Ensemble) (x:U):= A x.\\
+Notation "x $\in$ A":= (In A x) (at level 10).} 
+
+Note the definition of In and the notation $\in$.
+\warn{ The syntagm (at level 10) is a bit confusing. It establishes the Precedence level of the operator. For example $\rightarrow$ has precedence 99 while $\lor$ has precedence 85 and $\land$ has precedence 80. This means that if you are careless and write $A \rightarrow B\lor C \land D$, Spatchcoq will interpret this as  $A \rightarrow (B\lor (C \land D))$. }
+
+
+From now on we will almost forget the function definition and think about sets as collections of elements. To do so however we still need to define the various operations we can do with sets. 
+
+The fist concept we discuss is the concept of subset. We say that a set $A$ is a subset of a set $B$ (we write $A\subseteq B$ if any element of $A$ is also an element of $B$. Formally this means
+$$A \subseteq B := \forall x \in U, x \in A \rightarrow x \in B.$$
+
+Not so surprising the Spatchcoq definition is exactly this:
+
+\inp{Definition Included (B C:Ensemble) : Prop := forall x:U, x $ \in  $ B -> x $\in$ C.\\
+Notation "A $\subseteq$ B":= (Included  A B)(at level 10).}
+
+Note the notation $\subseteq$. It is different from $\in$ and you need to carefully understand the difference. The symbol $\in$ connects elements to the sets that contain them and the symbol $\subseteq$ connects sets. For example
+$$\{ 3\}\subseteq \{1, \{2\},3\}\mbox{ and }3 \in   \{1, \{2\},3\}$$ $$ 2\not\in  \{1, \{2\},3\} \mbox{ and } \{2\} \not\subseteq  \{1, \{2\},3\}, $$ $$\{2\} \in  \{1, \{2\},3\}\mbox{ and } \{\{2\}\} \subseteq  \{1, \{2\},3\}$$
+
+
+We now introduce the tow operation with sets. If $A$ and $B$ are two sets then we can define the union of $A$ and $B$ as the set of all the elements that either belong to  $A$ or belong to  $B$. That is:
+
+$$A\cup B =\{x | x \in A \lor x \in B\}.$$
+The corresponding Spatchcoq definition is a bit stranger, recall that we are defining a new set, that is a predicate $A\cup B : U\rightarrow Prop$. The format is perhaps a bit overcharged, you need to use the form (fun x: type  $\Rightarrow$ P(x))  that will define a predicate.
+\inp{
+Definition Union (B C:Ensemble):Ensemble:=fun x:U => (x$\in$B) $\lor$(x$\in$C).\\
+Notation "A $\cup$ B":= (Union  A B)(at level 8).}
+\rmk{Note that the precedence here is 8 so $A \subseteq B \cup C $ means $ A \subset (B\cup C)$.}
+
+\warn{ Note that these definition are definitions of functions, therefore unfolding definitions are a bit weird. For example if your goal looks like
+
+\coq{\cdots}{ x \in A\cup B}
+
+And you try
+\inp{Rewrite goal using the definition of Union.}
+You will get an unpleasant surprise:
+\coq{\cdots}{x  \in  (\lambda  x0  :  U,  x0  \in  A  \lor  x0  \in  B) )}
+
+The solution is to use a slightly modified form and unfold the actual definition of In the union.
+\inp{Rewrite goal using the definition of (In,Union).}
+To get
+\coq{\cdots}{((x \in A) \lor (x \in B))}}
+
+
+
+
+Similarly the intersection of two sets $A$ and $B$ is the set of the element they have in common. An element is in $A\cap B$ if it is in both $A$ and $B$. This means:
+$$A\cap B =\{x | x \in A \land x \in B\}.$$
+
+
+\inp{
+Definition Intersection (B C:Ensemble):Ensemble :=fun x:U=> (x$\in$B)$\land$(x$\in$C).\\
+Notation "A  $\cap$ B" := (Intersection  A B) (at level 10).
+}
+
+
+The complement of a set $A$ is the set of element of U that do not belong to $A$. That is:
+
+$$\mathsf{C} A =\{x | x \not\in A\}.$$
+Or in spatchcoq
+
+\inp{Definition Complement (A:Ensemble) : Ensemble := fun x:U =>not In A x.\\
+Notation " $\mathsf{C}$A" := (Complement A) (at level 5).
+}
+\rmk{note that the precedence is 5 so $\mathsf{C}A \cup B  $ means $(\mathsf{C}A)\cup B$.}
+And also $A\setminus B$ is the set of elements in $A$ and not in $B$. This can be also defined as $A\cap (\mathsf{C} B)$.
+
+\inp{Definition Setminus (A B :Ensemble) : Ensemble := $A\cap (\mathsf{C} B)$.\\
+Notation " $A\setminus B$" := (Setminus A B) (at level 10).
+}
+
+We will make use of the following technical axiom
+\inp{
+Axiom Extensionality\_Ensembles : forall A B:Ensemble, $A \subseteq B \land B\subseteq A  \rightarrow A = B$.}
+
+Finally we introduce the empty set
+\inp{Definition EmptySet:Ensemble:= fun x:U=>False.\\
+Notation ''$\emptyset$'':=Emptyset}
+\subsection{Operations on Sets}\label{subset:operations}
+This naive construction of set theory is an ideal ground  to try out our proof techniques. The proofs will be very similar to those in predicate calculus. Let us start with transitivity of inclusion:
+
+\begin{lemma}
+trans\_incl (A B C:Ensemble U): $A\subseteq B \land B \subseteq C \rightarrow A \subseteq C$.
+\end{lemma}
+
+We will provide three proofs. The first two will be informal and the last will be formal (in Spatchcoq). The first proof is a direct proof and the other two are backward proofs.
+\begin{proof}[informal direct proof]
+
+Recall that $X\subseteq Y$ if and only if $\forall x:U, x \in X \rightarrow x \in Y$.
+ In order to prove that $ A\subseteq C$, we will pick an element $x$, assume it is in $A$ and prove that it is in fact also in $C$. We will first do a direct proof. Since we know that $A\subseteq B$,  it follows by the definition of $\subseteq$ and by {\it modus ponens} that $x \in B$. Similarly since $B\subseteq$ it also follows from definition and modus ponens that $x\in C$.
+\end{proof}
+\begin{proof}[informal backward  proof]
+
+Recall that $X\subseteq Y$ if and only if $\forall x:U, x \in X \rightarrow x \in Y$.
+ In order to prove that $ A\subseteq C$, we will pick an element $x$, assume it is in $A$ and prove that it is in fact also in $C$. 
+Since $B \subseteq C$, by the definition of inclusion and by implication elimination, in order to prove that $x \in C$, it suffices to prove that $x \in B$. Moreover since $A\subseteq B$, in order to prove that $x \in B$ it is sufficient to show that $x \in A$. This is however our assumption and so we finish the proof.
+\end{proof}
+
+\begin{proof}[formal proof]  We start by assuming  $A\subseteq B \land B \subseteq C$ and aiming to prove $A \subseteq C$.
+\inp{
+Assume $(A\subseteq B \land B \subseteq C)$  then prove $(A\subseteq C$ )}.
+We now split the hypothesis  $(A\subseteq B \land B \subseteq C)$  into  $(A\subseteq B$  and  $B \subseteq C)$.
+ \inp{Eliminate the conjuction in hypothesis Hyp .}
+ Next we expand the definition of included everywhere.
+ 
+ 
+ \inp{Rewrite hypothesis Hyp0  using the definition of Included.\\
+Rewrite hypothesis Hyp1  using the definition of Included.\\
+Rewrite goal using the definition of Included.}
+
+Now we know that 
+$$Hyp0: (\forall x : U, (x \in A) \rightarrow (x \in B))$$
+and 
+$$Hyp1: (\forall x : U, (x \in B) \rightarrow (x \in C))$$
+
+And we want to show $$(\forall x : U, (x \in A) \rightarrow (x \in C))$$
+
+We pick a random $x\in U$ and try to prove $(x \in A) \rightarrow (x \in C)$. To do so assume that $(x \in A)$ and prove $ (x \in C))$.
+
+\inp{Fix an arbitrary element x.\\
+Assume $(x \in A)$ then prove $(x \in C)$.
+}
+
+
+Now by Hyp1 if we want to prove $x\in C$ it is enough to prove $x \in B$.
+\inp{Apply result Hyp1 .}
+
+Similarly by Hyp1 if we want to prove $x\in B$ it is enough to prove $x \in A$.
+\inp{Apply result Hyp0 .}
+
+We already know $x \in A$, finishing the proof.
+
+
+\inp{This follows from assumptions.}
+
+\end{proof}
+Did that look familiar? Recall the backward proof at page \pageref{backward Socrates}. The two proofs are basically identical one you abstract a bit.
+
+
+The sound proof will involve the empty set.
+
+\inp{Lemma emptyid(A :Ensemble): $A\cup \emptyset =A.$}
+
+\begin{proof}[informal proof]
+
+We first prove {\bf $A\cup \emptyset \subseteq A.$}
+
+To do so pick an element $x \in A\cup \emptyset$. There are two cases to consider:
+
+Case 1  $x\in A:$ in this case the conclusion is equal to one of the assumptions so we are done.
+
+Case 2  ${x \in \emptyset:}$ In this  case by the definition of the empty set, $x \in \emptyset$ implies $False$ and so a proof by contradiction finishes this.
+
+We now prove $A \subseteq A\cup \emptyset$. To do so let $x \in A$. By disjunction introduction it means that $ x \in A \cup \emptyset$, a proof of the second step.
+
+\end{proof}
+
+\begin{proof}[formal proof]
+
+We first apply the axiom
+\inp{
+Apply result Extensionality\_Ensembles.}
+ To get that we need to show
+ \coq{A:Ensemble}{(A\cup \emptyset \subseteq A )\land (A \subseteq A\cup \emptyset)}
+
+We now split the goal in two
+
+\inp{Prove the conjunction in the goal by first proving $(A\cup \emptyset \subseteq A )$ and then $ (A \subseteq A\cup \emptyset)$.}
+
+This part of the proof is for  { $A\cup \emptyset \subseteq A$}:
+We start with the standard ``opening moves:''
+\inp{Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.}
+
+To get
+
+ \coq{A:Ensemble\\ x:U }{(x \in (A\cup \emptyset) )\rightarrow (x \in A) }
+We now apply the standard tactic for implication
+\inp{Assume ($x \in (A\cup \emptyset)$) then prove ($x \in A$).}
+
+And then unfold the definition of the Union.
+\inp{Rewrite hypothesis Hyp  using the definition of (In, Union).}
+ To obtain
+ 
+ \coq{A:Ensemble\\ x:U \\ Hyp: (x \in A)\lor  (x \in \emptyset)} {x \in A }
+
+Which requires a case by case analysis.
+
+\inp{Consider cases based on disjunction in hypothesis Hyp .}
+The first case is 
+ \coq{A:Ensemble\\ x:U \\ Hyp0:(x \in A)} {x \in A }
+Which follows immediately from assumption:
+\inp{This follows from assumptions.}
+The second case is a bit stranger:
+
+ \coq{A:Ensemble\\ x:U \\ Hyp1:   (x \in \emptyset)} {x \in A }
+ 
+ And so we unfold the definition of the EmptySet to get 
+\inp{Rewrite hypothesis Hyp1  using the definition of (In, EmptySet).}
+
+ \coq{A:Ensemble\\ x:U \\ Hyp1: False} {x \in A }
+This is an immediate proof by contradiction.
+\inp{Prove by contradiction.\\
+This follows from assumptions.}
+
+Next we need to show that $A \subseteq A\cup \emptyset$:
+We use again the usual moves:
+\inp{
+Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.}
+To get 
+ \coq{A:Ensemble\\ x:U }{(x \in A)\rightarrow (x \in (A\cup \emptyset) ) }
+We now apply the standard tactic for implication
+\inp{Assume ($x \in A$) then prove ($x \in (A\cup \emptyset)$).}
+And then unfold the definition of the Union:
+\inp{
+Rewrite goal using the definition of (In, Union).}
+To get 
+ \coq{A:Ensemble\\ x:U \\ Hyp: x \in A} {(x \in A) \lor (x \in \emptyset)}
+W will now prove the left hand side of the disjunction:
+\inp{
+Prove (x $\in$ A) in the disjunction.\\
+This follows from assumptions.}
+\end{proof}
+
+Note that the Spatchcoq proof is roughly twice as long as the informal proof. The more complicated the proof the more the formal proof will increase.
+
+
+Let us write a more involved proof: another such proof:
+\begin{lemma}[distr]
+$\forall$ A B C: Ensemble, $ A\cap(B \cup C) = (A \cap B) \cup (A \cap C).$
+\end{lemma}
+I will start with a proof as you would see in a any Mathematics book followed by an Spatchcoq based proof.
+\begin{proof}[informal proof]
+In order to prove the equality of two sets $X$ and $Y$ we will show that $X\subseteq Y$ and that $Y\subseteq X$.
+
+{${\mathbf A\cap(B \cup C) \subseteq  (A \cap B) \cup (A \cap C)}$}
+
+We take an arbitrary $x \in A\cap(B \cup C)$ and show that $ x\in (A \cap B) \cup (A \cap C)$. By definition of the intersection it means that $x \in A $ and $x \in B\cup C$. Since $x \in B\cup C$ there are two cases to consider.
+
+Case 1: $x \in B$, in this case we know that $x$ is an element of $A$ and that $x$ is an element of $B$. This means that $x \in A\cap B$ and so it is also in $ x\in (A \cap B) \cup (A \cap C)$.
+
+Case 2: $x \in C$,  this case is very similar, we swap $C$ for $B$ in the previous proof, that is we know that $x$ is an element of $A$ and that $x$ is an element of $C$. This means that $x \in A\cap C$ and so it is also in $ x\in (A \cap B) \cup (A \cap C)$.
+
+Since  $ x\in (A \cap B) \cup (A \cap C)$ in both cases, this finishes  the proof of the first inclusion.
+
+
+{$\mathbf {(A \cap B) \cup (A \cap C) \subseteq A\cap(B \cup C)}$}
+
+For this we will take an element $x \in (A \cap B) \cup (A \cap C) $ and show that $ x \in A\cap(B \cup C)$. Since $x$ is in a union of two sets we again get to do a case by case analysis.
+
+Case 1: $x \in (A \cap B)$, In this case we know that $x$ is an element of $A$ and $x$ is an element of $B$. Since $x$ is an element of $B$ it follows that $x$ is also an element of $B\cup C$. Now we put together $x \in A$ and $x \in B\cup C$ to get $x \in A \cap (B\cup C)$.
+
+Case 2: $x \in (A \cap C)$, this case is very similar, we swap $C$ for $B$ in the previous proof, that is we know that $x$ is an element of $A$ and $x$ is an element of $C$. Since $x$ is an element of $C$ it follows that $x$ is also an element of $B\ cup C$. Now we put together $x \in A$ and $x \in B\cup C$ to get $x \in A \cap (B\cup C)$.
+\end{proof}
+
+
+
+\begin{proof}[formal proof]
+We first pick A, B and C to be sets and we prove $ A\cap(B \cup C) = (A \cap B) \cup (A \cap C).$
+\inp{Fix an arbitrary element A.\\
+Fix an arbitrary element B.\\
+Fix an arbitrary element C.}
+
+We are now going to employ the Extensionality axiom and so in order to prove the equality it suffices to prove both inclusions.
+\inp{Apply result Extensionality\_Ensembles .}
+To get 
+
+\coq{A B C:Ensemble}{((A \cap (B \cup C)) \subseteq ((A \cap B) \cup (A \cap C)))\land (((A \cap B) \cup (A \cap C)) \subseteq (A \cap (B \cup C))).}
+
+We will now prove the two inclusions separately.
+\inp{
+Prove the conjunction in the goal by first proving $((A \cap (B \cup C)) \subseteq ((A \cap B) \cup (A \cap C)))$ then $(((A \cap B) \cup (A \cap C)) \subseteq (A \cap (B \cup C))).$}
+
+The proof of $((A \cap (B \cup C)) \subseteq ((A \cap B) \cup (A \cap C)))$:
+
+We expand the definition of included, pick a random $x \in (A \cap (B \cup C))$ and prove $x \in (A \cap B) \cup (A \cap C))$. 
+
+\inp{
+Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.\\
+Assume ($x \in (A \cap (B \cup C))$) then prove ($x \in (A \cap B) \cup (A \cap C))$.}
+
+To get 
+
+\coq{A B C:Ensemble\\
+x:U\\
+x \in (A \cap (B \cup C))}{x \in (A \cap B) \cup (A \cap C))}
+
+ Next we explicitly expand the definitions of union and intersection  in the goal.
+ 
+ \inp{
+ Rewrite goal using the definition of  (In, Union).\\
+ Rewrite goal using the definition of  (In, Intersection).}
+ 
+ Note the format, (In, Union) respectively (In, Intersection), this is a technical trick, you could have done this in two steps but it would have looked ugly. The result is that we need to show:
+ 
+ \coq{x:U\\
+x \in (A \cap (B \cup C))}
+{ (((x \in A) \land (x \in B)) \lor ((x \in A) \land (x \in C)))}
+
+Similarly expanding the definition in the hypothesis:
+\inp{
+Rewrite hypothesis Hyp  using the definition of (In, Intersection).\\
+Eliminate the conjuction in hypothesis Hyp .\\
+Rewrite hypothesis Hyp1  using the definition of (In, Union).}
+
+To get the two hypotheses $Hyp0:(x \in A)$ and $Hyp1:(x \in B) \lor (x \in C)$. We now consider the two possible cases in Hyp1, that is either $x\in B$ or $x \in C$.
+\inp{
+Consider cases based on disjunction in hypothesis Hyp1 .}
+
+In the first case we know that $x\in A$ and $x \in B$ so we can prove the left hand side of the goal.
+\inp{
+Prove left hand side.\\
+Prove the conjunction in the goal by first proving ($x \in A$) then ($x \in B$).\\
+This follows from assumptions.\\
+This follows from assumptions.}
+
+In the second case we know that $x\in A$ and $x \in C$ so we can prove the right hand side of the goal.
+
+
+ \inp{
+Prove right hand side.\\
+Prove the conjunction in the goal by first proving ($x \in A$) then ($x \in C$).\\
+This follows from assumptions.\\
+This follows from assumptions.}
+The proof of $ ((A \cap B) \cup (A \cap C))) \subseteq((A \cap (B \cup C))$:
+
+We follow the same standard procedure:
+
+\inp{
+Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.\\
+Assume ($x \in (A \cap B) \cup (A \cap C)$) then prove ($x \in (A \cap (B \cup C))$) .}
+
+Now we do know that $x \in (A \cap B) \cup (A \cap C)$ so by using the definition of (In Union) we need to consider the two cases, either $x \in (A \cap B)$ or $x \in (A \cap C)$
+
+ \inp{
+ Rewrite hypothesis Hyp  using the definition of (In, Union).\\
+ Consider cases based on disjunction in hypothesis Hyp .
+ }
+ If $x \in (A \cap B)$ then using the definition of union we know that $x\in A$ and $x \in B$.
+ 
+ \inp{Rewrite hypothesis Hyp0  using the definition of (In, Intersection).
+Eliminate the conjuction in hypothesis Hyp0 .
+ }
+ So we now know that need to show that $$((x \in A) \land (x \in (B \cup C)))$$
+This follows using standard introduction rules:
+ \inp{
+ Rewrite goal using the definition of (In, Intersection).\\
+Prove the conjunction in the goal by first proving ($x \in A$) then ($x \in (B \cup C)$).\\
+This follows from assumptions.\\
+Rewrite goal using the definition of (In, Union).\\
+Prove left hand side.\\
+This follows from assumptions.}
+ 
+ \inp{
+Rewrite hypothesis Hyp  using the definition of (In, Intersection).\\
+Rewrite goal using the definition of (In, Intersection).}
+
+The other case is similar.
+
+  \inp{Rewrite hypothesis Hyp0  using the definition of (In, Intersection).
+Eliminate the conjuction in hypothesis Hyp0 .
+ Rewrite goal using the definition of (In, Intersection).\\
+Prove the conjunction in the goal by first proving ($x \in A$) then ($x \in (B \cup C)$).\\
+This follows from assumptions.\\
+Rewrite goal using the definition of (In, Union).\\
+Prove right hand side.\\
+This follows from assumptions.}
+\end{proof}
+
+Note again that this proof is not so much different from the proof of distributivity rule for and and or.
+
+
+
+
+\paragraph{\bf Exercises}
+ \begin{enumerate}
+  \item[\bf distr]$\forall$ A B C: Ensemble, $ A\cup(B \cap C) = (A \cup B) \cap (A \cup C).$
+
+ \item[\bf intuni] $ \forall $ A B:Ensemble,  $ A\cap (A \cup B) =A.$
+ 
+  \item[\bf intuni] $ \forall $ A B:Ensemble,  $ A\cup (A \cap B) =A.$
+
+  \item[\bf uniitro] $ \forall $ A B:Ensemble,  $ A\cap (A \cup B) =A.$
+
+ \item[\bf incl] $ \forall $ A B:Ensemble,  $ A\subset B  \leftrightarrow A= A \cup B.$
+  \item[\bf union] $ \forall $ A B:Ensemble,  $ A\subset B  \leftrightarrow B= A \cap B.$
+   \item[\bf diff] $ \forall $ A B:Ensemble,  $ A\subset B  \leftrightarrow A \cup \mathsf{C} B   =\emptyset.$
+
+
+
+ \end{enumerate}
+ \subsection{Sets in Coq}\label{sec:setsincoq}  
+\warn{
+The constructions of union, intersection,  complement and Empty Set form Section~\ref{sec:sets} are easy enough to deal with but if the theorems are complicated they begin to be slightly unruly. We used them to exemplify the use of the ``rewrite using the definition'' tactics but from now on we abandon them in favour of the built in definitions in Coq.}
+
+We do start by importing the Ensemble package.
+
+\inp{Require Import Ensembles.}
+
+Note that we can now also introduce the notations:
+\inp{
+Notation "x $\in $A":= (In \_ A x) (at level 10).\\
+Notation "A $ \subseteq $ B":= (Included \_  A B)(at level 10).\\
+Notation "A $ \cup $ B":= (Union \_  A B)(at level 1).\\
+Notation "A$ \cap $ B" := (Intersection \_  A B) (at level 10).\\
+Notation "$\mathsf{C}$ A" := (Complement \_ A) (at level 10).\\
+Notation " A $\setminus$ B" := (Setminus \_  A B) (at level 10).\\
+Notation "$\emptyset$ ":= (Empty\_set \_).}
+
+Note that in Section~\ref{sec:sets} the definition of union was:
+
+\inp{Definition Union (B C:Ensemble):Ensemble:=fun x:U => (x$\in$B) $\lor$(x$\in$C).}
+
+The package Ensembles in  Coq defines the union inductively. Therefore if you look at 
+\inp{Print Union.}
+You get 
+
+
+\inp{
+Inductive Union (B C:Ensemble) : Ensemble :=\\
+    | Union\_introl : forall x:U, In B x -> In (Union B C) x\\
+    | Union\_intror : forall x:U, In C x -> In (Union B C) x.}
+    
+    
+    Therefore, you get two different theorems (Union\_introl, Union\_intro4) that allow you to ``introduce a union''  if you want to prove  $x \in A\cup B$ you can either prove $x\in A$ and use Union\_introl or prove $x \in B$ and use Union\_intror.
+    
+For example if you want to prove
+
+\inp{
+Lemma distr (A B:Ensemble U): $ A  \subseteq (A \cup B).$}
+
+We do the same few standard things 
+
+\inp{
+Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.\\
+Assume (x $\in$ A) then prove ($x \in (A \cup B)$.}
+To get
+
+\coq{U:Type\\
+A, B: Ensemble\  U\\ x:U \\
+Hyp : x \in A}{x \in (A \cup B)}
+
+At this point however we can do
+\inp{
+Apply result Union\_introl.}
+
+To get 
+\coq{U:Type\\
+A, B: Ensemble\  U\\ x:U \\
+Hyp : x \in A}{x \in A }
+And finish with:
+\inp{
+This follows from assumptions.}
+
+
+At the same time, if you want to use a hypothesis of type $Hyp: x \in A \cup B$, you will use at the same cases tactic that you use for disjunction.
+
+For example, suppose you want to prove
+
+\inp{Lemma a (U:Type) ( A B:Ensemble U): (A $\cup$ B)$\subseteq$(B $\cup$ A).}
+
+We do the usual 
+\inp{Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.\\
+Assume ($x \in  (A \cup B))$ then prove ($x \in (B \cup A)$).
+}
+
+At which point your goal is:
+
+\coq{U:Type\\
+A, B: Ensemble U\\ x:U \\
+Hyp : x \in A\cup B}{x \in B\cup A }
+
+
+We now apply the tactic:
+\inp{
+Consider cases based on disjunction in hypothesis Hyp.}
+To get two cases:
+\coq{U:Type\\
+A, B: Ensemble U\\ x:U \\
+Hyp : x \in A}{x \in B\cup A }
+and
+
+\coq{U:Type\\
+A, B: Ensemble U\\ x:U \\
+Hyp : x \in B}{x \in B\cup A }
+
+We can now finish the proofs of the two cases by using:
+
+
+\inp{Apply result Union\_intror.\\
+This follows from assumptions.
+}
+Respectively 
+\inp{
+Apply result Union\_introl.\\
+This follows from assumptions}.
+
+Similarly, the command
+\inp{Print Intersection}.
+ will give us:
+ 
+ \mess{Inductive Intersection (U : Type) (B C : Ensemble U) : Ensemble U :=
+    Intersection\_intro : $\forall  x : U, x \in B \rightarrow  x \in C \rightarrow x \in (B \cap C) $}
+    
+    Which means that if you want to prove a goal of type $x\in A\cup B$, you can use the tactic:
+    \inp{Apply resuly  Intersection\_intro.}
+    
+     In order to use a hypothesis of the type $Hyp: x \in A \cup B$, you can use the tactic:
+   
+   
+    \inp{Eliminate the conjuction in hypothesis Hyp.} For example, in order to prove the lemma:
+    
+    \inp{Lemma b (U:Type) ( A B:Ensemble U): $(AcapB) \subseteq (B \cap A)$.}
+
+
+\inp{Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.\\
+Assume ($x \in (A \cap B)$) then prove ($x \in (B \cap A)$).\\
+Eliminate the conjunction in hypothesis Hyp.\\
+Apply result Intersection\_intro.\\
+This follows from assumptions.\\
+This follows from assumptions.}
+    
+Perhaps more interesting is the definition of the empty set. As before you can try
+\inp{Print Empty\_set.}
+ To get
+ \mess{Inductive Empty\_set (U : Type) : Ensemble U :=  }
+ That is the empty set has an empty intro constructor. You cannot really prove $x\in \emptyset$. Nevertheless if you look for it
+\inp{Search Empty\_set.}
+
+You get (a few similar results)among other things)
+\mess{
+Empty\_set\_ind: $\forall  (U : Type) (P : U \rightarrow Prop) (u : U), \emptyset  u \rightarrow P u$
+}
+Which means that if you know x is an  element of the empty set then you can prove anything. For example, to prove that $A \cup \emptyset \subseteq A$
+
+\inp{ Lemma emptyid (U:Type) (A :Ensemble U): $A \cup \emptyset  \subseteq  A$.}
+We do the following:
+\inp{
+Rewrite goal using the definition of Included.\\
+Fix an arbitrary element x.\\
+Assume $(x \in A \cup \emptyset)$ then prove $(x \in A)$.\\
+Consider cases based on disjunction in hypothesis Hyp.\\
+This follows from assumptions.\\
+Apply result Empty\_set\_ind.\\
+This follows from assumptions.}
+
+De definition of Complement and Setminus are identical to those of Section{sec:sets}.
+
+
+\warn{
+Finally note that in the Ensembles package the axiom  Extensionality\_Ensembles is defined using  Same\_set:
+$$\forall  (U : Type) (A B : Ensemble U), Same\_set U A B \rightarrow A = B $$
+were 
+$$Same\_set U B C: B\subseteq C \land C \subseteq B$$
+
+An d so usually equality proofs in sets start by doing
+\inp{Apply result Extensionality\_Ensembles.\\
+Rewrite goal using the definition of Same\_set.
+}
+}
+
+Here is a quick cheatsheet for set theory:
+
+
+\begin{tabular}{|c|c|}\hline Hypothesis contains & Tactic \\\hline $ x \in \emptyset $ & Apply result Empty\_Set\_ind. \\\hline $x \in A \cup B$ & Consider cases based on disjunction in hypothesis Hyp. \\\hline $x \in A \cap B $& Eliminate the conjuction in hypothesis Hyp. \\\hline \end{tabular}
+
+\begin{tabular}{|c|c|}\hline Goal contains & Tactic \\\hline $x \in A \cup B$ & \begin{tabular}{c}Apply result Union\_introl. \\ Apply result Union\_introl. \end{tabular} \\\hline $x \in A\cap B$ & Apply result Intersection\_intro. \\\hline \end{tabular}
+
+\paragraph{\bf Exercises}
+Do the same exercises as in Section \ref{sec:sets} with the inductive constructions for sets.
+ \begin{enumerate}
+  \item[\bf distr]$\forall$ A B C: Ensemble, $ A\cup(B \cap C) = (A \cup B) \cap (A \cup C).$
+
+ \item[\bf intuni] $ \forall $ A B:Ensemble,  $ A\cap (A \cup B) =A.$
+ 
+  \item[\bf intuni] $ \forall $ A B:Ensemble,  $ A\cup (A \cap B) =A.$
+
+  \item[\bf uniitro] $ \forall $ A B:Ensemble,  $ A\cap (A \cup B) =A.$
+
+ \item[\bf incl] $ \forall $ A B:Ensemble,  $ A\subset B  \leftrightarrow A= A \cup B.$
+  \item[\bf union] $ \forall $ A B:Ensemble,  $ A\subset B  \leftrightarrow B= A \cap B.$
+   \item[\bf diff] $ \forall $ A B:Ensemble,  $ A\subset B  \leftrightarrow A \cup \mathsf{C} B   =\emptyset.$
+
+
+
+ \end{enumerate}
+ 
