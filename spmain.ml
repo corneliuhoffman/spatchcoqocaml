@@ -384,7 +384,7 @@ let stop = win10#buffer#get_iter `START in
 let ast = try (Formulaparsing.parse name) with _ -> Var name in
            Printf.printf "the line is %i\n\n" (stop#line); flush_all ()  ;
            win10#buffer#insert ~iter:stop (n^"\n") )) ) 
-           (Formulaparsing.produce_possible_tactics_goal ast hypname goal) ) in
+           (Formulaparsing.produce_possible_tactics_goal listofcommands ast hypname goal) ) in
   selection#unselect_all ();
     GToolbox.popup_menu ~entries:(menupieces@[`S]@tactics)
 
@@ -422,11 +422,11 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
 
 (*     Printf.printf "|%s| \n " xx; flush_all ();
  *)
-    if (try (Str.search_forward (Str.regexp "Axiom \| Definition \|Inductive\|Notation\|Record\|Eval\|Load\|Locate\|Variable\|Section\|End\|Module") xx 0 )>=0  with _-> false) then 
+    if (try (Str.search_forward (Str.regexp "Axiom  \|Inductive\|Notation\|Record\|Eval\|Load\|Locate\|Variable\|Section\|End\|Module") xx 0 )>=0  with _-> false) then 
     (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}];}]; leaving_tactic=xx; values =[||]}]; 
     current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
     current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=xx; values =[||]});
-    if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\| Proposition") xx 0 )>=0  with _-> false) then 
+    if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\| Definition\| Proposition") xx 0 )>=0  with _-> false) then 
     (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}];}]; leaving_tactic=xx; values =[||]}]; 
     current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
     current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]});
@@ -453,7 +453,7 @@ let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listof
       if error <0 then 
         (begin
 
-          if (try (Str.search_forward (Str.regexp "Axiom\|Definition\|Variable\|Inductive\|Notation") xx 0 )>=0  with _-> false) then
+          if (try (Str.search_forward (Str.regexp "Axiom\|Variable\|Inductive\|Notation") xx 0 )>=0  with _-> false) then
             (let latextac = Latexstuff.preplatex (Processinputs.separate xx) in
             
             ignore(mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 

@@ -26,8 +26,8 @@ let rec print x = match x with
 (*   | Succ(e) -> "("^(print e)^" + 1)"
  *)  
  |Succ(e) ->(match e with
-  Var a-> "S "^(print e)
-  |_->"S ("^(print e)^")")
+  Var a-> (print e)^".+1"
+  |_->"("^(print e)^").+1")
  | EmptySet -> " ∅ "
   | Le(e1,e2) -> 
   let a = match e1 with Var x -> print e1 
@@ -155,25 +155,186 @@ let parant ast =
   match ast with
   | Var a -> print ast
   | _ -> "("^(print ast )^")"
+let contains s1 s2 =
+    let re = Str.regexp_string s2
+    in
+        try ignore (Str.search_forward re s1 0); true
+        with Not_found -> false
+let repl s reg list =
+List.fold_left (fun  a b -> Str.replace_first reg  b a) s list;;
+let cons_uniq xs x = if List.mem x xs then xs else x :: xs
 
-let produce_possible_tactics_goal ast name goal =
+let remove_from_left xs = List.rev (List.fold_left cons_uniq [] xs)
+
+let produce_possible_tactics_goal l ast name goal =
 Printf.printf "this is the form %s\n\n" (Ast.to_string ast);flush_all ();
-print_string (string_of_bool goal);
-  match ast with
-  | Implies(a, b) -> if  goal then ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
- | Iff(a,b) -> if goal then ["Prove both directions of "^(parant a)^" iff "^(parant b)^"."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."] else ["Eliminate the conjuction in hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
-  | Or(a,b) -> if goal then  (["Prove left hand side."; "Prove right hand side.";
-     "Prove "^(parant a)^" in the disjunction.";
-     "Prove "^(parant b)^" in the disjunction."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions."; "This is trivial."]) else ["Consider cases based on disjunction in hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR."; "Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
-| And(a,b) -> if goal then  ["Prove the conjunction in the goal by first proving "^(parant a)^" then "^(parant b)^"."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions.";"This is trivial."]
-      else ["Eliminate the conjuction in hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions." ]
 
-   |Forall(a, b) -> if goal then ["Fix an arbitrary element VAR."; "Apply induction on "^(parant a)^"."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."] else ["Obtain VAR using variable VAR in the universally quantified hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
-   |Exists(a, b) -> if goal then ["Prove the existential claim is true for VAR."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"This is trivial."] else ["Fix VAR the existentially quantified variable in "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR."; "Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
+  match ast with
+  | Implies(a, b) -> 
+  if  goal then 
+  let fil = List.filter (fun z-> contains (List.nth z 2) "Implies") l in
+  let res=List.map (fun z-> repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a); (parant b)]) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "Implies") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+(*   ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
+ *) 
+ | Iff(a,b) -> if goal then 
+let fil = List.filter (fun z-> contains (List.nth z 2) "Iff") l in
+  let res=List.map (fun z-> repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a); (parant b)]) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "Iff") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+
+(*  ["Prove both directions of "^(parant a)^" iff "^(parant b)^"."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."] else ["Eliminate the conjuction in hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
+ *)  | Or(a,b) -> if goal then
+
+let fil = List.filter (fun z-> contains (List.nth z 2) "Or") l in
+  let res=remove_from_left (List.fold_left (fun  tt z -> tt@[repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a)];repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [ (parant b)]]) [] fil) in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "Or") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+ (* then  (["Prove left hand side."; "Prove right hand side.";
+     "Prove "^(parant a)^" in the disjunction.";
+     "Prove "^(parant b)^" in the disjunction."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions."; "This is trivial."]) else ["Consider cases based on disjunction in hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR."; "Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."] *)
+| And(a,b) -> if  goal then 
+  let fil = List.filter (fun z-> contains (List.nth z 2) "And") l in
+  let res=List.map (fun z-> repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a); (parant b)]) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "And") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+
+(* if goal then  ["Prove the conjunction in the goal by first proving "^(parant a)^" then "^(parant b)^"."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions.";"This is trivial."]
+      else ["Eliminate the conjuction in hypothesis "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions." ]
+ *)
+   |Forall(a, b) ->if  goal then 
+  let fil = List.filter (fun z-> contains (List.nth z 2) "Forall") l in
+  let res=List.map (fun z-> repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a)]) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "Forall") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+
+(* 
+ *)   |Exists(a, b) -> if  goal then 
+  let fil = List.filter (fun z-> contains (List.nth z 2) "Exists") l in
+  let res=List.map (fun z-> repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a)]) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "Exists") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+(*  if goal then ["Prove the existential claim is true for VAR."; "Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"This is trivial."] else ["Fix VAR the existentially quantified variable in "^(med name)^".";"Rewrite hypothesis "^(med name)^" using the definition of VAR."; "Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^"."]
+ *)  
+|Equals(a, b) -> if goal then
+let fil = List.filter (fun z-> contains (List.nth z 2) "Equals") l in
+  let res=remove_from_left (List.fold_left (fun  tt z -> tt@[repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a)];repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [ (parant b)]]) [] fil) in
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "Equals") l in
+  let res=remove_from_left (List.fold_left (fun  tt z -> tt@[repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [(parant a); parant(b)];repl (Processinputs.makevar (List.nth z 1)) (Str.regexp "VAR") [ (parant b);parant(a)]]) [] fil) in
+  print_string ("helle\n\n\n"^(String.concat "----" res)); flush_all();
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+
+
+(* if goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"Replace VAR by VAR in the goal"] else ["Replace ("^(print a)^") by ("^(print b)^") in the goal.";"Replace ("^(print b)^") by ("^(print a)^") in the goal."; "Replace ("^(print b)^") by ("^(print a)^") in hypothesis VAR";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"Claim VAR by rewriting "^(med name)^" using VAR."] *)
   
-|Equals(a, b) -> if goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"This follows from assumptions.";"Replace VAR by VAR in the goal"] else ["Replace ("^(print a)^") by ("^(print b)^") in the goal.";"Replace ("^(print b)^") by ("^(print a)^") in the goal."; "Replace ("^(print b)^") by ("^(print a)^") in hypothesis VAR";"Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"Claim VAR by rewriting "^(med name)^" using VAR."]
-  |_->  if  goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"Replace VAR by VAR in the goal";"This follows from assumptions.";"This is trivial."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions."]
-;;
+
+
+
+
+
+
+  |_->  if  goal then 
+  let filall = List.filter (fun z-> contains (List.nth z 2) "all") l in
+  (List.map (fun z->  Processinputs.makevar (List.nth z 1)) filall)
+
+
+(*   ["Assume "^(parant a)^" then prove "^(parant b)^".";"Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR."; "This follows from assumptions."; "This is trivial."]
+ *)   
+else 
+  let fil = List.filter (fun z-> contains (List.nth z 3) "None") l in
+  let res=List.map (fun z-> Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) fil in
+  let filall = List.filter (fun z-> contains (List.nth z 3) "all") l in
+  res@(List.map (fun z->  Processinputs.makevar (Str.global_replace (Str.regexp "hyp(.?)") (med name)  (List.nth z 1))) filall)
+
+
+
+
+(*   if  goal then ["Rewrite the goal using VAR.";"Apply result VAR."; "Rewrite goal using the definition of VAR.";"Replace VAR by VAR in the goal";"This follows from assumptions.";"This is trivial."] else ["Rewrite hypothesis "^(med name)^" using the definition of VAR.";"Apply result "^(med name)^"."; "Rewrite the goal using "^(med name)^".";"This follows from assumptions."]
+ *);;
 
 print_string (Ast.to_string (parse "∀  n  :  nat,  n  ≠  0"));;
 flush_all ()
