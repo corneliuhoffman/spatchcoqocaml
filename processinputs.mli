@@ -7,7 +7,9 @@ val cleanforsearch : string -> string
 val makevar : string -> string
 (**makes the tactic notation into a string with VAR's *)
 val makeregexp : string -> Pcre.regexp
+
 (** creates a regular expression from a makevar string*)
+
 val checkinput : string -> string list -> bool
 (** check if the commands is a valid tactic*)
 val get_tactic : string -> string list list -> string list
