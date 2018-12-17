@@ -1,60 +1,66 @@
 \chapter{Basic proof techniques.}\label{chap:Basicproof}
-\epigraph{Nothing goes over my head. My reflexes are too fast, I would catch it and I would kill it. }{ Drax.}
+
+\epigraph{Contrariwise,' continued Tweedledee, 'if it was so, it might be; and if it were so, it would be; but as it isn't, it ain't. That's logic.}{Lewis Carroll}
 
 \section{Motivational Speeches}
-We start the book with a  few sections on Mathematical logic. This is usually a hard thing to grasp at the first sight so we hope to give enough examples to help the reader.
-One of the issues is the fact the English language is more nuanced than mathematical logic. To exemplify this we will choose a common   internet meme\footnote{My son Luca showed it to me.}. 
+
+ Lewis Caroll,  Oxford Logician and lecturer, delivers a self-deprecating jibe  through the words of Tweedledee. He understood very well the following  simple fact: Logic is hard and often sounds like complete gobbledygook. Nevertheless, Mathematical Logic plays the role of grammar for Mathematics and I hope that by the end of the chapter the reader will disagree with Tweedledee. This also the first place 
+ 
+ 
+
+The English language tends to be more nuanced than mathematical logic. For example consider the following   internet meme\footnote{My son Luca showed it to me.}:
 
 The phrase
-``I never said she stole my money.'' has 7 different meanings depending on the emphasis. For example ``{\bf I } never said she stole my money'' means that perhaps somebody else said it, ``I never said {\bf she} stole my money'' means that I said that somebody else stole it  while ``I never said she stole my {\bf money}.'' means that perhaps she stole something else.
+``I never said she stole my money.'' has 7 different meanings depending on the emphasis. For example ``{\bf I } never said she stole my money'' means perhaps somebody else said it, ``I never said {\bf she} stole my money'' might mean I said that somebody else stole the money  while ``I never said she stole my {\bf money}.'' might means  she stole something else.
 
- Mathematical logic is a lot more precise than that. Every statement has to be either true or false. Nuances have no place in this. You have to formulate statements in such a way that there is only one interpretation. 
+ Mathematical logic is a lot more precise than vernacular language. Every statement has to be either true or false. Nuances have no place in logic. You have to formulate statements offering only one interpretation. You will be introduced to the main concepts in the following	chapters. You will also learn about Spatchcoq at the same time.
 
 \section{Propositional Calculus}
+\epigraph{Nothing goes over my head. My reflexes are too fast, I would catch it and I would kill it. }{ Drax the Destroyer.}
 
-A lot of concepts in Mathematics (and CS) rely on the notion of a proposition. We will consider that an elementary notion.
-
+Propositions form the the building bricks of Mathematical Logic. Not any statement is a proposition, like bricks, propositions need to be build certain specifications in order to hold the edifice of Mathematics. The specifications are quite direct:
 \begin{Definition}
 A proposition is a sentence which is either true or false but not both.
 \end{Definition}
 
-This seems like an rather pompous definition but it is very important for what follows. here are some examples of propositions:
+ In other words Mathematical logic is completely literal. No metaphors or second meanings there. Drax the Destroyer likes propositional logic. 
+This seems like an rather pompous definition and it seems rather limiting (and prone to endless jokes in the case of poor Drax) but it is very important for what follows. Here are some examples of propositions:
 \begin{itemize}
 \item Earth is a planet.
 \item $2+2=5$
 \item $\forall x \in \mathbb{R}, x^2 \ge 0$
 \item Men are mortal.
 \end{itemize}
-
-However, the day to day language is much richer than mere logic. We can give  many examples of sentences that are not propositions. 
+The common language is much richer than mere logic, There are questions, metaphors, hyperbolae, oratorical flourishes and so on. Here are some  examples of sentences that fail to qualify as propositions. 
 
 \begin{itemize}
 
 \item What time is it?
 \item  We are better off today than 3 years ago.
+\item  All the world?s a stage, and all the men and women merely players.
 \item $x+3>5$
 \item It will rain tomorrow.
-
+\item In the case of Drax there is also the issue of ``Metaphors are gonna go over his head.''
 \end{itemize}
 
+But why should one restrict to such mundane requirements? Is it not true that if your restrict your language to the direct and practical, avoid questions, stylistics and oratorial style and state only facts then the language is made of propositions only? Enter an old friend of the sophists, the paradox.
 \paragraph{\bf Of paradoxes }
-In Titus 1:12-13, Paul states:
-``One of themselves, even a prophet of their own, said, The Cretians are alway liars [...] This witness is true''. Of course if this witness is true, then, since he is a Cretan, he must be a liar and therefore it cannot be true. This is a paradox due to the Cretan Philosopher  Epimenides. Its most condensed logical form is ``This statement is a lie'' if the statement is true then must be false and if it is false then it is true. There are various similar variations of. This paradox, from Pinnochio's ``My nose is growing!'' to the I paradox.
+In Titus 1:12-13, the apostle Paul states:
+``One of themselves, even a prophet of their own, said, The Cretians are alway liars [...] This witness is true''.  The Cretan Philosopher  Epimenides, the prophet in Paul's text, is usually credited with the first version of the paradox.   For simplicity we look at a slightly modified version:  ``This statement is a lie''. Cicero \cite{Cic} tells us how to think about it ``If you say that you lie and you speak the truth, you lie. But then you say that you lie and you speak the truth, so you lie.''
 
-'' Once upon a time there was a. Small island with extremely radical trespassing laws. Everyone caught trespassing was interrogated and if they weer found truthful they were shot and if they were found lying they were hanged. A logician is caught trespassing and his sole statement during  the interrogation is ``I will be hanged!''. Of course, in the classical logic of this island this person is either shot or hanged. If he is hanged then his statement is truthful and so he should have been shot. If he is shot then his statement is not truthful and so  the law in question seems to be paradoxical (inconsistent).
+A modern  take  on the old story is Pinnochio's paradox. Assume that Pinnochio utters the statement: ``My nose grows!'', what happens? If we observe his nose growing then his words ring true and so his nose should have remained proportional to his face. If we see no change in the size of the nose then his statement must have been false and so, as the story tells, his nose is due for a growth spur ...  
 
-
-
-
-Consider the following statement ``This proposition is false''\footnote{This is a very old story, it first occurred in the form of the liar paradox, in which the philosopher of Crete said ``All Cretans are liars.''}. Is this true or false? If it is true then it must be false, if it is false then it must be true. This is the kind of self referential paradox that lead to Russell type paradoxes (see Subsection~\ref{subs:Constructive vs Classical} and 
+Another variant is attributed to Bertrand Russell:
+'' Once upon a time there was a small island with extreme trespassing laws. Everyone caught trespassing was interrogated.  If   found to be truthful the guards  will shoot the intruder and if the intruder is found lying the  hangman awaits  them. A logician caught trespassing happily shouts ``You will hang me!''. Of course, in the logic of this island a trespasser  is either shot or hanged. If they hang him then the statement is truthful and so they should have  shot him. If they shoot him then his statement is not truthful so they should have hanged him. The law appears  inconsistent.
+These  self referential paradoxes  lead to Russell type paradoxes (see Subsection~\ref{subs:Constructive vs Classical} and 
  Chapter~\ref{ch:settheory} as well as Appendix~\ref{chap:setsvstypes})
 
 
   \subsection{Connectors}
-Just like other mathematical concepts, there is a ``calculus'' for dealing with  propositions. Some versions of this date back to Aristotle but they have been slightly modified thorough the ages. There are five connectors (operators) on the set of propositions. There are: and ($\land$), or ($\lor$),  implication ($\rightarrow$),   iff ($\leftrightarrow$) and  negation( $\neg$). The first four are so called ``binary operators'', that is they combine two propositions into one and the last one is a ``unary operation''  much like minus is for numbers. Most of these notions will seem familiar to you, our approach will however be a little bit more formal. Note also that the symbols are not indempendent, one can express some of the symbols using the others.
+Just like for other mathematical concepts, we build a ``calculus'' for dealing with  propositions. Some form of this date back to Aristotle but logicians  modified them thorough the ages. As with any kind of language, we start with simple forms and combine them into more complicated ones. In fact, as usual in the  pedagogical process,  we start with complicated propositions and break them down into  standard combinations of simple forms. To do so define five connectors (operators) on the set of propositions: and ($\land$), or ($\lor$),  implication ($\rightarrow$),   negation( $\neg$) and  double implication ($\leftrightarrow$) . The first four are  ``binary operators'', they combine two propositions . The last one is a ``unary operation''  much like minus is for numbers. Most of these notions will seem familiar to you, our approach will however be a little bit more formal. The symbols are not independent, one can express some of them using the others.
 
-\paragraph{\bf Conjunction}
-If $P$ and $Q$ are two propositions then their conjunction, denoted by $P\land Q$ is a proposition that is only true if both $P$ and $Q$ are true. We can write the Truth table bellow:
+\paragraph{\bf Conjunction (and)}
+If $P$ and $Q$ are two propositions then their conjunction, denoted by $P\land Q$  (read ``P {\bf and} Q'') is a proposition that is only true if both $P$ and $Q$ are true. We can write the Truth table bellow:
 
 $$\begin{array}{|c|c|c|}\hline P & Q & P\land Q \\\hline T & T & T \\\hline T & F & F \\\hline F & T & F \\\hline F & F & F\\ \hline\end{array}$$
 here are some examples.
@@ -64,8 +70,8 @@ here are some examples.
 \item $0<4<5$ can be written as $(0<4)\land (4<5)$.
 \end{itemize}
 
-\paragraph{\bf Disjunction}
- if $P$ and $Q$ are two propositions then their disjunction, denoted by $P\lor Q$ is a proposition that is only false if both $P$ and $Q$ are false. That is it is true if either $P$ or $Q$ or both are true.  Note that in SpatchCoq you can enter this by either clicking on the symbol or by typing \textbackslash /.
+\paragraph{\bf Disjunction (or)}
+ if $P$ and $Q$ are two propositions then their disjunction, denoted by $P\lor Q$ (read `` P {\bf or} Q'' )is a proposition that is only false if both $P$ and $Q$ are false. That is it is true if either $P$ or $Q$ or both are true.  Note that in SpatchCoq you can enter this by either clicking on the symbol or by typing \textbackslash /.
  
  The corresponding truth table is: 
  $$\begin{array}{|c|c|c|}\hline P & Q & P\lor Q \\\hline T & T & T \\\hline T & F & T \\\hline F & T & T \\\hline F & F & F\\ \hline\end{array}$$
@@ -79,7 +85,7 @@ here are some examples.
 Note that, unlike in nature language, the connector $\lor$ is not an ``exclusive or''. The proposition $P\lor Q$ is true in the case both $P$ and $Q$ are true.
 
 
-\paragraph{\bf Implication} If $P$ and $Q$ are two propositions then  $P\rightarrow Q$  (reads P implies Q) is a proposition that is only false if  $P$ is true and $Q$ is false. In other words, we can produce the following ``Truth Table'':
+\paragraph{\bf Implication} If $P$ and $Q$ are two propositions then  $P\rightarrow Q$  (read ``P {\bf implies} Q ''or ``{\bf if} P {\bf then} Q'') is a proposition that is only false if  $P$ is true and $Q$ is false. In other words, we can produce the following truth table':
 $$\begin{array}{|c|c|c|}\hline P & Q & P\rightarrow Q \\\hline T & T & T \\\hline T & F & F \\\hline F & T & T \\\hline F & F & T\\ \hline\end{array}$$
 
 \begin{itemize}
@@ -89,7 +95,7 @@ $$\begin{array}{|c|c|c|}\hline P & Q & P\rightarrow Q \\\hline T & T & T \\\hlin
 This is the most counterintuitive of all connectors. Note that if the proposition $P$ is false then $P\rightarrow Q$ is automatically true regardless of the truth value of $Q$.
 
 \paragraph{\bf Negation}
-if $P$ is a proposition then its negation, denoted by $\neg P$  is a proposition that is  false if  $P$ is true and true if $P$ is false. Note that in SpatchCoq this can be typed by clicking on the symbol or by writing not.
+if $P$ is a proposition then its negation, denoted by $\neg P$  ( read ``{\bf not} P'') is a proposition that is  false if  $P$ is true and true if $P$ is false. Note that in SpatchCoq this can be typed by clicking on the symbol or by writing not.
 The truth table is very simple:
 $$\begin{array}{|c|c|}\hline P & \neg P\\\hline T & F \\\hline F & T\\ \hline\end{array}$$
 
@@ -101,9 +107,9 @@ $$\begin{array}{|c|c|}\hline P & \neg P\\\hline T & F \\\hline F & T\\ \hline\en
 
 
 
-\paragraph{\bf If and only if}
+\paragraph{\bf Double implication (If and only if)}
 
-If $P$ and $Q$ are propositions then $P\leftrightarrow Q$ is the same as $(P\rightarrow Q) \land (Q\rightarrow P)$. It means that the two propositions have the exact same truth Value. The truth table is:
+If $P$ and $Q$ are propositions then $P\leftrightarrow Q$ (read ``P {\bf  if and only if} Q'') is the same construction as $(P\rightarrow Q) \land (Q\rightarrow P)$. It means that the two propositions have the exact same truth value. The truth table is:
 
 $$\begin{array}{|c|c|c|}\hline P & Q & P\leftrightarrow Q \\\hline T & T & T \\\hline T & F & F \\\hline F & T & F \\\hline F & F & T\\ \hline\end{array}$$
 
@@ -124,7 +130,30 @@ A proposition that is equivalent to the proposition True (i.e one that is True r
 
 \subsection{Translation between english and propositional calculus}
 
+Many questions in real life are not immediately expressed as an easy propositional calculus term and, depending on how convoluted the text is, it  might be a challenge to translate it into one.  Here are some rules that will help you recognise the logical connectors.
+
+
+\paragraph{\bf The conjunction ($q\mathbf{\land}p$)} This usually appears as ``and'' in texts. In other words  ``It rains and it's windy can pe written as ``It rains'' $ \land $ ``it's windy'. Other forms: ``but'',``moreover," ``however'',  ``even though'', ``although'', ``nevertheless''. Some of these seem surprising because the suggest a certain implication. For example the statement ``It is sunny although cold.'' should be interpreted as ``it is sunny'' $\land$
+ ``it is cold''. Even more bizarrely, you can rewrite the above as ``It is sunny even if it's cold.'' using the word ``if'' which suggests an implication.
+ 
+ \paragraph{\bf The disjunction \bf$p \mathbf{\lor}q$}You usually find this as ``or'' but this is a tricky one. In Mathematical logic, $\lor$ is an ``inclusive disjunction''. This means that if both $p$ and $q$ are true then so is ``p $\lor$ q''. In colloquial English ``or'' might mean exclusive disjunction, that is the statement is true only if exactly one of the components holds true. Often this appears in the ``either ... or ...'' syntagm. Moreover ``unless'' sometimes apears as an $\lor$ replacement and some other times as an exclusive disjunction. The translation of or is much more context dependent.  Drax the Destroyer really dislikes this.
+ 
+ \paragraph{\bf The implication $p \rightarrow q$} is the most complicated connector, its' normal form is  "if ... then ..."  But it can also appear as , "p implies q", "p therefore q", "p hence q", "q if p", "q provided p",  "p is the sufficient for q", and "q is the necessary for  p" or "q follows from p". Perhaps the most difficult to understand for is ``p only if q'' as it seems to be saying $q\rightarrow q$ when in fact it says $p\rightarrow q$.
+ 
+\paragraph{\bf The negation $\neg p$} is a bit more standard, the expression is usually $not p$. Not however the more complex forms of ``neither  p nor q '' meaning ``not p $\land$ not q'' or ``not both b and q are true'' which means ``not (p $\land$ q)'' while ``p and q are both not true '' which means ``not p $\land$ not q''.
+
+
+\paragraph{\bf The double implication $p \leftrightarrow q$} This usually appears as ``p if and only if q'' or ``p is equivalent to q'' or ``p is necessary and sufficient for q''.
+
+ Let us try to apply our newfound understanding. Consider the statement ``if it;'s Tuesday then I have Maths but not English.'' We have 3 propositions here p:``It is Tuesday.'', q:``I have Maths.'' and r:``I have English. ''. The statement can be written as $p\rightarrow (q \land \neg\ r)$.
+ 
+ 
+ 
+ 
+ 
+ 
 \subsection{Inference rules}\label{subset:inference}
+
 
 Of course any argument in propositional logic can be solved with a truth table. However this is quite tedious and hard to extend to more general notions. We prefer to use methods of proof called "inference rules".
 Each connector has two rules, an introduction and an elimination rule. We will also describe them using the standard logic notation. More precisely, the notation
@@ -178,6 +207,8 @@ We have two Axioms,
 $$\mbox{A1 :  \bf Socrates} \rightarrow \mbox{\bf Man}.$$
 $$\mbox{A2: \bf  Man} \rightarrow \mbox{\bf Mortal}.$$
 
+
+
 And we need to show that $$\mbox{\bf Socrates} \rightarrow \mbox{\bf Mortal}.$$
 
 
@@ -190,27 +221,42 @@ We could have argued backwardly as follows: Since we know A2, by implication eli
 
 In more complicated proofs one often combines the two methods.
 
+Now start Spatchcoq and continue your exploration of Propositional logic using it.
 
-
-The corresponding argument in SpatchCoq goes as follows. We first set up the three variables:
+The corresponding argument in SpatchCoq goes as follows. Sset up the three variables:
 
 \inp{Variables Socrates Man Mortal :Prop.}
+
+Note the format: 
+
+Variables $x_{1} x_{2} \cdots x_{n}$ : Prop.
+
+This means the we name these variables and we declare them to be of  {\bf type} Prop. For more discussions about types see \ref{chap:setsvstypes}.
+ 
+ 
 
 And then list the two axioms
 
 \inp{Axiom A1 :  Socrates -> Man.}
 \inp{Axiom A2 : Man -> Mortal.}
 
+
+Note the similarity between axioms and variables. See \ref{chap:setsvstypes} for details.
+
+Note the format 
+
 And finally type
 \inp{Lemma soc: Socrates->Mortal.}
 
-To get
+This time the effect on Spatchcoq si a bit different. For the first time you get to prove something. More precisely the goals window becomes
+
 \coq{ }{Socrates \rightarrow Mortal}
 
-Next we use
+Click on  that statement to get a hint. Pick the first Hint:
+
 \inp{Assume Socrates then prove Mortal.}
 
-to get
+This ``tactic'' modifies the goal:
 
 \coq{Hyp:Socrates}{Mortal}
 
@@ -249,6 +295,8 @@ Now we do
  Of course this is such a simple example that one can do directly 
  \inp{Apply result (A2 (A1 Hyp)).}
  
+Congratulations! You have finished your first proof with SpatchCoq. 
+ 
  
 \begin{tcolorbox}[colback=red!5!white,colframe=black]
 This might be the place to notice that implication elimination behaves much like a function application in standard mathematics. If you know $H:P\rightarrow Q$  and you know $H1:P$ then $(H H1)$ is a proof for Q. 
@@ -277,7 +325,7 @@ This tells you  that soc is a function  that takes the witness Hyp of the truth 
 
 
 
-\paragraph{bf Inference rules for conjunction}
+\paragraph{\bf Inference rules for conjunction}
 The conjunction introduction says that in order to prove $P\land Q$, you need to prove both $P$ and $Q$. In logic notation we have
 $$\infer{P\land Q}{P & Q}$$
 In SpatchCoq the tactic we use is ``Prove the conjunction in the goal by first proving P then Q.''
@@ -415,13 +463,16 @@ to eliminate the hypothesis $Hyp: P\leftrightarrow Q$.
 
 
 
-\subsection{Constructive vs Classical}\label{subs:Constructive vs Classical}
+\subsection{Constructive vs Classical (proofs by contradiction)}\label{subs:Constructive vs Classical}
+\epigraph{I mean, you could claim that anything's real if the only basis for believing in it is that nobody's proved it doesn't exist!} 
+{J.K. Rowling}
+Classical logic includes a certain axiom that the romans called ``tertium non datur'' or ``the excluded middle''. This Axiom states that of $P$ is a proposition then $P\lor \neg P$ always hold. 
 
-Classical logic includes a certain axiom that the romans called ``tertium non datur'' or ``the excluded middle''. This Axiom states that of $P$ is a proposition then $P\lor \neg P$ always hold. At the beginning of the 20th century a number of mathematicians started debating the need for such an axiom. They came to be collectively called intuitionists. The trouble with that position is that it takes away from the power of this axiom without necessarily offering something in return. The things you are able to prove are much more restrictive. As a consequence classical logic carried the day.
+ At the beginning of the 20th century a number of mathematicians started debating the need for such an axiom. They came to be collectively called intuitionists. The trouble with that position was that it took away from the power of this axiom without necessarily offering something in return. The things you are able to prove are much more restrictive. As a consequence classical logic carried the day.
 
 However at the end of the century, as Theoretical Computer Science started to gain strength and depth, excluding the excluded middled carried another promise: computability. Via the Curry-Howard correspondence, a ``constructive proof'' (i.e. one without the rule of excluded middle) is equivalent to the construction of a function. In particular, the familiar ``proof by contradiction'' relies on a variant of the excluded middle, namely the fact that the statements $P$ and $\neg \neg P$ are equivalent. We have seen that $P \leftarrow \neg \neg P$ above but the other implication relies on classical logic.
 
-Some ``constructivists'' argue that a proof of $P$ should be a witness to its truth and not merely to the falsity of its negation (as it is the case with $\neg \neg P$. This carries quite a bit of weight in the CS world even if not (yet) so much in the Mathematical world.
+Some ``constructivists'' argue that a proof of $P$ should be a witness to its truth and not merely to the falsity of its negation (as it is the case with $\neg \neg P$.  The motto from JK Rowling does exactly that. This carries quite a bit of weight in the CS world even if not (yet) so much in the Mathematical world.
 
 One of the main methods of "classical logic" is the so called "proof by contradiction". In brief, if you want to prove $P$ then you assume that $P$ is false and then prove a contradiction. The SpatchCoq tactic 
 "Prove by contradiction." will transform the statement
@@ -680,11 +731,11 @@ and in the second we prove by contradiction
 \inp{Prove by contradiction.\\
 Apply result (Hyp Hyp2).\\
 Qed.}
-\subsection{On the way to the barbershop}\footnote{I'd like to thank Richard Kaye for showing me this}
+\subsection{On the way to the barbershop }
 
-In a paper published in 1894 called ``A logical paradox'' Lewis Carroll presents the following situation:
+I'd like to thank Richard Kaye for introducing me to this ``paradox''.  In a paper published in 1894 called ``A logical paradox'' Lewis Carroll presents the following situation:
 
-Two uncles want to go the barbershop. There are three barbers, Allen Brown and Carr. We are told that at least one of them has to be in at all times. Also we know that Allen  ``ever since he had that fever he?s been so nervous about going out alone, he always takes Brown with him. '' 
+Two uncles want to go the barbershop. There are three barbers, Allen Brown and Carr. We are told that at least one of them has to be in at all times. Also we know that Allen  ``ever since he had that fever he's been so nervous about going out alone, he always takes Brown with him. '' 
 
 One of the uncles then argues that Carr has to be home. The argument is a proof by contradiction. Suppose that Carr is out.  Then if Allen is out then Brown will have to be in since somebody should be in the shop. On the other hand if Allen is out the Brown will have to be out as well on account of Allen's nervousness. Therefore Carr being out generates two contradictory statements ``if Allen is out then Brown is in'' and ``if Allen is out then Brown is out'' and so Carr must be in.
 

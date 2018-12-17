@@ -1,6 +1,7 @@
 \chapter{Sets vs types}\label{chap:setsvstypes}
-
-\section{types}\label{sec:types}
+\cite{Nederpelt:2014aa}
+\cite{Girard:1989aa}
+\section{Types}\label{sec:types}
 This is a rather subtle section. It deals with a primitive notion in Automated Theorem Provers, the concept of type. Reading through the book you might have wondered about the occurrence of things like this:
 
 \coq{P:Prop\\ Q:Prop\\ H:P->Q}{\cdots}
@@ -26,7 +27,9 @@ Note that, in particular h is NOT a proposition but an object of type $P->Q$, I.
 \inp{Axiom aaa:2=1+1.}then \inp{Check aaa.} will produce
 \mess{aaa
      : 2 = 1 + 1}
-That means that aaa is a witness of the equality $2=1+1$ and that you can refer to aaa in other proofs (for example using rewrite).
+That means that aaa is a witness of the equality $2=1+1$ and that you can refer to aaa in other proofs (for example using rewrite). You can also show for example that there is only one proof of the fact that 2=2+1.
+
+
 
 
  For much of the book one can look at the notation $a:nat$ as a SpatchCoq version of $a\in \mathbb{N}$. This is not quite correct. In fact $a:U$ denotes the statement ``a is of type U''. In particular, the notation $Hyp:P\rightarrow Q$ and $P:Prop$ have the same kind of meaning. The first one means that Hyp is an object of the type $P\rightarrow Q$ i.e a witness of a proof of $P\rightarrow Q$ while the second means that $P$ is an object of type $Prop$.
@@ -56,8 +59,67 @@ In fact, the notation ``$Type : Type$'' is a small notational abuse. It really m
 \inp{Check Type:Type} which produces:
 $Type : Type
      : Type$.
-     
+ There are also wonderfully confusing statements in type theory. For example, consider  two proofs of ``0=0'', the absolutely trivial one:
+\inp{Lemma a:0=0.\\
+This follows from reflexivity.\\
+Qed.}
 
+And a bizarre one:
+\inp{
+Lemma b:0=0.\\
+Claim (1=1).\\
+This follows from reflexivity.\\
+Apply result eq\_add\_S.\\
+This follows from assumptions.
+Qed.}
+They do turn out to be the same proof? Let us look at the  module Eqdep\_dec and the lemma eq\_proofs\_unicity\_on: 
+
+Theorem eq\_proofs\_unicity\_on :$ \forall (y:A) (p1 p2:x = y), p1 = p2.$
+
+It seems to be saying that any two proofs of an equality are the same. Cool let us use it.
+\inp{
+Require Import Eqdep\_dec.
+Lemma c:a=b.
+Apply result eq\_proofs\_unicity\_on.}
+
+Surprisingly we get:
+
+\coq{ }{\forall y : nat, (0 = y) \lor (not (0 = y)))}
+
+Which is a bit noting, in fact, the theorem in the story is true if equality id decidable in the type $A$. Luckily in nat it is:
+\inp{
+Fix an arbitrary element y.\\
+Apply induction on y.\\
+Prove left hand side.\\
+This follows from reflexivity.\\
+Consider cases based on disjunction in hypothesis IHy.\\
+Prove right hand side.\\
+Replace y by 0 in the goal.\\
+This is trivial.\\
+Prove right hand side.\\
+Rewrite goal using the definition of not.\\
+Apply result O\_S.\\
+Qed.}
+
+However if we consider functions $nat \rightarrow nat$ the story is a bit different even if we use identically looking functions.
+\inp{
+Definition f:nat->nat:=fun x$\Rightarrow$x.\\
+Lemma a:f=f.\\
+This follows from reflexivity.\\
+Qed.\\
+Lemma b: f=f.\\
+This follows from reflexivity.\\
+Qed.\\
+Require Import Eqdep\_dec.\\
+Lemma c :a=b.\\
+Apply result eq\_proofs\_unicity\_on.}
+Gives
+
+\coq{ }{(\forall (y : nat) \rightarrow nat, (f = y) \lor (not (f = y)))}
+
+Which is not decidable so we can only prove it in classical logic and not in constructive logic. 
+
+     
     
 
      

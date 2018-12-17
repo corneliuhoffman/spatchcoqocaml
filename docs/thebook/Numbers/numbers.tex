@@ -3,7 +3,7 @@
 
 \section{Natural numbers, operations, order}
 
-Number Theory is one of the oldest branches of Mathematics. We have some evidence of  prime numbers are as old as the Ishango bones, 22000 years ago. A formal definition of natural numbers however was only done rather recently. Surprisingly, it is not different to the intuition that you get all natural numbers by keep adding ones to  0 (or 1). Our approach will be quite formal, following Peano  and some of the questions will feel a bit strange. 
+Number Theory is one of the oldest branches of Mathematics. We have some evidence of  prime numbers that are as old as the Ishango bones, 22000 years ago. A formal definition of natural numbers however was only done rather recently. Surprisingly, it is not different to the intuition that you get all natural numbers by keep adding ones to  0 (or 1). Our approach will be quite formal, following Peano  and some of the questions will feel a bit strange. 
 
 We will definitely the natural numbers as a set $\mathbb{N}$ containing an element $0$\footnote{Note that Peano himself considered 1 instead of zero as the first natural number. That might have been historically accurate (humankind too a long time to discover zero) but created a lot of inconsistency. We made the more modern choice here, partly influenced by Coq.} and with a map (called the successor map) $S:\mathbb{N}\rightarrow \mathbb{N}$ so that 
 
@@ -453,14 +453,20 @@ $$\forall n\in \mathbb{N}, \sum_{i=0}^{n} 2^{i}= 2^{(n+1)}-1$$
 This is again a slightly complicated problem because of the minus in the story. At one point  in the proof we will need to use the result
 
 \mess{
-Nat.add\_sub\_assoc     : $\forall n m p : nat, p \le m \rightarrow n + (m - p) = n + m - p$}
+Nat.add\_sub\_assoc
+     : $\forall n m p : nat, p \le m \rightarrow n + (m - p) = n + m - p$}
 For that reason we will start by proving the following Lemma (which is another example of induction)
 \begin{lemma}[onepow]\label{onepow}
 $$\forall a \ n\in \mathbb{N}, a\ne 0 \rightarrow  1\le a\mbox{\textasciicircum }{n}$$
 \end{lemma}
 
 Recall that the definition of exponential in the natural numbers is also inductive:
-\inp{Nat.pow = fix pow (n m : nat) {struct m} : nat :=\\  match m with\\  | 0 => 1\\  | S m0 => n * pow n m0\\  end}
+\inp{Nat.pow = 
+fix pow (n m : nat) {struct m} : nat :=\\
+  match m with\\
+  | 0 => 1\\
+  | S m0 => n * pow n m0\\
+  end}
 
 That is we know that $a\mbox{\textasciicircum }0=1$ and that $a \mbox{\textasciicircum }{S n}= a* a\mbox{\textasciicircum }{n}$.
 
@@ -491,7 +497,18 @@ In order to prove that $a\mbox{\textasciicircum }{n}\le a\mbox{\textasciicircum 
 \end{proof}
 The formal proof is not much more difficult.
 \inp{
-Lemma onepow(a n:nat): $(a<>0)-> 1<= a\mbox{\textasciicircum }n$.\\Assume (a $\ne$ 0)  then prove $(1\le a\mbox{\textasciicircum }n)$.\\Apply induction on n.\\This is trivial.\\Rewrite goal using the definition of Nat.pow.\\Claim $( a\mbox{\textasciicircum } n   \le   a  \mbox{\textasciicircum } {(S n)} )$.\\Apply result Nat.pow\_le\_mono\_r.\\This follows from assumptions.\\This is trivial.\\Apply result (Nat.le\_trans \ 1$ (a\mbox{\textasciicircum }n) (a \mbox{\textasciicircum }(S n)))$.\\This follows from assumptions.\\This follows from assumptions.\\
+Lemma onepow(a n:nat): $(a<>0)-> 1<= a\mbox{\textasciicircum }n$.\\
+Assume (a $\ne$ 0)  then prove $(1\le a\mbox{\textasciicircum }n)$.\\
+Apply induction on n.\\
+This is trivial.\\
+Rewrite goal using the definition of Nat.pow.\\
+Claim $( a\mbox{\textasciicircum } n   \le   a  \mbox{\textasciicircum } {(S n)} )$.\\
+Apply result Nat.pow\_le\_mono\_r.\\
+This follows from assumptions.\\
+This is trivial.\\
+Apply result (Nat.le\_trans \ 1$ (a\mbox{\textasciicircum }n) (a \mbox{\textasciicircum }(S n)))$.\\
+This follows from assumptions.\\
+This follows from assumptions.\\
 Qed.}
 
 Do not forget the Qed so we can use the Lemma.
@@ -499,7 +516,11 @@ Do not forget the Qed so we can use the Lemma.
 We are now ready for the other lemma. First define the other sum:
 
 \inp{
-Fixpoint sum2 (n : nat) : nat :=\\match n with\\| 0 => 1\\| S p => $2\mbox{\textasciicircum }n$ + (sum2 p)\\end.}
+Fixpoint sum2 (n : nat) : nat :=\\
+match n with\\
+| 0 => 1\\
+| S p => $2\mbox{\textasciicircum }n$ + (sum2 p)\\
+end.}
  And state the Lemma.
  \inp{
  Lemma s2 (n:nat): sum2 n = $2\mbox{\textasciicircum }{(S\  n)}$-1}
@@ -510,7 +531,8 @@ Fixpoint sum2 (n : nat) : nat :=\\match n with\\| 0 => 1\\| S p => $2\mbox{\t
 
 The first step is of course
 \coq{ }{(sum2\  0 = (2\mbox{\textasciicircum } 1) - 1)}
-Which is trivial\inp{This is trivial.}
+Which is trivial
+\inp{This is trivial.}
 
 We now need to look at the indiction step
 \coq{n: nat\\ IHn: sum2\ n = (2\mbox{\textasciicircum }(S n)) - 1}{sum2 S\ n = (2\mbox{\textasciicircum }(S (S \ n ))) - 1}

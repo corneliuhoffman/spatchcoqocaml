@@ -1,14 +1,14 @@
 \chapter{Set Theory}\label{ch:settheory}
 \section{Introduction}
 
-The topic of Set Theory is at the very heart of Foundation of Mathematics. It is just about the simples construction in the world, a set is just a bunch of object right? Indeed, before the 20th century a set was rather informally considered to be just any collection of elements. This approach is now described as ``naive set theory''. The problem with this approach is that it allows for self referential definitions that  quickly run into paradoxes.  These paradoxes were first introduced by Bertrand Russell, based on the ancient Liar's paradox.  
+The topic of Set Theory is at the very heart of Foundation of Mathematics. It is just about the simplest construction in the world, a set is just a bunch of object right? Indeed, before the 20th century a set was rather informally considered to be just any collection of elements. This approach is now described as ``naive set theory''. The problem with this approach is that it allows for self referential definitions that  quickly run into paradoxes.  These paradoxes were first introduced by Bertrand Russell, based on the ancient Liar's paradox.  
 
 The paradoxes in the story mainly deal with constructions related to the ``set of all sets''. The commonly accepted solution is due to Ernst Zermelo and Abraham Fraenkel (and it is now called ZF (or ZFC) theory) and proposes an ``axiomatic set theory''. This means that we only allow sets that are built via a certain collection of axioms. We will describe this briefly bellow a little below but introducing all  the subtleties of Axiomatic Set Theory would warrant a separate book. We choose to avoid such details by restricting  to  subsets of a given ``predefined'' set U.  This avoids issues with any self referential sets and all paradoxes below. The interested reader is referred to {\color{red} citations for ZFC}.
 
 As a side remark, Russell's own solution to the problem that arose from ``the set of all sets'' type paradoxes  was quite different from the ZFT  approach. He proposed a ``type theory'' {\color{red} cite for types} which introduced a theory of ever increasing Universes so that the objects of a type n are sets of objects of type n-1. His constructions were simplified over the years especially with the development Computer Science. They form the basis of most of the modern type systems, in particular of  Thierry Coquand's calculus of constructions (CoC)which is the basis of  Coq's (and SpatchCoq's) own construction of types.  A more detailed exposure of this in Appendix~\ref{chap:setsvstypes}.
 
 Our formal approach in SpatchCoq is developed in two steps. The first one (Section~ \ref{sec:sets}) uses bespoke definitions based on a small modification of the Library Ensembles from Coq. To keep up with the library we will call our formal versions of sets Ensembles (the French word for set). This uses direct definitions and it is very useful to understand the definitions and the connections between Sets and propositional calculus. Nevertheless it gets quite unruly if you need to do longer proof and so the second step is to use the library Ensembles and its inductive definitions.
-\warn{Note that the definitions that we give in Section~\ref{sec:sets} are different from those in Section~\ref{sec:setsincoq} . We use these definitions initially because they are slightly better for understanding the ideas behind some of our tactics. See the discussions in Section~\ref{sec:setsincoq} }
+\warn{Note that the definitions that we give in Section~\ref{sec:sets} are different from those in Section~\ref{sec:setsincoq}. We use these definitions initially because they are slightly better for understanding the ideas behind some of our tactics. See the discussions in Section~\ref{sec:setsincoq} }
 
 Note that C Simpson and J Grim have formalised the Bourbaki version of Axiomatic Set theory in Coq. This is beyond the scope of this text but the interested reader can look at  \cite{simp04} and \cite{grimm}.
  \paragraph{\bf Paradoxes}\label{sec:paradoxes} 
@@ -22,13 +22,7 @@ Note that C Simpson and J Grim have formalised the Bourbaki version of Axiomatic
  \item If he does not shave himself the he should because he shaves all those that do not shave themselves.
  \end{enumerate}
  
- This is a modern version of an ancient paradox. It appears in various guises in the work of  Epimenides (600 BC), St Jerome (400Ad), Bhart?hari (400AD), Ath?r al-D?n Mufa??al (10th century AD) and so on. Int its simplest form the  paradox deals with the sentence: ``This sentence is false''. The question is wether this is a Mathematica proposition.
- Again there are two cases
- \begin{enumerate}
- \item The sentence is true in which case it is false
- \item The sentence is false in which case it is not not true which means it is true.
- \end{enumerate}
- 
+ This is a modern version of an ancient paradox. It appears in various guises in the work of  Epimenides (600 BC), St Jerome (400Ad), Bhart?hari (400AD), Ath?r al-D?n Mufa??al (10th century AD) and so on. See also  
  
 These paradoxes can be modified to show   what is wrong with the naive idea of sets. Suppose we define a set as a collection of elements. We also have a predicate $a\in B$ to mean that $a$ is an element of the set $B$. There are two kind of sets.
 
@@ -50,7 +44,7 @@ There are now again two possibilities:
 This means that the ``naive`` version of set theory cannot be consistent.
  
 \section{Sets}\label{sec:sets}
-\subsection{First definitions}
+section{Standard definitions}
 Despite the above mentioned issues, from now on a set will be a collection of elements. In order to do so we shall consider an ``universal'' set $U$ and for the most part, our sets will be subsets of $U$. More precisely, we a set $U$ which either has some formal construction via ZFT or it is a concretely constructed set such as the set of all people. A set will now be a collection of element of $U$.  We normally try to use lower letters for elements and capital letters for sets. We denote by $x\in A$ the fact that $x$ is an element of the set $A$ and by $x \not \in A$ the fact that $x$ is not an element of $A$. Note that if $x$ is a fixed element and $A$ is a fixed set then both $x\in A$ and $x \not\in A$ are propositions and $\neg (x \in A) $ is the same as $x \not \in A$. We will also use the notation $\{a, b, c\}$ for the set whose elements are $a,b$ and $c$. Another common notation is (here $P:U\rightarrow Prop$ is a predicate ):
 $$A=\{x\in U \mid P(x)\}$$
 This means that $A$ is the set of all elements (in U) that satisfy the property $P$. In fact if the universe $U$ can be deduced from the context then we ignore it in the notation. Here are some examples noting that these representations are not unique:
@@ -147,7 +141,7 @@ Axiom Extensionality\_Ensembles : forall A B:Ensemble, $A \subseteq B \land B\su
 Finally we introduce the empty set
 \inp{Definition EmptySet:Ensemble:= fun x:U=>False.\\
 Notation ''$\emptyset$'':=Emptyset}
-\subsection{Operations on Sets}\label{subset:operations}
+\section{Operations on Sets}\label{subset:operations}
 This naive construction of set theory is an ideal ground  to try out our proof techniques. The proofs will be very similar to those in predicate calculus. Let us start with transitivity of inclusion:
 
 \begin{lemma}
@@ -463,7 +457,7 @@ Note again that this proof is not so much different from the proof of distributi
 
 
  \end{enumerate}
- \subsection{Sets in Coq}\label{sec:setsincoq}  
+ \section{Sets in Coq}\label{sec:setsincoq}  
 \warn{
 The constructions of union, intersection,  complement and Empty Set form Section~\ref{sec:sets} are easy enough to deal with but if the theorems are complicated they begin to be slightly unruly. We used them to exemplify the use of the ``rewrite using the definition'' tactics but from now on we abandon them in favour of the built in definitions in Coq.}
 

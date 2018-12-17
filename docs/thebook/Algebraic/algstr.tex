@@ -1,127 +1,503 @@
 \chapter{Algebraic Structures}\label{ch:algstr}
 
+This Chapter proposes to raise the level of abstraction that you encounter. I hope that  the abstract concepts you already encountered via SpatcCoq will help the transition. We will describe general abstract concepts and note  many of the notions encountered in the previous sections appear as special cases. This way of doing mathematics is almost as old as civilisation itself. Throughout the ancient world scholars made various attempts at abstraction in order to formulate general solutions to practical or theoretical problems. We can see that in Babilonian solutions to quadratic equations\cite{Robson:2002aa}, the geometric algebra of Eyipt   \cite{robins1987rhind}, Greece \cite{Euclid:2002aa} and China \cite{abbott_2001}. It was not until Diophantus and Muhammad ibn Musa al-Khwaarizm\`i that the fundamentals of formal algebra started to emerge. They will be completely formalised by Viete and Descartes in the 16th and 17th century. See \cite{Shell-Gellasch:2015aa} and \cite{Waerden:1983aa} for excellent historical records of the development of algebra.
+
+In the 19th and 20th century Algebra saw a complete rejuvenation. A general idea started to crystallise, general abstract structures can be defined and described and results about those structures  will then specialised to many areas of Mathematics. Abstract or Modern Algebra was born. A plethora of such structures appeared, groups, rings, fields, algebras and, more recently categories. This book will not even scratch  the surface of the rich and beautiful field. The interested reader should run to the nearest library and borrow a copy of Shafarevich's gem \cite{Shafarevich:2006aa} and read it before the week is over.
+
+Some of the most resounding successes of Proof assistants were in the realm of Abstract Algebra. Indeed the large effort of Gonthier  and his team lead to the formalisation of the Odd Order Theorem, one of the most difficult theorems in the Classification of Finite Simple Groups. I am a huge admirer of Mathematical Components and ssreflect. Unfortunately, I think that while they are  beautiful and effective theier austerity makes them a bit unsuitable for teaching at this level. The more advanced reader should definitely check the gorgeous book by Assia Mahboubi and Enrico Tassi( with contributions by Yves Bertot and Georges Gonthier) \cite{MathComp}. I will restrict to the vanilla version of Coq and will sacrifice elegance and briefness for the sake of clarity. Moreover, as these are not standard subjects in a discrete Mathematics course, each section will be separated in two almost mirroring subsections. The first will be entirely informal and the second entirely formal.
 \section{Groups}
 
-We will briefly define abstract groups. 
-\begin{definition}\label{def:group}
-A group is a triple $(G, mult, id, inv)$ where $G$ is a set, mult is a binary operation that associates to every pair of elements $ a b $ an element $mult\ a\ b$,  $id$ is an element of  $G$ and $inv:G\rightarrow  G$ is a function such that.
-\begin{itemize}
-\item[mult\_closure] 
-G is closed under multiplication, that is $\forall a b \in G, mult \ a \ b \in G$.
-\item {\bf assoc} $\forall x\  y\ z,  mult\ (mult\ x\ y) z = mult \  x (mult\  y z)$
- \item {\bf right\_id} $ \forall x,  mult\  x\  id = x$
- \item {\bf inv\_closure} $\forall x\in G,  (inv\ x) \in G$
-   \item {\bf right\_inverse} $\forall x,  mult\ x (inv\ x) =  id$
-\end{itemize}
+Group theory is one of the oldest subjects in what we now call Abstract Algebra. We now like to describe groups as arbiters of symmetry in any of guises from geometric tiling patterns to chemical molecules. However it was not always so. Groups were invented by Evariste Galois in the 19th century as a bookkeeping system  for the express purpose of solving polynomial equations. In a series of mind-shaterring papers, the 19 year old developed a correspondence between  polynomial equations and a completely new set of beasts: Permutation Groups. He then started to study this new bestiary, identified  those that will help solve equations and showed that some equations are just not solvable. Then he spent 6 months in prison for being a republican and promptly died in a mysterious duel. The absolute romantic figure if there ever was one. Recently Peter Neumann has collected all his works in a very interesting book\cite{Galois:2011aa}.
 
+ A mere 40 years afterwards, Felix Klein presented the world with the Ernlangen Program \cite{klein1893} in which he  proposed to classify geometric objects via their symmetries. In the intervening 150 years, Groups have found applications in many areas of Mathematics, Physics, Chemistry and Computer Science  and even in Childhood Psychology \cite{piaget1960logic}.  Moreover, in the 1970's ``the building blocks '' of finite groups have been classified. This is one of the most spectacular endeavours of human culture. An concerted effort by quite a few dozens of mathematicians produced a 10000 page proof of the statement: ``We now the stuff that groups are made of! ''. There are some (infinitely many) families of related and nicely behaved groups and 26 ``sporadic`` ones.'''' 
+ 
+ Our treatment will be brief and somewhat formal. The reader should not expect to really learn moderne Group Theory from the short section.  For a more in depth analysis the reader is directed to a more standard Group theory book such as \cite{scott2012group} or a more exciting popularisation book such as \cite{Sautoy:2009aa,Sautoy:2012aa, Ronan:2007aa}
+
+\subsection{Definitions and first theorems(informally).}
+A group is a set together with a binary operations that satisfies some natural properties. The reader should take as the standard first example the set of integers together with the operation $+$ and as the standard ``non-examples'' the same set with operations $-$ or $*$. 
+
+We will now define abstract groups. Our choice  definition might sound strange to the expert. We start with a mysterious larger set $U$, define the multiplication a bit more generally and do not ask for left identity or left inverses. We make this choice in order to optimise the formalisation and the effort of verifying that an object is a group. We will the proceed to show the equivalence with the standard definitions and prove some standard properties of a group. 
+\begin{definition}\label{def:group}
+A group is a triple $(G, mult, e_G, inv)$ where $G\subset U$ is a set, $mult: U\times U \rightarrow U$ is a binary operation that associates to every pair of elements $ a,  b $ an element $mult\ a\ b$,  $e$ is an element of  $U$ and $inv:U\rightarrow  U$ is a function. In order to simplify notations we will denote $mult( a,  \ b)$ by $ a* b$ and $inv(x)$ by $x^{-1}$. The triplet has to satisfy the following:
+\begin{itemize}
+\item {\bf mult\_closure}
+G is closed under multiplication, that is $\forall a\  b \in G,  a * b \in G$.
+\item {\bf assoc} $\forall x\  y\ z\in G, (mult\ x\ y) z = mult \  x (mult\  y\ z)$, that is $(x * y) * z = x* (y*z)$.
+ \item {\bf right\_id} $ \forall x\in G ,  mult\  x\  e_{G} = x* e_{G}= x$
+ \item {\bf inv\_closure} $\forall x\in G,  x^{-1} \in G$
+   \item {\bf right\_inverse} $\forall x \in G,  mult\ x (inv\ x) = x* x^{-1} =  e_{G}$
+\end{itemize}
+\paragraph[\bf First examples and counterexamples]{
+Consider $U=G =\mathbb{Z}$.
+\begin{itemize}
+\item Show that if $mult: \mathbb{Z} \times \mathbb{Z} \rightarrow \mathbb{Z}$ is defined as $mult( x, y) = x+y$ then you can find $e_\mathbb{Z}$ and $inv: \mathbb{Z} \rightarrow \mathbb{Z}$ so that $(\mathbb{Z}, mult, e_{\mathbb{Z}}, inv)$ is a group.
+\item Show that if $mult: \mathbb{Z} \times \mathbb{Z} \rightarrow \mathbb{Z}$ is defined as $mult (x, y) = x*y$ then you {\bf cannot} find $e_\mathbb{Z}$ and $inv: \mathbb{Z} \rightarrow \mathbb{Z}$ so that $(\mathbb{Z}, mult, e_{\mathbb{Z}}, inv)$ is a group.
+\item Show that if $mult: \mathbb{Z} \times \mathbb{Z} \rightarrow \mathbb{Z}$ is defined as $mult (x, y) = x-y$ then you  {\bf cannot}  find $e_\mathbb{Z}$ and $inv: \mathbb{Z} \rightarrow \mathbb{Z}$ so that $(\mathbb{Z}, mult, e_{\mathbb{Z}}, inv)$ is a group.
+\end{itemize}}
+\end{definition}
+
+Note a more standard definition of a group:
+\begin{definition}\label{def:gpshorted}
+A group is a pair $(G, *)$ where $G$ is a set and $*:G\times G \rightarrow G$ is a function such that:\
+\begin{itemize}
+\item {\bf associativity} $\forall x, y,z \in G, (x * y) * z = x* (y*z)$.
+\item {\bf identity} There exists $e_{G}\in G$ so that $\forall x \in G, x* e_{G}= e_{G}*x = x$.
+\item {\bf inverse} Every element has an inverse, that is $\forall x \in G, \exists y \in G, x*y = y*x =e_{G}$.
+\end{itemize}
 
 \end{definition}
 
-Note that we gave been deliberately vague in assoc, right\_id and right\_inverse. This is because we will be somewhat light on this in our definition. We also did not require left inverses or left identity, we shall prove these later.
+The two definitions seem slightly different but we will soon show that they are in fact equivalent. Note first that a pair $(G,*)$ that satisfies the condition of Definition \ref{def:gpshorted} can be easily seen to be extended to a triplet that satisfy Definition \ref{def:group}. Indeed take $U=G$, $mult = *$, $e_{G}$ the element defined by identity condition and $inv(x)$ to be an element $y$ that satisfies the condition inverse. It is left as an exercise that this choice satisfy Definition \ref{def:group}. From now  a group will be a triplet $(G, mult, e_{G}, inv)$ as defined in Definition \ref{def:group}.
 
-To introduce the definition of a group we will use some new Coq notions, modules and  records.  
-We start by Importing sets and  recalling the set notations
+We first show that the element $e_{G}$ is unique with that property. In fact we shall prove something stronger: the only  element with  the property that its square is identical to itself ( this is called an idempotent in algebra) is the identity.
+
+\begin{lemma}[unit\_uniq]\label{leminf:unituniq}
+If $(G, mult, e, inv)$ is a group then $\forall x \in G, x* x = x \rightarrow x=e$.
+ \end{lemma}
+\begin{proof}[informal]
+We need to show that $x*x = x \rightarrow x =e$. To do so assume $x*x=x$ and  try to prove that $x=e$. Note that, by the definition of the identity we have $x= x*e$ and so the goal is equivalent to proving that $x * e = e$. We now also note that $x*x^{-1}= e$ and so the goal is equivalent to $x* (x* x^{-1}) = e$. You can use associativity to see that it is enough to prove that $(x*x)* x^{-1} =e$. Nor by assumption we know that $x*x =x$ and , replacing $x*x$ by $x$  in the goal we only need to show $x*x^{-1}= e$ which is exactly the property of the right inverse.
+\end{proof}
+
+Next we are able to prove that right inverses are also left inverses :
+\begin{lemma}[ left\_inverse] ~$\forall x, x^{-1} * x =e_{G}.$
+\end{lemma}
+\begin{proof}
+To see that let us fix an $x$. We will use Lemma\ref{leminf:unituniq} for $y=x^{-1}* x$. This means that, in order to show that $y=e_{G}$,  it is enough to show that $y.* y= y$. Now  we repeatedly use associativity as well as right\_inverse and right\_id:
+\begin{align*}
+y* y & =  (x^{-1}* x)*(x^{-1}*x )= x^{-1}* (x* (x^{-1}*x )) =x^{-1}*(( x* x^{-1})* x ) \\ & = x^{-1}* (e_{G}* x)=(x^{-1}* e_{G})* x= x^{-1}*x \\ & =  y
+\end{align*}
+\end{proof}
+
+We can now prove that the right identity is also a right identity, that is:
+
+\begin{lemma}[left\_id]$\forall x, e_{G}*x =x.$
+\end{lemma}
+\begin{proof}
+Let us fix an element $x$. Using the right\_inv and assoc  properties we get that $$e_{G}* x= (x* x^{-1})*x= x* (x^{-1}*x)$$
+Next we can use left\_inverse lemma and the right\_id we get  get  $x*(x^{-1}*x)= x* e_{G}=x$. Combining the two equalities we get
+$e_{G}* x= x$.
+\end{proof}
+
+And the fact that the inverse of an element is unique:
+\begin{lemma}[inverse\_uniq] $\forall x y, x*y = e-> y = x^{-1}.$
+\end{lemma}
+\begin{proof}
+Fix $x $ and $y$ and assume $x*y = e$. We need to show that $y=x^{-1}$.
+Note that
+$$ y =e_{G} * y = (x^{-1}* x)* e_{G}= x^{-1}*(x*y) = x^{-1}* e_{G}= x^{-1} $$
+
+\end{proof}
+
+
+We can also show that, in a group, you have right cancelation:
+
+\begin{lemma}[right\_cancel] $\forall x\  y\  z, x*y= z*y-> x=z.$\
+\end{lemma}
+\begin{proof}
+We fix $x, y$ and $z$,  assume $x*y= z*y$ and prove $x=z$.
+
+Now we have that
+$$ x = x*e_{G}= x* (y * y^{-1})=(x*y)* y^{-1}= (z*y)*y^{-1}= z*( y* y^{-1}) = z*e_{G}= z $$
+\end{proof}
+
+\subsection{Definitions and first theorems(formal with Typeclasses)}
+
+In this section we formalise groups and reprove the lemmas above, this time in spatchcoq. You should see the similarities.
+To introduce  a group we will use some new Coq notions, Casses and  Instants .  
+We start by importing Ensembles and  recalling the set notations:
 \inp{
 Require Import Ensembles.\\
 Notation "x $ \in $ A":= (In \_ A x) (at level 10).\\
 Notation "A $ \subseteq $ B":= (Included \_  A B)(at level 10).\\
 Notation "A $\cup$ B":= (Union \_  A B)(at level 8).\\
 Notation "A $ \cap $ B" := (Intersection \_  A B) (at level 10).}
-We now start a module. This is convenient for polymorphisms.
+We now start a module. This is convenient for polymorphisms. 
 \inp{
 Module gps.}
 
-The definition of a groups resembles Definition~\ref{def:group} closely. 
+The definition of a groups will resemble Definition~\ref{def:group} closely. However we are not using a definition but a class notation. 
 \inp{ 
-Record Group : Type := group\\
-  \{U:Type;\\
-setG : Ensemble U;\\
-   mult : U -> U -> U;\\
-   inv : U -> U;\\
-   id : U;\\
-   mult\_closure : $\forall x y:U,  x \in setG \rightarrow y \in setG  \rightarrow  (mult x y) \in setG ;$\\
-   assoc : $\forall x y z:U,  mult\ (mult\ x\ y)\ z = mult\  x (mult\ y\ z);$\\
-   id\_closure : id $\in$ setG;\\
-   right\_id :$\forall x:U, mult\ x\  id = x;$\\
-   inv\_closure : $\forall x:U,  (inv\ x) \in setG;$\\
-   right\_inverse: $\forall x:U, mult\ x (inv\ x) =  id;$
+Class Group (U:Type) (set : Ensemble U) := \\
+  \{op:  U->U->U;\\
+   inv :  U->U;\\
+    e:U;\\
+ mult\_closure : forall x y:U, In U set x -> In U set y -> In U set  (op x y);\\
+   assoc : forall x y z:U,  op (op x y) z = op  x (op y z);\\
+   id\_closure : In U set e;\\
+   right\_id : forall x:U, op x  e = x;\\
+   inv\_closure : forall x:U,  In U set (inv x);\\
+   right\_inverse: forall x:U, op x (inv x) =  e;\\
   \}.}
-  
-Note the format, this is in fact an inductive constructor, not unlike $nat$. 
+In CS this  is called  a ``Type class''. It is a concept first introduced in Haskell in order to enable overloading of arithmetics  operations. A group will be a type class that depends of two parameters, a type (U:Type) (the overset of the group) and a set:Ensemble U that is the actual underlying set of G. We could have exaggerated a bit and defined U and set inside the Class but we wanted some parameters.A group will also have an operation  which is a function of two variables $op: U\rightarrow U \rightarrow U$, an inverse $inv:U \rightarrow U$ and an identity $e:U$. It has to satisfy the properties in Definition~\ref{def:group}. In fact the definition is in some sense an inductive constructor, not unlike $nat$. Note that the Class introduction creates some ``projection functions'' as well. For example try
+\inp{Check op.}
+ And note that you get:
+ \mess{op\\
+     : ?U $\rightarrow$
+ ?U $\rightarrow$
+ ?U\\
+where\\
+?U : [ $\vdash$ Type] \\
+?set : [ $\vdash$ Ensemble ?U] \\
+?Group : [ $\vdash$ Group ?U ?set] }
 
-We introduce some convenient notations:
+This is a strange looking message isn't it? It means that op is now a dependent function. It depends of what the ``flavour of the month'' is in groups. As we will see soon, once we have an instance of a group then the same Check will give a completely different answer.
+
+Since we know op and inv we  also introduce some convenient notations:
+\inp{Notation "x '.*' y" := (op x y) (at level 40, no associativity).\\
+Notation "x\inv'" := (inv x ) (at level 20).}
+
+Note that we could have overloaded the $*$ notation. This might run into some difficulties and so we use the notation ``.*''. We also require no associativity so that Coq does not save on brackets.
+
+Once we defined a group, we can immediately start proving theorems about it.
+
+A general theorem about groups will look as follows:
 \inp{
-Notation "x \{*\}  y":=(mult  \_ x y) (at level 50).\\
-Notation "'e'":=(id  \_ ) (at level 50).\\
-Notation "x \textasciicircum-1'":=(inv \_ x) (at level 30).}
+Lemma name \`{}\{G:Group\}: P}
 
-And we are now ready to prove the first group theory lemma, the uniqueness of identity (we shall prove the theorem inside the module gps so we can use it with any group.
+Where P is a proposition involving $e, .*, x\inv $. Note the format \`{}\{G:Group\}, this is a shortcut called implicit generalisation. It generalises everything it can. For example let us prove the uniqueness of identity (we shall prove the theorem inside the module gps so we can use it with any group.
+
 
 \inp{
-Lemma unit\_uniq (U:Type)(G:Group): forall x:gps.U G, x \{*\} x = x -> x = e.}
-The ``gps:U G'' notation looks a bit strange but this automatically generated.
+Lemma unit\_uniq  \`{}\{G:Group\}: forall x ,  x .* x = x $\rightarrow$ x = e.}
 
 The resulting goal is 
-\coq{U:Type\\ G:Group}{\forall   x  :  gps.U \ G,  x  \{*\}  x  =  x  \rightarrow  x  =  e )}
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set}{\forall   x  :  U,  x  .*  x  =  x  \rightarrow  x  =  e }
+Note that even if we never spoke of U or set, they have been chosen for us (generalised) by the notation. 
+
+\rmk{
+We could have employed this earlier, for example
+\inp{Generalizable All Variables.\\
+Lemma a:\`{}(m+n = n+m).}
+
+Will generalise m and n in the context, 
+
+\coq{ }{\forall m\  n:nat, m+n=n+m.}
+
+
+We chose not to do so earlier to keep notations light. Nevertheless here the notations are already heavy and this will be slightly easier.}
+
 The first two moves are standard.
 \inp{
 Fix an arbitrary element x.\\
-Assume (x  \{*\}  x  =  x ) then prove (x=e).}
+Assume (x  .*  x  =  x) then prove (x=e).}
 
 And we arrive at 
-\coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp: x  \{*\}  x  =  x}{   x  =  e }
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  .*  x  =  x}{   x  =  e }
 We will now use the fact that $x = x*e$ and we replace it in the goal (and prove it later)
 
 \inp{
 Replace x by (x {*} e)  in the goal.}
-\coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{   x\{*\} e =  e }
- Respectively
- \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{   x\{*\} e =  x }
-  We now know that  x \{*\} x \textasciicircum -1 = e and so 
- \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{x  {*}  (x  {*}  x  \mbox{\textasciicircum}-1)  =  x  {*}  x  \mbox{\textasciicircum}-1 }
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  .*  x  =  x}{   x .* e =  e }
+Respectively
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  .*  x  =  x}{   x .* e =  x }
+  We now know that  x.* x \inv = e and so 
+  \inp{Replace e by (x*x\inv) in the goal.} gives 
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{x  {*}  (x  {*}  x\inv)  =  x  {*}  x\inv }
  
  Respectively 
-  \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{x  {*}  x  \mbox{\textasciicircum}-1  =  e }
-\inp{
-Replace (id G) by (x {*} x \mbox{\textasciicircum} -1) in the goal.}
+ \coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{x  {*}  x\inv  =  e }
 
 We now apply associativity and Hyp. 
 \inp{
-Rewrite the goal using (assoc G).\\
+Rewrite the goal using assoc.\\
 Rewrite the goal using Hyp .\\
 This follows from reflexivity.}
 
 And we now only need to show the two goals that we introduced.
 \inp{
-Apply result (right\_inverse).\\
-Apply result (right\_id G).\\
-Qed.\\
-End gps.}
-
-
-Now we show how to prove that $Z$ is a group under addition:
+Apply result right\_inverse.\\
+Apply result right\_id.\\
+Qed.}
+Let us now reprove the left\_inv lemma:
 \inp{
-Open Scope Z\_scope.\\
-Import gps.\\
-Definition gZ:Group.\\
-Apply result (group Z (fun x=> True) Z.add Z.opp 0).\\
-Rewrite goal using the definition of In.\\
-This is trivial.\\
+Lemma left\_inverse \`{}\{G:Group\}: forall x, x\inv
+ .* x =e.}
+ We prove it almost the same way as the informal version. We first fix an element $x$ and use unit\_uniq.
+\inp{Fix an arbitrary element x.\\
+Apply result unit\_uniq.}
+
+The result is:
+ \coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{(x\inv  .*  x)  .*  (x \inv  .*  x)  =  x\inv  .*  x ) }
+We now use assoc
+\inp{Rewrite the goal using assoc.}
+to get
+
+ \coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{(x\inv  .*  (x  .*  (x \inv  .*  x) ) =  x\inv  .*  x ) }
+
+Now it would be very tempting to apply associativity again. Nevertheless, due to the way we defined the apply tactic if we do so we will be back where we started and so we need to be precise on how we want to use it:
+\inp{
+Replace (x  .*  (x  \inv
+  .*  x) ) by ((x .*  x  \inv
+)  .*  x) in the goal.}
+
+And we get 
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{x\inv  .*  (x  .*  x \inv)  .*  x ) =  x\inv  .*  x ) }
+
+And another (easy) goal to be proved later
+
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{x  .*  (x  \inv
+  .*  x) =(x .*  x  \inv
+)  .*  x  }
+
+\inp{Rewrite the goal using right\_inverse.\\
+Rewrite the goal using assoc .}
+
+And we have
+\coq{U:Type\\ set: Ensemble\ U\\
+G: Group\ U\ set\\  x  : U \\  Hyp: x  *  x  =  x}{ (x  \inv
+  .*  e).* x =x \inv .*  x  }
+  
+  This can easily be proved by:
+  \inp{
+Rewrite the goal using right\_id.\\
+This follows from reflexivity.}
+
+
+Leaving just the new goal to prove:
+\inp{
+Rewrite the goal using assoc.\\
+This follows from reflexivity.\\
+Qed.}
+
+We will not go through the rest of the proofs step by step, try them for yourself.
+
+
+
+\inp{
+Lemma left\_id \`{}\{G:Group\}: forall x, e.*x =x.\\
+Fix an arbitrary element x.\\
+Rewrite the goal using (right\_inverse x).\\
+Rewrite the goal using assoc.\\
+Rewrite the goal using left\_inverse.\\
+Rewrite the goal using right\_id.\\
+This follows from reflexivity.\\
+Qed.}
+
+
+
+\inp{
+Lemma inverse\_uniq \`{}\{G:Group\}: forall x y, x.*y = e-> y = x\inv
+.\\
+Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Assume (x  .*  y  =  e ) then prove ( y  =  x  \inv
+ ).\\
+Rewrite the goal using right\_id.\\
+Rewrite the goal using Hyp.\\
+Rewrite the goal using assoc.\\
+Rewrite the goal using left\_inverse.\\
+Rewrite the goal using left\_id.\\
+This follows from reflexivity.\\
+Qed.}\inp{
+Lemma right\_cancel  \`{}\{G:Group\}: forall x y z, x.*y= z.*y-> x=z.\\
 Fix an arbitrary element x.\\
 Fix an arbitrary element y.\\
 Fix an arbitrary element z.\\
-True by arithmetic properties.\\
-Rewrite goal using the definition of In.\\
-This is trivial.\\
-Fix an arbitrary element x.\\
-True by arithmetic properties.\\
-Rewrite goal using the definition of In.\\
-This is trivial.\\
-Fix an arbitrary element x.\\
-True by arithmetic properties.\\
+Assume (x .* y = z .* y) then prove (x = z).\\
+Replace x by (x.*e) in the goal.\\
+Rewrite the goal using (right\_inverse y).\\
+Rewrite the goal using assoc.\\
+Replace (x .* y) by (z .* y) in the goal.\\
+Rewrite the goal using assoc.\\
+Rewrite the goal using right\_inverse.\\
+Rewrite the goal using right\_id.\\
+This follows from reflexivity.\\
+Rewrite the goal using right\_id.\\
+This follows from reflexivity.\\
 Qed.}
+We now close the Module gps. 
+\inp{
+End gps.}
+
+
+After proving some general results, we now show how to define a particular group. We shall see that $\mathbb{Z}$ is a group under addition. We first import the module we just closed.
+\inp{
+Import gps.}
+Next we use the Instance command. This defines a group following the pattern in the Class. You need to give a type and a Ensemble set. IN this case we pick $\mathbb{Z}$ respectively the whole $\mathbb{Z}$ as set, more precisely set =$fun  x \Rightarrow True.$ We also give the variable op, inv and e.
+\inp{
+Instance  s:Group Z (fun  x=>True):=\{op:= Z.add; inv:= Z.opp; e:= 0\}.}
+
+Note that the result is that we have to prove 6 different goals, the ones that were promised in the Class description: mult\_closure, assoc, id\_closure,  right\_id, inv\_closure, right\_inverse. The definition is interactive. We need to prove them one by one.
+
+
+\inp{
+Rewrite goal using the definition of In.}
+The result is quite bizarre:
+\coq{ }{(Z \rightarrow
+ (Z \rightarrow
+ (True \rightarrow
+ (True \rightarrow
+ True))))}
+ This is an unfortunate shortcut in Coq. Whenever the variable is unimportant, the expression $x:Z$ is shortened to just $Z$. Nevertheless this is a trivial statement. The rest are either trivial or applications of standard lemmas:	
+ 
+ \inp{
+This is trivial.\\
+Apply result Zplus\_assoc\_reverse.\\
+Rewrite goal using the definition of In.\\
+This is trivial.\\
+Apply result Zplus\_0\_r.\\
+Rewrite goal using the definition of In.\\
+This is trivial.\\
+Fix an arbitrary element x.\\
+True by arithmetic properties.\\
+Defined.}
+Note that we end the proof with Defined rather than Qed. This allows the operations to be transparent. From now on, until we construct another instance, the only group in the world is $\mathbb{Z}$ under addition.
+
 And we can see that one can apply unit\_uniq immediately.
 \inp{
-Lemma b: forall x:gps.U gZ, x {*} x = x -> x = e.\\
+Lemma b: forall x:Z, x .* x = x -> x = e.\\
 Apply result (unit\_uniq  Z s).\\
 Qed.}
+
+Note also that now .* means addition in $\mathbb Z$. Indeed:
+\inp{Eval compute in 3\%Z .* 4\%Z.}
+gives:
+
+\mess{     = 7\%Z\\
+     : Z}
+
+While 
+\inp{Eval compute in (3\%Z*4\%Z).}
+
+Gives
+\mess{   = 12\%Z\\
+     : Z}
+
+\begin{enumerate}
+\item Show that any group admits left cancelation. That is
+\inp{Lemma left\_cancel \`{}\{G:Group\}: $\forall x\ y\ z, y.*x= y.*z-> x=z.$
+}
+\item Show that in any group the socks and shoes property holds: \inp{Lemma socks\_shoes \`{}\{G:Group\}: $\forall x\  y , (x.*y)\inv= y\inv.*x\inv.$}
+\item Prove the following Lemma:
+\inp{Lemma inv \`{}\{G:Group\}: $\forall x \  y , (x.*x = e) \land  (y*y = e) \land ((x.* y).*(x.*y)=e)\rightarrow (x.*y = y.* x).$}
+
+\end{enumerate}
+
+
+%\subsection{with just records}
+%Note that we gave been deliberately vague in assoc, right\_id and right\_inverse. This is because we will be somewhat light on this in our definition. We also did not require left inverses or left identity, we shall prove these later.
+%
+%To introduce the definition of a group we will use some new Coq notions, modules and  records.  
+%We start by Importing sets and  recalling the set notations
+%\inp{
+%Require Import Ensembles.\\
+%Notation "x $ \in $ A":= (In \_ A x) (at level 10).\\
+%Notation "A $ \subseteq $ B":= (Included \_  A B)(at level 10).\\
+%Notation "A $\cup$ B":= (Union \_  A B)(at level 8).\\
+%Notation "A $ \cap $ B" := (Intersection \_  A B) (at level 10).}
+%We now start a module. This is convenient for polymorphisms.
+%\inp{
+%Module gps.}
+%
+%The definition of a groups resembles Definition~\ref{def:group} closely. 
+%\inp{ 
+%Record Group : Type := group\\
+%  \{U:Type;\\
+%setG : Ensemble U;\\
+%   mult : U -> U -> U;\\
+%   inv : U -> U;\\
+%   id : U;\\
+%   mult\_closure : $\forall x y:U,  x \in setG \rightarrow y \in setG  \rightarrow  (mult x y) \in setG ;$\\
+%   assoc : $\forall x y z:U,  mult\ (mult\ x\ y)\ z = mult\  x (mult\ y\ z);$\\
+%   id\_closure : id $\in$ setG;\\
+%   right\_id :$\forall x:U, mult\ x\  id = x;$\\
+%   inv\_closure : $\forall x:U,  (inv\ x) \in setG;$\\
+%   right\_inverse: $\forall x:U, mult\ x (inv\ x) =  id;$
+%  \}.}
+%  
+%Note the format, this is in fact an inductive constructor, not unlike $nat$. 
+%
+%We introduce some convenient notations:
+%\inp{
+%Notation "x \{*\}  y":=(mult  \_ x y) (at level 50).\\
+%Notation "'e'":=(id  \_ ) (at level 50).\\
+%Notation "x \textasciicircum-1'":=(inv \_ x) (at level 30).}
+%
+%And we are now ready to prove the first group theory lemma, the uniqueness of identity (we shall prove the theorem inside the module gps so we can use it with any group.
+%Note the lemma we need to prove is 
+%\begin{lemma}
+%In any group $G$, the identity is unique.
+%\end{lemma}
+%\begin{proof}[informal]
+%To prove this we assume that another element $x$ is also an identity, that is $\forall y, x*y =y$. We do not need such generality, we shall show that $x*x = x \rightarrow x =e$. To do so assume $x*x=x$ and  try to prove that $x=e$. Note that, by the definition of the identity we have $x= x*e$ and so the goal is equivalent to proving that $x * e = e$. We now also note that $x*x^{-1}= e$ and so the goal is equivalent to $x* (x* x^{-1}) = e$. Youcan use associativity to see that it is enough to prove that $(x*x)* x^{-1} =e$. Nor by assumption we know that $x*x =x$ and , replacing $x*x$ by $x$  in the goal we only need to show $x*x^{-1}= e$ which is exactly the property of the right inverse.
+%\end{proof}
+%We shall prove this using SpatchCoq:
+%
+%\inp{
+%Lemma unit\_uniq (U:Type)(G:Group): forall x:gps.U G, x \{*\} x = x -> x = e.}
+%The ``gps:U G'' notation looks a bit strange but this automatically generated.
+%
+%The resulting goal is 
+%\coq{U:Type\\ G:Group}{\forall   x  :  gps.U \ G,  x  \{*\}  x  =  x  \rightarrow  x  =  e }
+%The first two moves are standard.
+%\inp{
+%Fix an arbitrary element x.\\
+%Assume (x  \{*\}  x  =  x ) then prove (x=e).}
+%
+%And we arrive at 
+%\coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp: x  \{*\}  x  =  x}{   x  =  e }
+%We will now use the fact that $x = x*e$ and we replace it in the goal (and prove it later)
+%
+%\inp{
+%Replace x by (x {*} e)  in the goal.}
+%\coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{   x\{*\} e =  e }
+% Respectively
+% \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{   x\{*\} e =  x }
+%  We now know that  x \{*\} x \textasciicircum -1 = e and so 
+% \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{x  {*}  (x  {*}  x  \mbox{\textasciicircum}-1)  =  x  {*}  x  \mbox{\textasciicircum}-1 }
+% 
+% Respectively 
+%  \coq{U:Type\\ G:Group \\  x  :  gps.U \  G\\  Hyp:  x  \{*\}  x  =  x}{x  {*}  x  \mbox{\textasciicircum}-1  =  e }
+%\inp{
+%Replace (id G) by (x {*} x \mbox{\textasciicircum} -1) in the goal.}
+%
+%We now apply associativity and Hyp. 
+%\inp{
+%Rewrite the goal using (assoc G).\\
+%Rewrite the goal using Hyp .\\
+%This follows from reflexivity.}
+%
+%And we now only need to show the two goals that we introduced.
+%\inp{
+%Apply result (right\_inverse).\\
+%Apply result (right\_id G).\\
+%Qed.\\
+%End gps.}
+%
+%
+%Now we show how to prove that $Z$ is a group under addition:
+%\inp{
+%Open Scope Z\_scope.\\
+%Import gps.\\
+%Definition gZ:Group.\\
+%Apply result (group Z (fun x=> True) Z.add Z.opp 0).\\
+%Rewrite goal using the definition of In.\\
+%This is trivial.\\
+%Fix an arbitrary element x.\\
+%Fix an arbitrary element y.\\
+%Fix an arbitrary element z.\\
+%True by arithmetic properties.\\
+%Rewrite goal using the definition of In.\\
+%This is trivial.\\
+%Fix an arbitrary element x.\\
+%True by arithmetic properties.\\
+%Rewrite goal using the definition of In.\\
+%This is trivial.\\
+%Fix an arbitrary element x.\\
+%True by arithmetic properties.\\
+%Qed.}
+%And we can see that one can apply unit\_uniq immediately.
+%\inp{
+%Lemma b: forall x:gps.U gZ, x {*} x = x -> x = e.\\
+%Apply result (unit\_uniq  Z s).\\
+%Qed.}

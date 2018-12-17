@@ -253,7 +253,7 @@ We will now prove that mod3 is also symmetric:
 \inp{
 Lemma a:symmetric Z mod3.}
 \begin{proof}[informal]
-We need to show that $forall x y \in \mathbb{Z}, mod3 x y \rightarrow mod3 y x$. To do so we fix $x$ and $y$ and use the definitions of mod3 respectively div. We are left to prove that $\exists c : Z, x - y = 3 * c\rightarrow \exists c : Z, y - x = 3 * c$ and so we assume that $\exists c : Z, x - y = 3 * c$ and prove that $\exists c : Z, y- x = 3 * c$ if we pick the c so that $x-y =3c$ then it is not too hard to see that $y-x = 3(-c)$.
+We need to show that $\forall x\  y \in \mathbb{Z}, mod3 x\ y \rightarrow mod3 y\ x$. To do so we fix $x$ and $y$ and use the definitions of mod3 respectively div. We are left to prove that $\exists c : Z, x - y = 3 * c\rightarrow \exists c : Z, y - x = 3 * c$ and so we assume that $\exists c : Z, x - y = 3 * c$ and prove that $\exists c : Z, y- x = 3 * c$ if we pick the c so that $x-y =3c$ then it is not too hard to see that $y-x = 3(-c)$.
 \end{proof}
 The formal proof is slightly harder.
 
@@ -295,6 +295,19 @@ This looks a bit different but the two are equivalent. See for example exercise 
 
 
 Let us prove that mod3 is transitive
+\begin{lemma}
+Congruence modulo 3 is transitive.
+\end{lemma}
+\begin{proof}[informal]
+We need to show that $\forall x\  y \ z \in \mathbb{Z}, mod3\  x\ y \rightarrow mod3\ y\ z \rightarrow mod3\ x\ z $. 
+To do so we fix $x, z$ and $z$ and use the definitions of mod3 respectively div. As usual, we assume that  know that $mod3\ x\ y$  and  $mod3\  y\ z$ that is $3 | (x-y)$ and $3 | (y-z)$. 
+
+In other words there exist $k$ and $l$ so that $(x-y) = 3k$ and $(y-z) = 3l$. If we add these two equalities we see that $x-y+y-z= 3l+3k$ and so, after simplification $x-z= 3(k+l)$ and so $mod3 \ x \ z$.
+\end{proof}
+
+We now rewrite this proof formally.
+
+
 \inp{Lemma trans: transitive Z mod3.}
 \inp{
 Rewrite goal using the definition of transitive.\\
@@ -317,3 +330,100 @@ True by arithmetic properties.}
  
  \section{Functions}\label{sec:functions}
  
+ The definition of a function is another place where we see an important difference between set theory and type theory. In set theory a function $f:A \rightarrow B$ is a special kind of relations. More precisely, a function is a subset $ f\subseteq A\times B$ so that for any alert $x \in A$ there exists a unique element $y \in B$ so that $(x,y)\in f$.
+ 
+ In type theory functions are  if $A$ and $B$ are types,  the  type $A\rightarrow B$ is primitive concept,  called the type of functions form $A$ to $B$. A function $f:A \rightarrow B$ is an element of that type. Functions have the property that they can be applied, that is if $f:A\rightarrow B$ and $a:A$ then $f\ a:B$.  
+ 
+ Indeed we have seen this in action in the propositional calculus sections where we saw that if $P$ $Q$   are two propositions and we have $h:P$ (h a proof of P) and $f:P\rightarrow Q$ ( f a proof of $P\rightarrow Q$) then implication elimination rule tells us that $(f h):Q$ ( (f h )is a proof of $Q$. 
+ We choose not to dwell on this too much. In Subsection\ref{subsec:fuctions as relation} we first define functions as a relation, in the sense of set theory. Later in Subsection~\ref{subsec:fuctions in coq} we change the definitions  slightly for the sake of efficiency. In both cases we use Coq's type classes to define functions. 
+ 
+ \subsection{Functions as relations}\label{subsec:fuctions as relation}
+ 
+ \begin{definition}
+ If $A$ and $B$  are sets, a function $f:A \rightarrow B$ is a relation $f\subseteq A\times B$ so that for any element $x\in A$ there exists a unique element $y$ in $B$ so that $ (a, b) \in f$. We denote the element $y$ by $f(x)$.
+ \end{definition}
+ 
+ 
+In this subsection we will define function as relations, we start by recalling Ensembles as well as the notations there.
+ 
+ 
+ \inp{
+Module funct.\\
+Require Import Ensembles.\\
+Notation "x $ \in $ A":= (In \_ A x) (at level 10).\\
+Notation "A $ \subseteq $ B":= (Included \_  A B)(at level 10).\\
+Notation "A $\cup$ B":= (Union \_  A B)(at level 8).\\
+Notation "A $ \cap $ B" := (Intersection \_  A B) (at level 10).}
+
+
+We now define a function. To do so we use a new Coq concept, that of type classes. Typeclasses have first been introduced in Haskell in order to enable overloading of arithmetics operations. A function will be a type class that depends on 3 parameters: domain, codomain and rule. So far, except for the word Class  this is not that different from a definition. Next however we see a different Forman. The format for defining a a class will be:
+\inp{Class Id ( p1 : t1) $\cdots$ ( pn: tn) [: sort] := { f1 : u1; $\cdots$ fm : um }.}
+
+The  $p$'s are called parameters and the $f$'s are called methods. In defining new concept, the preferred Coq choice is that the classes have as many parameters as possible. Here is the definition:
+ \inp{
+Class func 
+\{U V :Type\}  (domain:Ensemble U)
+(codomain:Ensemble V)
+(rule:Ensemble (U*V)) :Type:=\\
+\{
+existence:forall x, \\ 
+x$\in$domain -> exists y, (y $\in$ codomain ) $\land$ (x,y) $\in$ rule;\\
+uniqueness:forall x y z,\\  (x $\in$ domain) $\land$ (x, y) $\in$ rule  $\land$  (x, z) $\in$ rule  $\rightarrow$ y=z;\}.}
+
+\inp{
+Definition rule1 \{U V domain codomain rule\} \(r:@func U V domain codomain rule\):=rule.\\
+End funct.\\
+Import funct.}
+\inp{
+Definition allnat: Ensemble nat:=fun x =>True.
+Definition ff:(Ensemble (nat*nat)) := fun z => match z with |(x , y)=>2*x=y end.
+Check func.
+Instance f:func  allnat allnat ff:={}.
+Rewrite goal using the definition of (In,ff).
+Rewrite goal using the definition of allnat.
+Fix an arbitrary element x.
+Assume (True ) then prove ( exists   y  :  nat,  y  ?  allnat  /\   (x,  y)  ?  ff ).
+Prove the existential claim is true for (2*x).
+This is trivial.
+Fix an arbitrary element x.
+Fix an arbitrary element y.
+Fix an arbitrary element z.
+Rewrite goal using the definition of (In, ff).
+Rewrite goal using the definition of allnat.
+Assume (True /\  ((2 * x = y) /\  (2 * x = z))) then prove (y = z).
+Eliminate the conjuction in hypothesis Hyp.
+Eliminate the conjuction in hypothesis H0.
+Replace z by (2 * x) in the goal.
+Replace y by (2 * x) in the goal.
+This follows from reflexivity.
+Defined.
+Check rule1.
+Definition allZ: Ensemble Z:=fun x =>True.
+Definition g:(Ensemble (Z*Z)) := fun z => match z with |(x , y)=>(3*x)%Z=y end.
+Check (Build_func _ _ _ _ _).
+Definition g1:Prop:= func allZ allZ g.
+Instance gg:func  allZ allZ g:={}.
+Fix an arbitrary element x.
+Assume (True ) then prove ( exists   y  :  Z,  y  ?  allZ  /\   (x,  y)  ? g  ).
+Rewrite goal using the definition of (In, g).
+Prove the existential claim is true for ((3*x)%Z).
+Rewrite goal using the definition of (In, allnat).
+This is trivial.
+Rewrite goal using the definition of (In, allnat).
+Rewrite goal using the definition of (In, g).
+Fix an arbitrary element x.
+Fix an arbitrary element y.
+Fix an arbitrary element z.
+Assume (True /\  (((3 * x)%Z = y) /\  ((3 * x)%Z = z))) then prove (y = z).
+Eliminate the conjuction in hypothesis Hyp.
+Eliminate the conjuction in hypothesis H0.
+Replace y by ((3*x)%Z) in the goal.
+Replace z by ((3 * x)%Z) in the goal.
+This is trivial.
+Defined.
+Check f.
+Print g1.
+About rule1.
+Check rule1  f.
+ }
+  \subsection{Functions in Coq}\label{subsec:fuctions in coq}

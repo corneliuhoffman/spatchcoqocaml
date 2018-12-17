@@ -19,20 +19,20 @@ Here are some predicates.
 \item P(x): $x^{2}+x+1 =0$ (here x is a real number).
 \item P(p): p is a prime. (here p is a natural number)
 \item P(x) : x is a man. (here x is an animal)
-\item P(x, y) : x > y. (here both x an y are real numbers and so P : $mathbb{R}^{2}\rightarrow Prop.$
+\item P(x, y) : x $>$ y. (here both x an y are real numbers and so P : $\mathbb{R}^{2}\rightarrow Prop.$
 
 \end{itemize}	
 
-Of course you cannot really prove predicates, just statements. Predicates have ``free'' variables and those need to be ``quantified''. There are two quantifiers that bind variables. as with connectors for propositions they have introduction and elimination rules.
+Of course you cannot really prove predicates, just statements. Predicates have ``free'' variables and those need to be ``quantified''. We define two quantifiers ($\forall$ - forall and $\exists$-exists) that bind variables. As with connectors for propositions they have introduction and elimination rules.
 
 \subsection{ Quantifiers, free and bound variables.}
 
-As mentioned above, a predicate is a function which takes values in Prop. As such it has at least free variable (we might consider several variable. predicates). There are two ways to bind predicates,  the existential and the universal quantifier. You have used both of them in a somewhat informal way.
+As mentioned above, a predicate is a function which takes values in Prop. As such it has at least free variable (we might consider several variable predicates). There are two ways to bind predicates,  the existential and the universal quantifier. You have used both of them in a somewhat informal way.
   Very often you see the following colloquial statements.
   
  " Show that $x^2 > 0$. "
   
-  This is formally incorrect and its correct statement is : " Show that for any real number $x, x^2 > 0$.  
+  This is formally incorrect and its correct statement is : " Show that for any real number $x, x^2 > 0$.''  
 The second statement is false since $x=0$ is a counterexample. The first one is not a statement unless $x$ has been defined earlier and, if it has, it might be true or false.
 
   
@@ -198,7 +198,7 @@ The result is :
 \coq{(\exists x : Beings, (x is a lion) \land (not (x drinks coffee)))}{(\exists a : Beings, (not (a drinks coffee)) \land (a is fierce))}
 
 
-Now we shall fix the element that is lion and does not drink coffee and prove that is fierce and does not drink coffee. The proof is standard.
+Now we shall fix the element that is a lion and does not drink coffee and prove that is fierce and does not drink coffee. The proof is standard.
 
 
 \inp{Fix b the existentially quantified variable in H .\\
@@ -265,10 +265,10 @@ This is a very interesting side effect of classical logic. It was popularised by
 In any pub there is a customer so that if he drinks \ then everybody drinks. 
 
 
-This sounds very counterintuitive but the proof is very nice and it will test your understanding of predicate calculus. In particular there will be a few applications of "proof by contradiction" and one of "Apply result classic." The idea is that you consider two cases. If everybody Drinks  then there is no problem, you can pick anybody as you witness. The more difficult case is when not everybody drinks. You then pick one person that does not drink and the statement will still be true. While the idea is quite clear, writing a complete formal proof is rather difficult. 
+This sounds very counterintuitive but the proof is very nice and it will test your understanding of predicate calculus. In particular there will be a few applications of "proof by contradiction" and one of "Apply result classic." The idea is that you consider two cases. If everybody Drinks  then there is no problem, you can pick anybody as your witness. The more difficult case is when not everybody drinks. You then pick one person that does not drink and the statement will still be true. While the idea is quite clear, writing a complete formal proof is rather difficult. 
 
 
-To fix the notations let say that $U$ is the people in the bars and that $Drinks: U \rightarrow Prop$ is the  predicate that verifies if somebody drinks, With this notation, our paradox becomes:
+To fix the notations let say that $U$ is the people in the bar and that $Drinks: U \rightarrow Prop$ is the  predicate that verifies if somebody drinks, With this notation, our paradox becomes:
 
 \begin{align}\label{al:drinker}\exists x,  (Drinks \ x \rightarrow \forall y, Drinks \ y).\end{align}
 
@@ -329,9 +329,9 @@ to get
 \coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ H:\neg (\exists x : Customers, neg (Drinks \ x))}{False}
 
 Note that Hyp0 is a negation and (that is of type $P\rightarrow False$ ) so we acan use implication elimination
-
+:
 \inp{Apply the result Hyp0.}
-an so we now only need to prove $(\forall y : Customers, Drinks\ y)$, taht is th goal is
+an so we now only need to prove $(\forall y : Customers, Drinks\ y)$, the goal is
 \coq{Hyp0:\neg (\forall y : Customers, Drinks\  y)\\ H:\neg (\exists x : Customers, neg (Drinks \ x))}{(\forall y : Customers, Drinks\ y)}
  
  We now fix an arbitrary element $x$ (universal introduction) and agaian try to prove by contradiction:
@@ -421,6 +421,66 @@ Prove by contradiction.\\
 Apply result H .\\
 This follows from assumptions.\\
 Qed.}
+
+\section{Proof methods, a quick review.}
+
+You have now acquire a reasonably consistent bag of tricks (proof methods) both informally and formally (in SpatchCoq). You have only used them in the laboratory (aka predicate calculus) so far  and so I think this is the place to review them before deploying to the ``wild'' world of Mathematics. We will produce two tables than one can use as a ``cheat sheets'' for predicate calculus. For example if one of your hypotheses is $P\lor Q$ then you can look at the corresponding line in Table:\ref{tab:hype} and see that you should probably use the tactic ``Consider cases based on disjunction in hypothesis H.''. Similarly if  your conclusion was $P\land Q$ you can look at the corresponding row in Table:\ref{tab:concl} and see that you probably should use the tactic ``Prove the conjunction in the goal by first proving P then Q.''.
+
+{\scriptsize
+\begin{table}\caption{How to use hypotheses}\label{tab:hype}
+\begin{tabular}{| l | l | p{4.5cm} | p{4.5cm} | l |}
+\hline
+
+{ \bf \begin{tabular}{c} Hypothesis \\ Theorem\end{tabular} } & { \bf Conclusion} & { \bf Informal method} & { \bf Formal tactic} & { \bf Result} \\\hline
+
+H:P & P &  \begin{tabular}{p{4.5cm}}``This follows from assumptions. '' or \\
+``This follows from theorem H.''\end{tabular}& \begin{tabular}{p{4.5cm}}
+
+``Apply result H.'' or \\``This follows from assumptions.'' or \\``This is trivial.'' \end{tabular}  & done \\\hline
+H :P $\rightarrow$ Q & Q & ``By H it suffices to prove P.'' & ``Apply result H.'' & Conclusion is P.\\\hline
+H: P $\land$ Q & \_ & ``From H you know both P and Q''. &``Eliminate the conjunction in hypothesis H.'' & \begin{tabular}{l} new hypotheses \\H1:P\\ H2:Q\end{tabular}\\\hline
+
+H: P $\lor$ Q & \_ &  ``Case by case analysis.'' &Consider cases based on disjunction in hypothesis H. &\begin{tabular}{l} two goals  \\ H1:P \\ --- \\  \\\hline \\ H2:Q\\ ---\\ \end{tabular}\\\hline
+ H: P $\leftrightarrow$ Q & \_ & ``From H you know both $P\rightarrow Q$ and $Q\rightarrow P$''. &``Eliminate the conjunction in hypothesis H.'' & \begin{tabular}{l} new hypotheses \\H1 $:P \rightarrow Q$\\ H2:$Q\rightarrow P$\end{tabular}\\\hline
+ H:$\exists x:U, P(x)$ & \_ & Fix x so that P(x) & Fix x the existentially quantified variable in H. &  \begin{tabular}{l} new hypotheses \\ x:U \\ H: P(x)\end{tabular}\\\hline
+\begin{tabular}{l} a:U\\  H:$\forall x:U, P(x)$\end{tabular}
+ & \_ & From H we get P(a) &Obtain P(a) using variable a in the universally quantified hypothesis H&  \begin{tabular}{l} new hypotheses \\H: P(a)\end{tabular}\\\hline
+
+\end{tabular}
+\end{table}
+
+
+\begin{table}\caption{How to modify conclusions}\label{tab:concl}
+\begin{tabular}{| l | l | p{4.5cm} | p{4.5cm} | l |}
+\hline
+{ \bf \begin{tabular}{c} Hypothesis \\ Theorem\end{tabular} } & { \bf Conclusion} & { \bf Informal method} & { \bf Formal tactic} & { \bf Result} \\\hline
+\_ & P $\rightarrow$ Q & ``We assume P and prove Q'' & ``Assume P then prove Q.'' &  \begin{tabular}{l} new goal \\\ H:P\\ --- \\ Q\end{tabular}.\\\hline
+\_ & P $\land$ Q & ``First prove P and then Q'' & ``Prove the conjunction in the goal by first proving P then Q.'' &  \begin{tabular}{l} new goals \\\ \_ \\ --- \\ P \\\hline  \_ \\ --- \\ Q\end{tabular}.\\\hline
+
+
+\_ & P $\lor$ Q & ``Prove P'' &  \begin{tabular}{l} ``Prove P in the disjunction.'' or\\
+``Prove left hand side.''\end{tabular}
+ &  \begin{tabular}{l} new goal \\\ \_ \\ --- \\ P \end{tabular}.\\\hline
+\_ & P $\lor$ Q &``Prove Q'' &  \begin{tabular}{l} ``Prove Q in the disjunction.'' or\\
+``Prove right hand side.''\end{tabular}
+ &  \begin{tabular}{l} new goal \\\ \_ \\ --- \\ Q \end{tabular}.\\\hline
+ 
+  \_ &  $\neg P $
+ & Note that means we need to prove the P implies False.  &`Rewrite goal using the definition of not.''& \begin{tabular}{l} new goal \\ P$\rightarrow$ False \end{tabular}\\\hline
+ 
+ \_ &   H:$\exists x:U, P(x)$ & Prove P(a)  & ``Prove the existential claim is true for a.'' &  \begin{tabular}{l} new goal  \\ P(a)\end{tabular}\\\hline
+ \_ &  H:$\forall x:U, P(x)$
+ & Fix  a random x &``Fix an arbitrary element x.''& \begin{tabular}{l} new goal \\ a:U \\ --- \\ P(a)\end{tabular}\\\hline
+ 
+   \_ &  $P $
+ & ``Prove by contradiction.''  &``Prove by contradiction.''& \begin{tabular}{l} new goal \\ H:$\neg P$ \\ --- \\ False \end{tabular}\\\hline
+ 
+
+\end{tabular}
+\end{table}
+}
+
+
 
 
 
