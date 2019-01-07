@@ -36,10 +36,10 @@ I will slowly introduce the software using basic proofs methods in Chapter~\ref{
 
 Spatchcoq is developed on top of Coq and  will suffer from some of the difficulties inherent in using Coq (or any other proof assistant). Proof assistants are based on type theory rather than set theory (see Appendix E for details) and this creates many of the issues. In particular every object in Coq has exactly one type and you need a conversion to move form one to the other. We have tried to keep this under the hood as much as possible and to mimic the usual set theory notations.
 
-This creates certain surprising complications. For example, in the number theory chapter, we have decided to work with natural numbers rather than integers (this is mainly so that induction will work as expected). In general this is ok but, because N is not a ring, subtraction is a delicate beast. In particular, if m ? n are two natural numbers then m ? n = 0. Soa statement like (m?n)+n = m is only true if m ? n. For example (2?3)+3 = 0+3 = 3. For this reason we advise to tilt your examples in the number theory section towards addition rather than
+This creates certain surprising complications. For example, in the number theory chapter, we have decided to work with natural numbers rather than integers (this is mainly so that induction will work as expected). In general this is ok but, because N is not a ring, subtraction is a delicate beast. In particular, if $m < n$ are two natural numbers then $m - n$ = 0. So a statement like (m -n)+n = m is only true if $m > n$. For example $(2-3)+3 = 0+3 = 3$. For this reason we advise to tilt your examples in the number theory section towards addition rather than
 subtraction. 
 
-We will try to remind the reader about such issues as we go along. We will use the following format:\warn{Watch for the complications related to minus.}
+I will try to remind the reader about such issues as we go along. We will use the following format:\warn{Watch for the complications related to minus.}
 
 We will also use some separate coloured boxes to separate txt. More neutral remarks are going to look like this:
 \rmk{This is a remark that should help you understand the paragraph better.}
@@ -51,7 +51,7 @@ Lemma ancomm$(P\ Q:Prop):P\lor Q ->Q\lor P.$\\
 Assume $(P \lor Q)$ then prove $(Q \lor P)$.
 Consider cases based on disjunction in hypothesis Hyp.}
 
-The goals that Spatchcoq will return to us will look like this:
+The goals that Spatchcoq   will return to us will look like this:
 \coq{Hyp:not\ (P \land (not\ Q))\\
 Hyp0:(((not\ P) \land Q) \lor (P \land (not\ Q)))\\
 }{Q}

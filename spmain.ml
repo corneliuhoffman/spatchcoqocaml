@@ -9,8 +9,6 @@ open GToolbox
 open Treestuff
 let listofcommands = Commands.commands ();;
 let focused=ref true
-
-(* List.map (fun x -> List.map print_string x; flush_all ()) listofcommands;; *)
 type status = BUSY | WAITING ;;
 let completionindex = ref 0
 let completionlist = ref []
@@ -21,7 +19,7 @@ let (listoftrees: Processresults.goal tree list ref) = ref []
 let (current_tree:Processresults.goal tree ref)=ref (LEAF Processresults.emptygoal)
 let current_head = ref Processresults.emptygoal
 (* type mainthing ={ mutable state_id: string; mutable goals :Processresults.goal list; mutable leaving_tactic: string; mutable values: string array };;
- *)let coqstr = ref "";;
+*)let coqstr = ref "";;
 let mainobj:(Treestuff.mainthing list ref) =  ref [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}] 
 let startingTime = Unix.gettimeofday ();;
 let logs:Logs.logs list ref = ref [];;
@@ -29,50 +27,50 @@ let gettime () = int_of_float(Unix.gettimeofday ()-. startingTime)
 let uniq lst =
   let seen = Hashtbl.create (List.length lst) in
   List.filter (fun x -> let tmp = not (Hashtbl.mem seen x) in
-                        Hashtbl.replace seen x ();
-                        tmp) lst
+                Hashtbl.replace seen x ();
+                tmp) lst;;
 
 
 
 let create_tags (buffer:GText.buffer) =
-  buffer#create_tag ~name:"heading" 
-    [`WEIGHT `BOLD; `SIZE (15*Pango.scale)];
-  buffer#create_tag ~name:"italic" [`STYLE `ITALIC];
-  buffer#create_tag ~name:"bold" [`WEIGHT `BOLD];  
-  buffer#create_tag ~name:"big" [`SIZE 20];
-  buffer#create_tag ~name:"xx-small" [`SCALE `XX_SMALL];
-  buffer#create_tag ~name:"x-large" [`SCALE `X_LARGE];
-  buffer#create_tag ~name:"monospace" [`FAMILY "monospace"];
-  buffer#create_tag ~name:"blue_foreground" [`FOREGROUND "blue"];
-  buffer#create_tag ~name:"red_background" [`BACKGROUND "red"];
+  ignore(buffer#create_tag ~name:"heading" 
+      [`WEIGHT `BOLD; `SIZE (15*Pango.scale)]);
+  ignore(buffer#create_tag ~name:"italic" [`STYLE `ITALIC]);
+  ignore(buffer#create_tag ~name:"bold" [`WEIGHT `BOLD]);  
+  ignore(buffer#create_tag ~name:"big" [`SIZE 20]);
+  ignore(buffer#create_tag ~name:"xx-small" [`SCALE `XX_SMALL]);
+  ignore(buffer#create_tag ~name:"x-large" [`SCALE `X_LARGE]);
+  ignore(buffer#create_tag ~name:"monospace" [`FAMILY "monospace"]);
+  ignore(buffer#create_tag ~name:"blue_foreground" [`FOREGROUND "blue"]);
+  ignore(buffer#create_tag ~name:"red_background" [`BACKGROUND "red"]);
 
   let stipple = Gdk.Bitmap.create_from_data 2 2 "\002\001" in
-  buffer#create_tag ~name:"background_stipple" [`BACKGROUND_STIPPLE stipple];
-  buffer#create_tag ~name:"foreground_stipple" [`FOREGROUND_STIPPLE stipple];
-  buffer#create_tag ~name:"big_gap_before_line" [`PIXELS_ABOVE_LINES 30];
-  buffer#create_tag ~name:"big_gap_after_line" [`PIXELS_BELOW_LINES 30];
-  buffer#create_tag ~name:"double_spaced_line" [`PIXELS_INSIDE_WRAP 10];
-  buffer#create_tag ~name:"not_editable" [`EDITABLE false];
-  buffer#create_tag ~name:"word_wrap" [`WRAP_MODE `WORD];
-  buffer#create_tag ~name:"char_wrap" [`WRAP_MODE `CHAR];
-  buffer#create_tag ~name:"no_wrap" [`WRAP_MODE `NONE];
-  buffer#create_tag ~name:"center" [`JUSTIFICATION `CENTER];
-  buffer#create_tag ~name:"right_justify" [`JUSTIFICATION `RIGHT];
-  buffer#create_tag ~name:"wide_margins" [`LEFT_MARGIN  50; `RIGHT_MARGIN 50];
-  buffer#create_tag ~name:"strikethrough" [`STRIKETHROUGH true];
-  buffer#create_tag ~name:"underline" [`UNDERLINE `SINGLE];
-  buffer#create_tag ~name:"double_underline" [`UNDERLINE `DOUBLE];
-  buffer#create_tag ~name:"superscript"
-    [`RISE (10*Pango.scale); `SIZE (8*Pango.scale)];
-  
-  buffer#create_tag ~name:"subscript"
-    [`RISE (-10*Pango.scale); `SIZE (8*Pango.scale)];
-  buffer#create_tag ~name:"rtl_quote" 
-    [`WRAP_MODE `WORD;
-     `DIRECTION `RTL;
-     `INDENT 30;
-     `LEFT_MARGIN 20;
-     `RIGHT_MARGIN 20];
+  ignore (buffer#create_tag ~name:"background_stipple" [`BACKGROUND_STIPPLE stipple]);
+  ignore (buffer#create_tag ~name:"foreground_stipple" [`FOREGROUND_STIPPLE stipple]);
+  ignore(buffer#create_tag ~name:"big_gap_before_line" [`PIXELS_ABOVE_LINES 30]);
+  ignore(buffer#create_tag ~name:"big_gap_after_line" [`PIXELS_BELOW_LINES 30]);
+  ignore(buffer#create_tag ~name:"double_spaced_line" [`PIXELS_INSIDE_WRAP 10]);
+  ignore(buffer#create_tag ~name:"not_editable" [`EDITABLE false]);
+  ignore(buffer#create_tag ~name:"word_wrap" [`WRAP_MODE `WORD]);
+  ignore(buffer#create_tag ~name:"char_wrap" [`WRAP_MODE `CHAR]);
+  ignore(buffer#create_tag ~name:"no_wrap" [`WRAP_MODE `NONE]);
+  ignore(buffer#create_tag ~name:"center" [`JUSTIFICATION `CENTER]);
+  ignore(buffer#create_tag ~name:"right_justify" [`JUSTIFICATION `RIGHT]);
+  ignore(buffer#create_tag ~name:"wide_margins" [`LEFT_MARGIN  50; `RIGHT_MARGIN 50]);
+  ignore(buffer#create_tag ~name:"strikethrough" [`STRIKETHROUGH true]);
+  ignore(buffer#create_tag ~name:"underline" [`UNDERLINE `SINGLE]);
+ ignore( buffer#create_tag ~name:"double_underline" [`UNDERLINE `DOUBLE]);
+ ignore (buffer#create_tag ~name:"superscript"
+      [`RISE (10*Pango.scale); `SIZE (8*Pango.scale)]);
+
+  ignore(buffer#create_tag ~name:"subscript"
+      [`RISE (-10*Pango.scale); `SIZE (8*Pango.scale)]);
+  ignore(buffer#create_tag ~name:"rtl_quote" 
+      [`WRAP_MODE `WORD;
+       `DIRECTION `RTL;
+       `INDENT 30;
+       `LEFT_MARGIN 20;
+       `RIGHT_MARGIN 20]);
   ()
 let checkforcoq () =
   if Coqstuff.isMac () then
@@ -92,14 +90,14 @@ let checkforcoq () =
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10  
           ~filename:"" () in
       ignore(filew#ok_button#connect#clicked ~callback:( 
-        fun () -> 
-          let file = filew#filename in 
-          coqstr := file;
-          let coqfile= open_out (Filename.current_dir_name^"/hello.txt") in 
-          Printf.fprintf coqfile "%s\n" file; 
-          close_out coqfile;
-          filew#destroy (); 
-          Main.quit ()));
+          fun () -> 
+            let file = filew#filename in 
+            coqstr := file;
+            let coqfile= open_out (Filename.current_dir_name^"/hello.txt") in 
+            Printf.fprintf coqfile "%s\n" file; 
+            close_out coqfile;
+            filew#destroy (); 
+            Main.quit ()));
 
       ignore(filew#cancel_button#connect#clicked ~callback:filew#destroy);
       filew#show ();
@@ -110,51 +108,65 @@ if (Coqstuff.isLinux ()) then (coqstr:="coqtop") else
 
 let oc,ic,ec  = Unix.open_process_full (!coqstr^" -ideslave -main-channel stdfds") (Unix.environment ());;
 
+let coqvar=Coqstuff.about ic oc ();;
+
 
 
 let coqinit () =
-if (not (Coqstuff.isWin ())) then (
-  set_binary_mode_in oc true;
-  Unix.set_nonblock (Unix.descr_of_in_channel oc))
-else ();;
+  if (not (Coqstuff.isWin ())) then (
+    set_binary_mode_in oc true;
+    Unix.set_nonblock (Unix.descr_of_in_channel oc))
+  else ();;
 coqstatus := WAITING;
 let repeat = if Coqstuff.isWin () then  30 else 1 in
-let imports =["Require Import Classical.";  "Require Import Utf8."; ] in
+let imports =["Require Import Classical.";  "Require Import Utf8." ] in
 ignore(List.map (fun x-> 
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to repeat do
       ignore((List.map Processresults.printmessages  (Coqstuff.getmessages ic oc [])));
-     
+
 
     done;
-    id:=Coqstuff.fstid ic oc  !id; 
+if (coqvar<"8.8") then
+    id:=Coqstuff.fstid ic oc  !id 
+else 
+    id:=Coqstuff.fstid8 ic oc  !id;
 
     Printf.printf "\n The id is %s \n" !id; flush_all ())
 
-  imports);
+    imports);
 
 let imports =["Require Import  Arith." ] in
 ignore(List.map (fun x-> 
     Coqstuff.writeToCoq ic   x !id;
     for i = 1 to 100*repeat do
       ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
-     
+
     done;
-    id:=Coqstuff.fstid ic oc  !id;
+if (coqvar<"8.8") then
+    id:=Coqstuff.fstid ic oc  !id 
+else 
+    id:=Coqstuff.fstid8 ic oc  !id;
     Printf.printf "\n The id is %s \n" !id; flush_all ())
 
-  imports);
+    imports);
 let imports =["Require Import  ZArith." ] in
 ignore(List.map (fun x-> Coqstuff.writeToCoq ic   x !id;
-    for i = 1 to 100*repeat do
-      ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
+                  for i = 1 to 100*repeat do
+                    ignore(List.map Processresults.printmessages  (Coqstuff.getmessages ic oc []));
 
-    done;
-    id:=Coqstuff.fstid ic oc  !id;
-    Printf.printf "\n The id is %s \n" !id; flush_all ())
+                  done;
+                  if (coqvar<"8.8") then
+    id:=Coqstuff.fstid ic oc  !id 
+else 
+    id:=Coqstuff.fstid8 ic oc  !id;
+                  Printf.printf "\n The id is %s \n" !id; flush_all ())
 
-  imports);;
+         imports);;
+
 coqinit ();;
+
+
 (*  let imports =["Local Open Scope Z_scope." ] in
     List.map (fun x-> 
       Coqstuff.writeToCoq ic   x !id;
@@ -174,22 +186,28 @@ coqinit ();;
 *)
 let rec sendcommand ic oc  x anid =
 
-let txt = (Processinputs.addtext (List.nth x 1) anid) in
-Printf.printf "%s\n\n\n\n" txt; flush_all();
-        Printf.fprintf ic "%s"  (Processinputs.addtext (List.nth x 1) anid) ;flush_all ();
-        if int_of_string anid >= int_of_string (Coqstuff.fstid ic oc  anid) then 
-         sendcommand ic oc  x anid
-       else id :=  (Coqstuff.fstid ic oc  anid);
+(*   let txt = (Processinputs.addtext (List.nth x 1) anid) in
+ *)  (* Printf.printf "%s\n\n\n\n" txt; flush_all();
+  *) 
+  let cur = if (coqvar<"8.8") then
+    Coqstuff.fstid ic oc  anid 
+else 
+    Coqstuff.fstid8 ic oc  anid in 
+  Printf.fprintf ic "%s"  (Processinputs.addtext (List.nth x 1) anid) ;flush_all ();
+  if int_of_string anid >= int_of_string cur then 
+    sendcommand ic oc  x anid
+  else id :=  cur;
 
-       (* Printf.printf "  %s\n the id is %s" (List.nth x 1) !id; flush_all () *) in
+  (* Printf.printf "  %s\n the id is %s" (List.nth x 1) !id; flush_all () *) in
 
 
-List.map (fun x-> sendcommand ic oc  x (Coqstuff.fstid ic oc  !id)
-(* 
-    Printf.fprintf ic "%s"  (Processinputs.addtext (List.nth x 1) (Coqstuff.fstid ic oc  !id)) ;flush_all ();
-    id:=Coqstuff.fstid ic oc  !id;
-    Printf.printf " the id is %s" !id; flush_all () *)) (listofcommands);;
+List.map (fun x-> sendcommand ic oc  x (if (coqvar<"8.8") then
+    Coqstuff.fstid ic oc  !id 
+else 
+    Coqstuff.fstid8 ic oc  !id)
+         ) (listofcommands);;
 
+print_string ((List.hd (Coqstuff.getmessages ic oc []))|>to_string);;
 
 let locale = GtkMain.Main.init ()
 
@@ -200,17 +218,17 @@ let remove_book notebook () =
   ();;
 
 let rec getlines l1 st list = match list with
-| [] -> if st="" then List.rev (l1) else List.rev (st::l1)
-| hd::tl -> let hhd = (String.trim hd)  in
-  if hhd="" then getlines l1 st tl
-      else if hhd.[String.length hhd - 1] = '.' 
-          then getlines ((st ^"\n"^ hd)::l1) "" tl
-          else getlines l1 (st ^"\n"^ hd) tl
+  | [] -> if st="" then List.rev (l1) else List.rev (st::l1)
+  | hd::tl -> let hhd = (String.trim hd)  in
+    if hhd="" then getlines l1 st tl
+    else if hhd.[String.length hhd - 1] = '.' 
+    then getlines ((st ^"\n"^ hd)::l1) "" tl
+    else getlines l1 (st ^"\n"^ hd) tl
 
 (* let rec getlines l1 st list = match list with
-| [] -> if st="" then List.rev (l1) else List.rev (st::l1)
-| hd::tl -> let hhd = (String.trim hd)  in
-  let ind = String.rindex_opt hhd '.' in
+   | [] -> if st="" then List.rev (l1) else List.rev (st::l1)
+   | hd::tl -> let hhd = (String.trim hd)  in
+   let ind = String.rindex_opt hhd '.' in
     match ind with 
       None -> getlines l1 (st ^"\n"^ hd) tl
       | Some i -> if  i = (String.length hhd) - 1 
@@ -223,18 +241,18 @@ let get_first_line str =
   |h::tl -> h;;
 
 (* let get_first_line str =
-  print_string str; flush_all ();
-  match (Str.split (Str.regexp "\n") str) with
-  | h::t -> h^"\n"
-  |[] -> "" *)
+   print_string str; flush_all ();
+   match (Str.split (Str.regexp "\n") str) with
+   | h::t -> h^"\n"
+   |[] -> "" *)
 let get_tail_lines str =
   match (getlines [] "" (String.split_on_char '\n' str)) with
-  []->""
+    []->""
   |h::tl -> String.concat "" tl
 
- (*  match (Str.split (Str.regexp "\n") str) with
-  | h::t -> String.concat "\n" t
-  |[] -> "" *)
+(*  match (Str.split (Str.regexp "\n") str) with
+    | h::t -> String.concat "\n" t
+    |[] -> "" *)
 let get_last_line str =
   let l = List.rev (getlines [] "" (Str.split (Str.regexp "\n") str)) in
   match l with
@@ -245,419 +263,588 @@ let get_first_lines str =
   match l with
   | [] -> ""
   | hd::tl -> String.concat "" (List.rev tl)
-  (* if l !=[] then String.concat "\n" (List.rev (List.tl (List.rev l)))
-  else "";; *)
+(* if l !=[] then String.concat "\n" (List.rev (List.tl (List.rev l)))
+   else "";; *)
 let popup x_root y_root txt =
-let window = GWindow.window ~urgency_hint:true ~modal:true ~title:"Spatchcoq" () in
-window#move ~x:x_root ~y:y_root;
-let vbox = GPack.vbox  ~packing:window#add () in
+  let window = GWindow.window ~urgency_hint:true ~modal:true ~title:"Spatchcoq" () in
+  window#move ~x:x_root ~y:y_root;
+  let vbox = GPack.vbox  ~packing:window#add () in
 
   ignore(window#connect#destroy);
 
-let win = GText.view ~editable:false 
+  let win = GText.view ~editable:false 
       ~packing:vbox#add () in
-      win#buffer#set_text txt;
+  win#buffer#set_text txt;
 
 
-window
+  window
 ;;
 let rec addListToNotebook (notebook:GPack.notebook) list (win10:GText.view) (win00:GText.view)= 
   remove_book notebook ();
   List.map (fun x-> 
-      let text = x in
+      (* let text = x in *)
       let label = GMisc.label ~text:("Goal "^x.number ) () in
       let frame = GPack.vbox (* ~label:"" *) ~width:100 ~height:75 ~border_width:1 ~homogeneous:false
           ~packing:(fun a-> Printf.printf "%s" (string_of_int (notebook#append_page ~tab_label:label#coerce a))) () in
       let scroll = GBin.scrolled_window ~height:200
-      ~hpolicy:`ALWAYS ~vpolicy:`ALWAYS 
-      ~border_width: 1
-      ~packing:frame#add () in
+          ~hpolicy:`ALWAYS ~vpolicy:`ALWAYS 
+          ~border_width: 1
+          ~packing:frame#add () in
 
       let buttonlayer = GPack.hbox (* ~label:"" *) ~width:100 ~height:5 ~border_width:1 ~homogeneous:true
-        ~packing:frame#add () in
-let fbutton =GButton.button  ~label:"Focus" ~packing:buttonlayer#add () in
-ignore (fbutton#connect#clicked 
-    ~callback:(fun x -> let a = notebook#current_page in
-      Coqstuff.writeToCoq ic  ("Focus "^(string_of_int (a+1))^".") !id;
-      win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\nFocus "^(string_of_int (a+1))^".");
-        let x =Coqstuff.reallyread ic oc  !id false in
-        let y = List.hd x in
-        ignore(addListToNotebook notebook (Processresults.processoutput y ) win10 win00);
-        let gls = Processresults.goallist y in 
-        let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
-         
-                  
-        id:=(Coqstuff.fstid ic oc  !id);
-         mainobj := {state_id = !id; goals=goals; leaving_tactic ="Focus "^(string_of_int (a+1))^"."; values = [| |] }::!mainobj;
-         current_head:=List.hd goals
-    )); 
-let ubutton =GButton.button  ~label:"Unfocus" ~packing:buttonlayer#pack() in
-ignore (ubutton#connect#clicked 
-    ~callback:(fun x -> let a = notebook#current_page in
-      Coqstuff.writeToCoq ic  ("Unfocus.") !id;
-        let x =Coqstuff.reallyread ic oc  !id false in
-        let y = List.hd x in
-        let gls = Processresults.goallist y in 
+          ~packing:frame#add () in
+      let fbutton =GButton.button  ~label:"Focus" ~packing:buttonlayer#add () in
+      ignore (fbutton#connect#clicked 
+                ~callback:(fun x -> let a = notebook#current_page in
+                            Coqstuff.writeToCoq ic  ("Focus "^(string_of_int (a+1))^".") !id;
+                            win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\nFocus "^(string_of_int (a+1))^".");
+                            let x =Coqstuff.reallyread ic oc  !id false in
+                            let y = List.hd x in
+                            ignore(addListToNotebook notebook (Processresults.processoutput y ) win10 win00);
+                            let gls = Processresults.goallist y in 
+                            let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
 
-        let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
-        current_head:=List.hd goals;
 
-        ignore(addListToNotebook notebook (Processresults.processoutput (List.hd x)) win10 win00);
-         win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\nUnfocus.");
-        id:=(Coqstuff.fstid ic oc  !id)
-    )); 
-  
-let cols = new GTree.column_list in
-let col_name = cols#add string in 
-let col_color = cols#add string in 
-let col_size = cols#add string in 
-let data = List.map Processresults.print_goal x.hyps  in
-let conc = (Processresults.print_goal x.conclusion )in
+                            if (coqvar<"8.8") then
+    id:=Coqstuff.fstid ic oc  !id 
+else 
+    id:=Coqstuff.fstid8 ic oc  !id;
+                            mainobj := {state_id = !id; goals=goals; leaving_tactic ="Focus "^(string_of_int (a+1))^"."; values = [| |] }::!mainobj;
+                            current_head:=List.hd goals
+                          )); 
+      let ubutton =GButton.button  ~label:"Unfocus" ~packing:buttonlayer#pack() in
+      ignore (ubutton#connect#clicked 
+                ~callback:(fun x -> (* let a = notebook#current_page in *)
+                            Coqstuff.writeToCoq ic  ("Unfocus.") !id;
+                            let x =Coqstuff.reallyread ic oc  !id false in
+                            let y = List.hd x in
+                            let gls = Processresults.goallist y in 
+
+                            let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
+                            current_head:=List.hd goals;
+
+                            ignore(addListToNotebook notebook (Processresults.processoutput (List.hd x)) win10 win00);
+                            win00#buffer#set_text  ((String.trim (win00#buffer#get_text ()))^"\nUnfocus.");
+                            if (coqvar<"8.8") then
+    id:=Coqstuff.fstid ic oc  !id 
+else 
+    id:=Coqstuff.fstid8 ic oc  !id;
+                          )); 
+
+      let cols = new GTree.column_list in
+      let col_name = cols#add string in 
+      let col_color = cols#add string in 
+      let col_size = cols#add string in 
+      let data = List.map Processresults.print_goal x.hyps  in
+      let conc = (Processresults.print_goal x.conclusion )in
 
       let create_model data conc =
-  
-  let store = GTree.list_store cols in
-  let fill (name) =
-    let iter = store#append () in
-    store#set ~row:iter ~column:col_name name;
-    store#set ~row:iter ~column:col_color "Azure";
-    store#set ~row:iter ~column:col_size "System 16";
-   
-  in
-List.iter fill data;
-  store in 
 
-let create_view ~model ~packing () =
-  let view = GTree.view ~model ~packing () in
+        let store = GTree.list_store cols in
+        let fill (name) =
+          let iter = store#append () in
+          store#set ~row:iter ~column:col_name name;
+          store#set ~row:iter ~column:col_color "Azure";
+          store#set ~row:iter ~column:col_size "System 16";
 
-  (* Column #1: col_name is string column *)
-  let col = GTree.view_column 
-      ~renderer:(GTree.cell_renderer_text [], ["text", col_name; "background", col_color;"font", col_size]) () in
-  ignore (view#append_column col);
-  view#set_headers_visible false;  
+        in
+        List.iter fill data;
+        store in 
 
-  view in
+      let create_view ~model ~packing () =
+        let view = GTree.view ~model ~packing () in
+
+        (* Column #1: col_name is string column *)
+        let col = GTree.view_column 
+            ~renderer:(GTree.cell_renderer_text [], ["text", col_name; "background", col_color;"font", col_size]) () in
+        ignore (view#append_column col);
+        view#set_headers_visible false;  
+
+        view in
 
 
-  let store = create_model data conc in
-  let view = create_view ~model:store ~packing:scroll#add () in
-  view#set_headers_visible false;
+      let store = create_model data conc in
+      let view = create_view ~model:store ~packing:scroll#add () in
+      view#set_headers_visible false;
       let iter = store#append () in
-    store#set ~row:iter ~column:col_name conc;
-        store#set ~row:iter ~column:col_color "MistyRose";
-        store#set ~row:iter ~column:col_size "System 16";
+      store#set ~row:iter ~column:col_name conc;
+      store#set ~row:iter ~column:col_color "MistyRose";
+      store#set ~row:iter ~column:col_size "System 16";
 
 
 
       (* GText.view ~editable:false  ~packing:frame#add () in
-      view#buffer#set_text text; *)
+         view#buffer#set_text text; *)
       view#misc#modify_base [(`NORMAL, `NAME "lightgrey")];
 
 
-let selection_changed (model:#GTree.model) selection () =
-  let pr path =
-    let row = model#get_iter path in
-    let col= model#get ~row ~column:col_color in
-    let name = model#get ~row ~column:col_name in
-    Printf.printf "\n\n\n\n\n the name is %s\n\n\n\n\n\n" name;flush_all ();
-     ( let goal = (col = "MistyRose") in
-      let hypname, ast =Processresults.astofstr name goal in
-      let pieces = Processresults.listofstr name goal in
-(*       Printf.printf "there are %i %s" (List.length pieces) (List.hd pieces);flush_all ();
- *)
-    (* let x, y = Gdk.Window.get_pointer_location (Gdk.Window.root_parent ()) in
-    let break = Str.split (Str.regexp ":") name in
-      let nname, formula = if List.length break =1 then "", name else List.hd break, String.concat ":" (List.tl break) in 
-    
- *)
-let menupieces = (List.map (fun name -> `I (name, (fun () -> 
+      let selection_changed (model:#GTree.model) selection () =
+        let pr path =
+          let row = model#get_iter path in
+          let col= model#get ~row ~column:col_color in
+          let name = model#get ~row ~column:col_name in
+          Printf.printf "\n\n\n\n\n the name is %s\n\n\n\n\n\n" name;flush_all ();
+          ( let goal = (col = "MistyRose") in
+            let hypname, ast =Processresults.astofstr name goal in
+            let pieces = Processresults.listofstr name goal in
+            (*       Printf.printf "there are %i %s" (List.length pieces) (List.hd pieces);flush_all ();
+            *)
+            (* let x, y = Gdk.Window.get_pointer_location (Gdk.Window.root_parent ()) in
+               let break = Str.split (Str.regexp ":") name in
+               let nname, formula = if List.length break =1 then "", name else List.hd break, String.concat ":" (List.tl break) in 
 
-let stop = win10#buffer#get_iter `INSERT in
-           Printf.printf "the nline is %i\n\n" (stop#line); flush_all ()  ;
+            *)
+            let menupieces = (List.map (fun name -> `I (name, (fun () -> 
 
-           win10#buffer#insert~iter:stop ("("^name^")") )) ) pieces)  in
-           
-    
+                let stop = win10#buffer#get_iter `INSERT in
+                Printf.printf "the nline is %i\n\n" (stop#line); flush_all ()  ;
 
-let tactics = (List.map (fun n -> `I (n, (fun () -> 
-let stop = win10#buffer#get_iter `START in
-let ast = try (Formulaparsing.parse name) with _ -> Var name in
-           Printf.printf "the line is %i\n\n" (stop#line); flush_all ()  ;
-           win10#buffer#insert ~iter:stop (n^"\n") )) ) 
-           (Formulaparsing.produce_possible_tactics_goal listofcommands ast hypname goal) ) in
-  selection#unselect_all ();
-    GToolbox.popup_menu ~entries:(menupieces@[`S]@tactics)
+                win10#buffer#insert~iter:stop ("("^name^")") )) ) pieces)  in
 
-               (* [`I (name, (fun () -> 
 
-let stop = win10#buffer#get_iter `INSERT in
-           win10#buffer#insert ~iter:stop ("("^name^")") )); `S] *)
 
-            ~button:0 ~time:(Int32.of_int 0); ())
+            let tactics = (List.map (fun n -> `I (n, (fun () -> 
+                let stop = win10#buffer#get_iter `START in
+                (* let ast = try (Formulaparsing.parse name) with _ -> Var name in *)
+                Printf.printf "the line is %i\n\n" (stop#line); flush_all ()  ;
+                win10#buffer#insert ~iter:stop (n^"\n") )) ) 
+                (Formulaparsing.produce_possible_tactics_goal listofcommands ast hypname goal) ) in
+            selection#unselect_all ();
+            GToolbox.popup_menu ~entries:(menupieces@[`S]@tactics)
 
-      in
-  List.iter pr selection#get_selected_rows
-  
-in 
+              (* [`I (name, (fun () -> 
 
-view#selection#set_mode `SINGLE;
-  view#selection#connect#changed ~callback:(selection_changed store view#selection);
+                 let stop = win10#buffer#get_iter `INSERT in
+                 win10#buffer#insert ~iter:stop ("("^name^")") )); `S] *)
+
+              ~button:0 ~time:(Int32.of_int 0); ())
+
+        in
+        List.iter pr selection#get_selected_rows
+
+      in 
+
+      view#selection#set_mode `SINGLE;
+      view#selection#connect#changed ~callback:(selection_changed store view#selection);
 
     ) list
 
 
 
 let runcommand ic oc (win00:GText.view)  (win10:GText.view) win11 mainobj listoftheorems (notebook:GPack.notebook)  = 
-  if !coqstatus = WAITING then
-    ( focused:=false;
-      coqstatus:=BUSY; 
-    win10#buffer#set_text (String.trim (win10#buffer#get_text ()));
-    let start = win10#buffer#start_iter in
-    let stop = start#forward_sentence_end  in
-   
-    (*  let xx = win10#buffer#get_text ~start ~stop () in *)
-     
-    let xx=String.trim (get_first_line (win10#buffer#get_text ())) in 
-    
+  focused:=false;
+  coqstatus:=BUSY; 
+  win10#buffer#set_text (String.trim (win10#buffer#get_text ()));
+  let start = win10#buffer#start_iter in
+  let stop = start#forward_sentence_end  in
 
-(*     Printf.printf "|%s| \n " xx; flush_all ();
- *)
-    if (try (Str.search_forward (Str.regexp "Axiom  \|Inductive\|Notation\|Record\|Eval\|Load\|Locate\|Variable\|Section\|End\|Module") xx 0 )>=0  with _-> false) then 
+  (*  let xx = win10#buffer#get_text ~start ~stop () in *)
+
+  let xx=String.trim (get_first_line (win10#buffer#get_text ())) in 
+
+
+  (*     Printf.printf "|%s| \n " xx; flush_all ();
+  *)
+  if (try (Str.search_forward (Str.regexp "Axiom  \|Inductive\|Notation\|Record\|Eval\|Load\|Locate\|Variable\|Section\|End\|Module") xx 0 )>=0  with _-> false) then 
     (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}];}]; leaving_tactic=xx; values =[||]}]; 
-    current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
-    current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=xx; values =[||]});
-    if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\| Definition\| Proposition") xx 0 )>=0  with _-> false) then 
+     current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
+     current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=xx; values =[||]});
+  if (try (Str.search_forward (Str.regexp "Lemma\|Theorem\| Definition\| Proposition") xx 0 )>=0  with _-> false) then 
     (mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}];}]; leaving_tactic=xx; values =[||]}]; 
-    current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
-    current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]});
-    
-
-
-    if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
-      (begin Coqstuff.writeToCoq ic  (String.trim xx) !id;
-      let x =Coqstuff.reallyread ic oc  !id false in
-   
- let str = (String.concat " "  (texts (List.hd x))) in 
-
-      let ids = List.map (fun a -> try (attribute "val" (a $ "state_id")) with _-> None) x in
-      (* List.map (fun x-> match x with Some y -> print_string y | None -> ()) ids; flush_all (); *)
-      let maxid =  List.fold_left (fun a b -> 
-      let z = (match b with
-      Some z -> int_of_string z
-      |None -> -1) in  max a z ) 0 ids in
-     
-     (*  List.map (fun a -> print_string (to_string a)) x; *)
-      let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
-      let error =try Str.search_forward (Str.regexp "rror") (messages^str)  0 with Not_found -> -1 in
-
-      if error <0 then 
-        (begin
-
-          if (try (Str.search_forward (Str.regexp "Axiom\|Variable\|Inductive\|Notation") xx 0 )>=0  with _-> false) then
-            (let latextac = Latexstuff.preplatex (Processinputs.separate xx) in
-            
-            ignore(mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
-(*              ignore(List.map (fun x->ignore(List.map (fun a -> print_string (Processresults.print_goal a)) (List.hd x.goals).hyps)) !mainobj);flush_all ();
- *)             
-                current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
-                current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=latextac; values =[||]};
-     
-                listoftheorems := !mainobj::!listoftheorems;
-                listoftrees:=!current_tree::!listoftrees;
+     current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
+     current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]});
 
 
 
+  if Processinputs.checkinput xx (List.map (fun x -> List.hd (List.tl x)) (listofcommands )) then 
+    (begin 
 
-             mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
-             current_head := Processresults.emptygoal;
-          current_tree := LEAF Processresults.emptygoal;
-   
-             win00#buffer#set_text  (String.trim((String.trim (win00#buffer#get_text ()))^"\n"^xx));
-             (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
-             win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ())); 
-             win11#buffer#set_text (String.trim messages)))
-          else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
-               (listoftheorems := ((* {state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}:: *)!mainobj)::!listoftheorems;
-                listoftrees:=!current_tree::!listoftrees;
-                current_tree := LEAF Processresults.emptygoal;
+      if coqvar < "8.8" then
+        ( Coqstuff.writeToCoq ic  (String.trim xx) !id;
+          let x =Coqstuff.reallyread ic oc  !id false in
+          let str = (String.concat " "  (texts (List.hd x))) in 
 
-                
-                mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
-             current_head := Processresults.emptygoal;
-             let w00txt=  ((String.trim (win00#buffer#get_text ()))^"\n"^(String.trim xx)) in
-             win00#buffer#set_text (String.trim w00txt);
-(*                 set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
- *)                (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
-(*                 win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
- *)                win10#buffer#delete start stop;
+          let ids = List.map (fun a -> try (attribute "val" (a $ "state_id")) with _-> None) x in
+          (* List.map (fun x-> match x with Some y -> print_string y | None -> ()) ids; flush_all (); *)
+          let maxid =  List.fold_left (fun a b -> 
+              let z = (match b with
+                    Some z -> int_of_string z
+                  |None -> -1) in  max a z ) 0 ids in
+
+          (*  List.map (fun a -> print_string (to_string a)) x; *)
+          let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
+          let error =try Str.search_forward (Str.regexp "rror") (messages^str)  0 with Not_found -> -1 in
+
+          if error <0 then 
+            (begin
+
+              if (try (Str.search_forward (Str.regexp "Axiom\|Variable\|Inductive\|Notation") xx 0 )>=0  with _-> false) then
+                (let latextac = Latexstuff.preplatex (Processinputs.separate xx) in
+
+                 ignore(mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
+                        (*              ignore(List.map (fun x->ignore(List.map (fun a -> print_string (Processresults.print_goal a)) (List.hd x.goals).hyps)) !mainobj);flush_all ();
+                        *)             
+                        current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
+                        current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=latextac; values =[||]};
+
+                        listoftheorems := !mainobj::!listoftheorems;
+                        listoftrees:=!current_tree::!listoftrees;
+
+
+
+
+                        mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
+                        current_head := Processresults.emptygoal;
+                        current_tree := LEAF Processresults.emptygoal;
+
+                        win00#buffer#set_text  (String.trim((String.trim (win00#buffer#get_text ()))^"\n"^xx));
+                        (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+                        win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ())); 
+                        win11#buffer#set_text (String.trim messages)))
+              else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
+                   (listoftheorems := ((* {state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}:: *)!mainobj)::!listoftheorems;
+                    listoftrees:=!current_tree::!listoftrees;
+                    current_tree := LEAF Processresults.emptygoal;
+
+
+                    mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
+                    current_head := Processresults.emptygoal;
+                    let w00txt=  ((String.trim (win00#buffer#get_text ()))^"\n"^(String.trim xx)) in
+                    win00#buffer#set_text (String.trim w00txt);
+                    (*                 set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+                    *)                (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+                    (*                 win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
+                    *)                win10#buffer#delete start stop;
                     let txt = String.trim (win10#buffer#get_text ()) in
                     win10#buffer#set_text txt;
-                win11#buffer#set_text (String.trim messages);) 
-             else (completionindex:=0;
-                   completionlist:=[];
+                    win11#buffer#set_text (String.trim messages);) 
+                 else (completionindex:=0;
+                       completionlist:=[];
 
-                   win00#buffer#set_text  (String.trim ((String.trim (win00#buffer#get_text ()))^"\n"^xx));
-                   (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
-                   win10#buffer#set_text (String.trim (get_tail_lines (win10#buffer#get_text ())));
-                   win11#buffer#set_text (String.trim messages);
-(*                    Printf.printf "here is atry for is %s\n" (Coqstuff.fstid ic oc  !id);
- *)                   let rems = List.filter (fun a -> try (attribute "val" (a $ "state_id") = Some (string_of_int maxid))  with _-> false  ) x in 
-                 let strings = List.map (fun a -> Processresults.processoutput a ) rems in
-(*                  Printf.printf "%s\n\n" (String.concat "\n\n======\n\n" (List.map (fun a ->String.concat "\n\n\n" (Processresults.print_goal  a)) strings)); flush_all ();
- *)                   let possible_goal = Processresults.get_a_goal x in
-                   let y = List.hd x (* match  (Processresults.goallist possible_goal) with
-                   [] -> Coqstuff.soupgoal ic oc ()
-                   |_ -> possible_goal *)
-                  in
-                     
-                   id:=string_of_int maxid; 
-                   (* Printf.printf "\n the id is %s\n--- %s\n ---\n" !id ((Processresults.xmltostr ( String.concat " " (texts y)))^"\n"^(Processresults.xmltostr str));flush_all(); *)
-                   let tac =  (Processinputs.get_tactic xx (listofcommands)) in
-                   let latextac = if tac !=[] then 
-                   
-                  List.hd tac else (Latexstuff.preplatex ((Processinputs.separate xx)^"\n\n Proof: @latex{1}")) in
-                  
-                   let gls = Processresults.goallist y in 
-                   let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
-                   (* let _ = List.hd !mainobj in
+                       win00#buffer#set_text  (String.trim ((String.trim (win00#buffer#get_text ()))^"\n"^xx));
+                       (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+                       win10#buffer#set_text (String.trim (get_tail_lines (win10#buffer#get_text ())));
+                       win11#buffer#set_text (String.trim messages);
+                       (*                    Printf.printf "here is atry for is %s\n" (Coqstuff.fstid ic oc  !id);
+                       (* *)                   let rems = List.filter (fun a -> try (attribute "val" (a $ "state_id") = Some (string_of_int maxid))  with _-> false  ) x in  *)
+                       (* let strings = List.map (fun a -> Processresults.processoutput a ) rems in *)
+                       (*                  Printf.printf "%s\n\n" (String.concat "\n\n======\n\n" (List.map (fun a ->String.concat "\n\n\n" (Processresults.print_goal  a)) strings)); flush_all ();
+                       (* *)                   let possible_goal = Processresults.get_a_goal x in *)
+                       let y = List.hd x (* match  (Processresults.goallist possible_goal) with
+                                            [] -> Coqstuff.soupgoal ic oc ()
+                                            |_ -> possible_goal *)
+                       in
+
+                       id:=string_of_int maxid; 
+                       (* Printf.printf "\n the id is %s\n--- %s\n ---\n" !id ((Processresults.xmltostr ( String.concat " " (texts y)))^"\n"^(Processresults.xmltostr str));flush_all(); *)
+                       let tac =  (Processinputs.get_tactic xx (listofcommands)) in
+                       let latextac = if tac !=[] then 
+
+                           List.hd tac else (Latexstuff.preplatex ((Processinputs.separate xx)^"\n\n Proof: @latex{1}")) in
+
+                       let gls = Processresults.goallist y in 
+                       let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
+                       (* let _ = List.hd !mainobj in
+                       *)
+                       mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
+                       let newgoals = List.filter (fun x -> let leave_numbers  = List.map (fun a -> a.number ) (Treestuff.get_leaves !current_tree) in
+                                                    not (List.mem x.number leave_numbers)) goals in
+
+                       if newgoals != [] then
+
+                         ((* List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals;flush_all (); *)
+
+                           current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac; values = (Processinputs.get_values xx listofcommands) }, List.map (fun x->Treestuff.LEAF(x)) goals)) !current_tree ;
+
+                           current_head := (List.hd newgoals)
+
+                           (*                         Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) !current_tree; flush_all ();   
+                           *)                        )
+                       else
+                         ( 
+                           (ignore(List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals);flush_all ();
+                            current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac}, 
+                                                                       [LEAF(emptygoal)]) ) !current_tree ;
+
+                            current_head := try (List.hd goals) with _-> emptygoal)
+                         )
+                       ;
+
+
+
+
+
+                       (* mainobj.ids <- !id::mainobj.ids;
+                          mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
+                       ignore(addListToNotebook notebook (Processresults.processoutput y) win10 win00); 
+                       focused:=true;
+                       () ));
+
+              id:=(Coqstuff.fstid ic oc  !id);
+
+              (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) 
+            end )
+          else (Printf.printf "the after erroe id is %s\n" (Coqstuff.fstid ic oc  !id); 
+                win11#buffer#set_text (String.trim (Processresults.xmltostr messages^str)); Coqstuff.movebackto  ic !id);(*  Printf.printf "the oldbeforeerroe is %s\n" !id; 
+                                                                                                                             Printf.printf "the after computed id is %s\n" (Coqstuff.fstid ic oc  !id);  flush_all ();
+                                                                                                                             Printf.printf "the text\n %s\n %s" (Processresults.xmltostr str) messages; flush_all (); *)
+        )
+
+
+
+
+      else 
+        ( 
+          if (try (Str.search_forward (Str.regexp "Eval\|Print\|Check\|Search") xx 0 )>=0  with _-> false)  then 
+            (id:=(Coqstuff.fstid8 ic oc  !id);
+
+              let st = Coqstuff.query ic oc xx  !id in
+        
+              win11#buffer#set_text st;
+              id:=(Coqstuff.fstid8 ic oc  !id);
+
+
+            )
+          else(Coqstuff.getlisttext  ic oc "";
+            Coqstuff.writeToCoq ic  (String.trim xx) !id;
+            let rd = (Coqstuff.getlisttext  ic oc "") in
+            print_string (rd^"----\n\n"); flush_all ();
+            let x = [Coqstuff.newparse rd] in
+            let ids =  List.map (fun a ->try (attribute "val" a) with _-> None) ((List.hd x) $$ "state_id"|>to_list) in
+            let maxid =  List.fold_left (fun a b -> 
+                let z = (match b with
+                      Some z -> int_of_string z
+                    |None -> -1) in  max a z ) 0 ids in
+
+            let response = Coqstuff.getok  rd in
+            print_string (!id^(fst response)^(string_of_int maxid));flush_all ();
+            if (fst response) = "fail" then
+              (print_string "failed"; flush_all (); win11#buffer#set_text (String.trim (Processresults.xmltostr (snd response)));Coqstuff.movebackto  ic !id; (* id:= string_of_int (max (int_of_string !id) maxid); *)Coqstuff.movebackto  ic !id)
+
+            (*  List.map (fun a -> print_string (to_string a)) x; *)
+            (* let str = (String.concat " "  (texts (List.hd x))) in 
+
+               let messages =String.concat "\n\n" (List.map Processresults.printmessages  x) in
+               let error =try Str.search_forward (Str.regexp "rror") (messages^str)  0 with Not_found -> -1 in
+
+               if error <0 then *) 
+            else 
+              (
+(*                 id:=Coqstuff.fstid8 ic oc  !id;
  *)
-                   mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
-                   let newgoals = List.filter (fun x -> let leave_numbers  = List.map (fun a -> a.number ) (Treestuff.get_leaves !current_tree) in
-                                                not (List.mem x.number leave_numbers)) goals in
-                        
-                        if newgoals != [] then
+                let read = (List.hd (Coqstuff.getmessages ic oc []))|>to_string in
+                (* let x1 = Coqstuff.newparse read in *)
+                print_string read; flush_all ();
+                let response1 = Coqstuff.getok  read in
+                if (fst response1) = "fail" then
+                  ( win11#buffer#set_text (String.trim (Processresults.xmltostr (snd response1))); Coqstuff.movebackto  ic !id)
+                else ( let messages = (snd response)^"\n"^(snd response1) in
+                       print_string messages ; flush_all ();
+                       if (try (Str.search_forward (Str.regexp "Axiom\|Variable\|Inductive\|Notation") xx 0 )>=0  with _-> false) then
+                         (let latextac = Latexstuff.preplatex (Processinputs.separate xx) in
 
-                        ((* List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals;flush_all (); *)
+                          ignore(mainobj :=  [{state_id= !id; goals =[{Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]}]; leaving_tactic=latextac; values =[||]}]; 
+                                 (*              ignore(List.map (fun x->ignore(List.map (fun a -> print_string (Processresults.print_goal a)) (List.hd x.goals).hyps)) !mainobj);flush_all ();
+                                 *)             
+                                 current_head := {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=(xx^"\n Proof: @latex{1}."); values =[||]};
+                                 current_tree := LEAF {Processresults.emptygoal with number ="0"; hyps =[{name=""; content =xx}]; leaving_tactic=latextac; values =[||]};
 
-                        current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac; values = (Processinputs.get_values xx listofcommands) }, List.map (fun x->Treestuff.LEAF(x)) goals)) !current_tree ;
-
-                        current_head := (List.hd newgoals)
-
-(*                         Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) !current_tree; flush_all ();   
- *)                        )
-                      else
-                      ( 
-                        (List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals;flush_all ();
-                          current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac}, 
-                          [LEAF(emptygoal)]) ) !current_tree ;
-
-                        current_head := try (List.hd goals) with _-> emptygoal)
-                      )
-                      ;
+                                 listoftheorems := !mainobj::!listoftheorems;
+                                 listoftrees:=!current_tree::!listoftrees;
 
 
 
-                  
 
-                   (* mainobj.ids <- !id::mainobj.ids;
-                      mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
-                   ignore(addListToNotebook notebook (Processresults.processoutput y) win10 win00); 
-                   focused:=true;
-                   () ));
-          
-      id:=(Coqstuff.fstid ic oc  !id);
+                                 mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
+                                 current_head := Processresults.emptygoal;
+                                 current_tree := LEAF Processresults.emptygoal;
 
-          (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) 
-        end )
-      else (Printf.printf "the after erroe id is %s\n" (Coqstuff.fstid ic oc  !id); 
-      win11#buffer#set_text (String.trim (Processresults.xmltostr messages^str)); Coqstuff.movebackto  ic !id);(*  Printf.printf "the oldbeforeerroe is %s\n" !id; 
-      Printf.printf "the after computed id is %s\n" (Coqstuff.fstid ic oc  !id);  flush_all ();
-      Printf.printf "the text\n %s\n %s" (Processresults.xmltostr str) messages; flush_all (); *)
+                                 win00#buffer#set_text  (String.trim((String.trim (win00#buffer#get_text ()))^"\n"^xx));
+                                 (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+                                 win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ())); 
+                                 win11#buffer#set_text (String.trim messages)))
+                       else (if (try (Str.search_forward (Str.regexp "Qed\|Admitted") xx 0 )>=0  with _-> false) then
+                            (listoftheorems := ((* {state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}:: *)!mainobj)::!listoftheorems;
+                             listoftrees:=!current_tree::!listoftrees;
+                             current_tree := LEAF Processresults.emptygoal;
 
-       end)
+
+                             mainobj :=  [{state_id= !id; goals =[Processresults.emptygoal]; leaving_tactic=""; values = [||]}];
+                             current_head := Processresults.emptygoal;
+                             let w00txt=  ((String.trim (win00#buffer#get_text ()))^"\n"^(String.trim xx)) in
+                             win00#buffer#set_text (String.trim w00txt);
+                             (*                 set_text  ((String.trim (win00#buffer#get_text ()))^"\n"^xx);
+                             *)                (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+                             (*                 win10#buffer#set_text (get_tail_lines (win10#buffer#get_text ()));
+                             *)                win10#buffer#delete start stop;
+                             let txt = String.trim (win10#buffer#get_text ()) in
+                             win10#buffer#set_text txt;
+                             win11#buffer#set_text (String.trim messages);) 
+                          else (completionindex:=0;
+                                completionlist:=[];
+
+                                win00#buffer#set_text  (String.trim ((String.trim (win00#buffer#get_text ()))^"\n"^xx));
+                                (* insert ~iter:(win00#buffer#get_iter `END) ("\n"^xx); *)
+                                win10#buffer#set_text (String.trim (get_tail_lines (win10#buffer#get_text ())));
+                                win11#buffer#set_text (String.trim messages);
+                                (*                    Printf.printf "here is atry for is %s\n" (Coqstuff.fstid ic oc  !id);
+                                (* *)                   let rems = List.filter (fun a -> try (attribute "val" (a $ "state_id") = Some (string_of_int maxid))  with _-> false  ) x in  *)
+                                (* let strings = List.map (fun a -> Processresults.processoutput a ) rems in *)
+                                (*                  Printf.printf "%s\n\n" (String.concat "\n\n======\n\n" (List.map (fun a ->String.concat "\n\n\n" (Processresults.print_goal  a)) strings)); flush_all ();
+                                (* *)                   let possible_goal = Processresults.get_a_goal x in *)
+                                let y = Coqstuff.newparse read (* match  (Processresults.goallist possible_goal) with
+                                                                  [] -> Coqstuff.soupgoal ic oc ()
+                                                                  |_ -> possible_goal *)
+                                in
+
+                                
+                                id:=Coqstuff.fstid8 ic oc  !id; 
+                                (* Printf.printf "\n the id is %s\n--- %s\n ---\n" !id ((Processresults.xmltostr ( String.concat " " (texts y)))^"\n"^(Processresults.xmltostr str));flush_all(); *)
+                                let tac =  (Processinputs.get_tactic xx (listofcommands)) in
+                                let latextac = if tac !=[] then 
+
+                                    List.hd tac else (Latexstuff.preplatex ((Processinputs.separate xx)^"\n\n Proof: @latex{1}")) in
+
+                                let gls = Processresults.goallist y in 
+                                let goals = List.map (fun a ->Processresults.manage (to_list (children a))) gls in 
+                                (* let _ = List.hd !mainobj in
+                                *)
+                                mainobj := {state_id = !id; goals=goals; leaving_tactic =latextac; values = (Processinputs.get_values xx listofcommands) }::!mainobj;
+                                let newgoals = List.filter (fun x -> let leave_numbers  = List.map (fun a -> a.number ) (Treestuff.get_leaves !current_tree) in
+                                                             not (List.mem x.number leave_numbers)) goals in
+
+                                if newgoals != [] then
+
+                                  ((* List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals;flush_all (); *)
+
+                                    current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac; values = (Processinputs.get_values xx listofcommands) }, List.map (fun x->Treestuff.LEAF(x)) goals)) !current_tree ;
+
+                                    current_head := (List.hd newgoals)
+
+                                    (*                         Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) !current_tree; flush_all ();   
+                                    *)                        )
+                                else
+                                  ( 
+                                    (ignore(List.map (fun a-> Printf.printf "goals = %s\n\n" (Processresults.print_goals a)) goals);flush_all ();
+                                     current_tree := Treestuff.add_a_tree (TREE({!current_head with leaving_tactic=latextac}, 
+                                                                                [LEAF(emptygoal)]) ) !current_tree ;
+
+                                     current_head := try (List.hd goals) with _-> emptygoal)
+                                  )
+                                ;
+
+
+
+
+
+                                (* mainobj.ids <- !id::mainobj.ids;
+                                   mainobj.goals <- (Processresults.processoutput y)::mainobj.goals; *)
+                                ignore(addListToNotebook notebook (Processresults.processoutput y) win10 win00); 
+                                focused:=true;
+                                () ));
+
+                       (* id:=(Coqstuff.fstid8 ic oc  !id) *)))
+
+            (* win01#buffer#set_text (String.concat "\n_________________\n" (Processresults.processoutput  y)) *) 
+
+
+          ))(*  Printf.printf "the oldbeforeerroe is %s\n" !id; 
+                Printf.printf "the after computed id is %s\n" (Coqstuff.fstid ic oc  !id);  flush_all ();
+                Printf.printf "the text\n %s\n %s" (Processresults.xmltostr str) messages; flush_all (); *)
+    end)
   else  
     GToolbox.message_box ~title:"error" ~ok:"Ok" (xx^"is not an accepted tactic please check your text.");
-coqstatus := WAITING )  
-else () ;;
+;; 
+
 let saveformarking file listoftrees =(* listoftheorems = *)
 
- let out = open_out file in
-          (* let listoftrees=List.map ( fun thm ->
-            let rthm = List.rev thm in 
+  let out = open_out file in
+  (* let listoftrees=List.map ( fun thm ->
+     let rthm = List.rev thm in 
 
-            let totaltree = match rthm with
+     let totaltree = match rthm with
 
-          h::[] -> let goal = match h.goals with []-> Processresults.emptygoal
-          |aha::atl -> aha in
-           LEAF {goal  with leaving_tactic = h.leaving_tactic} 
-        | h::tl -> 
+     h::[] -> let goal = match h.goals with []-> Processresults.emptygoal
+     |aha::atl -> aha in
+     LEAF {goal  with leaving_tactic = h.leaving_tactic} 
+     | h::tl -> 
 
-        let t = 
-        let goal = match h.goals with []-> Processresults.emptygoal
-          |aha::atl -> aha in
-           LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
-            Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in
-            (* (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) Processresults.emptygoal *) 
-            let rec newtree t = match t with
-              LEAF a -> Printf.printf "conc = %s" (print_goal  a.conclusion); LEAF (print_goal  a.conclusion)
-              
-              |TREE (a, [LEAF b]) -> TREE ((String.concat "\n" (List.map print_goal  a.hyps))^"\n ==== \n "^(print_goal a.conclusion), [LEAF (print_goal  b.conclusion)])
-              | TREE (a, l) -> TREE ((String.concat "\n" (List.map print_goal  a.hyps))^"\n ====\n"^(print_goal a.conclusion), List.map newtree l) in
+     let t = 
+     let goal = match h.goals with []-> Processresults.emptygoal
+     |aha::atl -> aha in
+     LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
+     Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in
+     (* (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) Processresults.emptygoal *) 
+     let rec newtree t = match t with
+      LEAF a -> Printf.printf "conc = %s" (print_goal  a.conclusion); LEAF (print_goal  a.conclusion)
 
-            let tree = newtree totaltree in
-            (* Treestuff.maptree (fun x->
+      |TREE (a, [LEAF b]) -> TREE ((String.concat "\n" (List.map print_goal  a.hyps))^"\n ==== \n "^(print_goal a.conclusion), [LEAF (print_goal  b.conclusion)])
+      | TREE (a, l) -> TREE ((String.concat "\n" (List.map print_goal  a.hyps))^"\n ====\n"^(print_goal a.conclusion), List.map newtree l) in
 
-             (String.concat "\n" (List.map print_goals  x.hyps)))  totaltree in *)
-          tree
-          (* Treestuff.print_tree print_string tree;flush_all (); *)
-          (* print_string (Sexplib.Sexp.to_string (Treestuff.sexp_of_tree Sexplib.Std.sexp_of_string tree));flush_all (); *)
-          (* print_string (Latexstuff.latex totaltree); *)
-          (* Treestuff.create_tree tree *)
-        ) !listoftheorems in  *)
+     let tree = newtree totaltree in
+     (* Treestuff.maptree (fun x->
+
+     (String.concat "\n" (List.map print_goals  x.hyps)))  totaltree in *)
+     tree
+     (* Treestuff.print_tree print_string tree;flush_all (); *)
+     (* print_string (Sexplib.Sexp.to_string (Treestuff.sexp_of_tree Sexplib.Std.sexp_of_string tree));flush_all (); *)
+     (* print_string (Latexstuff.latex totaltree); *)
+     (* Treestuff.create_tree tree *)
+     ) !listoftheorems in  *)
 
 
-          let sexp = Sexplib.Std.sexp_of_list (fun x -> Treestuff.sexp_of_tree Sexplib.Std.sexp_of_string x) listoftrees in 
-          let txt = Sexplib.Sexp.to_string sexp in 
+  let sexp = Sexplib.Std.sexp_of_list (fun x -> Treestuff.sexp_of_tree Sexplib.Std.sexp_of_string x) listoftrees in 
+  let txt = Sexplib.Sexp.to_string sexp in 
 
-          let _=Processresults.emptygoal in
-          Printf.fprintf out "%s\n" txt;
-          close_out out;; 
+  let _=Processresults.emptygoal in
+  Printf.fprintf out "%s\n" txt;
+  close_out out;; 
 let savelogs file logs=
-   let out = open_out file in
-          let txt = Logs.text_of_list logs in
-          
-          Printf.fprintf out "%s\n" txt;
-          close_out out;; 
+  let out = open_out file in
+  let txt = Logs.text_of_list logs in
+
+  Printf.fprintf out "%s\n" txt;
+  close_out out;; 
 let savelatex file mainobj listoftheorems=
-   let out = open_out file in
-          let d=Processresults.emptygoal in
-          let printtrees = List.rev (!current_tree::!listoftrees) in 
-          let newlist = !mainobj::!listoftheorems in
+  let out = open_out file in
+  (* let d=Processresults.emptygoal in *)
+  let printtrees = List.rev (!current_tree::!listoftrees) in 
+  (* let newlist = !mainobj::!listoftheorems in *)
 
 
 
-          List.map (fun a -> List.map (fun b-> Printf.printf "another goal \n%s\n" (Processresults.print_goals b)) a.goals)   (List.rev !mainobj);flush_all ();
+  ignore (List.map (fun a -> List.map (fun b-> Printf.printf "another goal \n%s\n" (Processresults.print_goals b)) a.goals)   (List.rev !mainobj));flush_all ();
 
-(* List.map (fun x-> List.map (fun y -> Printf.printf "leavingtac %s\n+++++\n%s\n-----\n" (String.concat "\n" (List.map Processresults.print_goals y.goals)) y.leaving_tactic;flush_all()) x ) newlist;
- *)          let message = List.fold_left (fun   m thm ->
-            
-            let totaltree = thm  in(*  match rthm with
+  (* List.map (fun x-> List.map (fun y -> Printf.printf "leavingtac %s\n+++++\n%s\n-----\n" (String.concat "\n" (List.map Processresults.print_goals y.goals)) y.leaving_tactic;flush_all()) x ) newlist;
+  *)          let message = List.fold_left (fun   m thm ->
 
-          h::[] -> let goal = match h.goals with []-> Processresults.emptygoal
-          |aha::atl -> aha in
-           LEAF {goal  with leaving_tactic = h.leaving_tactic} 
-        | h::tl -> 
+      (* let totaltree = thm  in(*  match rthm with *)
 
-        let t = 
-        let goal = match h.goals with []-> Processresults.emptygoal
-          |aha::atl -> aha in
-           LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
-            Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in *)(* (
-                                List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d ) *) 
-(*            Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) totaltree; flush_all ();   
- *)              m^(Latexstuff.latex thm))  "" printtrees (* (List.rev newlist) *)   in
-          let message = Latexstuff.header^message^"\\end{document}" in 
-         
-          Printf.fprintf out "%s\n" message; flush_all ();
-          close_out out;; 
+                                 h::[] -> let goal = match h.goals with []-> Processresults.emptygoal
+                                 |aha::atl -> aha in
+                                 LEAF {goal  with leaving_tactic = h.leaving_tactic} 
+                                 | h::tl -> 
+
+                                 let t = 
+                                 let goal = match h.goals with []-> Processresults.emptygoal
+                                 |aha::atl -> aha in
+                                 LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
+                                 Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in *)(* (
+                                                                                List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d ) *) 
+      (*            Treestuff.print_tree (fun x-> Printf.printf "%s" (Processresults.print_goals x)) totaltree; flush_all ();   
+      *)              m^(Latexstuff.latex thm))  "" printtrees (* (List.rev newlist) *)   in
+  let message = Latexstuff.header^message^"\\end{document}" in 
+
+  Printf.fprintf out "%s\n" message; flush_all ();
+  close_out out;; 
 
 let main () =
-  
+
   let listoftheorems = ref [] in
   let window = GWindow.window ~width:1200 ~height:700
       ~title:"Spatchcoq" () in
   let vbox0 = GPack.vbox  ~packing:window#add () in
- vbox0#set_resize_mode`PARENT;
+  vbox0#set_resize_mode`PARENT;
   ignore(window#connect#destroy ~callback:Main.quit);
 
   (* Menu bar *)
@@ -669,9 +856,9 @@ let main () =
   (* File menu *)
   let factory = new GMenu.factory file_menu ~accel_group in
   ignore( factory#add_item "Quit" ~key:_Q ~callback: Main.quit);
- let hbox = GPack.hbox  ~packing:vbox0#add () in
- let vbox = GPack.vbox  ~packing:hbox#add () in
- 
+  let hbox = GPack.hbox  ~packing:vbox0#add () in
+  let vbox = GPack.vbox  ~packing:hbox#add () in
+
 
   (* first row *)
   let row0 = GPack.hbox  ~height:285 ~homogeneous:true ~packing:vbox#add() in
@@ -682,31 +869,31 @@ let main () =
       ~packing:scroll00#add_with_viewport () in
   win00#buffer#set_text "";
   win00#misc#modify_base [(`NORMAL, `NAME "Honeydew")];
-   win00#misc#modify_font_by_name "System 14";
+  win00#misc#modify_font_by_name "System 14";
   (*right window*)
   (* let scroll01=GBin.scrolled_window ~border_width:10
      ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row0#add () in *)
   let notebook = GPack.notebook ~tab_pos:`TOP
       ~packing:row0#add  () in
-      notebook#connect#switch_page ~callback:(fun x->  
-        if !focused then
-         (print_string ("Iswitched to "^(string_of_int x)); flush_all ())
-       else ()
-          (* Coqstuff.writeToCoq ic   ("Unfocus.") !id; 
-          id:=Coqstuff.fstid ic oc  !id; *)
-       (*   Coqstuff.writeToCoq ic   ("Focus "^(string_of_int (x+1))^".") !id; 
-for i = 1 to 100 do
-      ignore(List.map  (fun a-> print_string (Processresults.printmessages a); flush_all ()) (Coqstuff.getmessages ic oc []));
-     
-    done;
-    id:=Coqstuff.fstid ic oc  !id;
-    print_int x; flush_all () *)
+  ignore (notebook#connect#switch_page ~callback:(fun x->  
+      if !focused then
+        (print_string ("Iswitched to "^(string_of_int x)); flush_all ())
+      else ()
+      (* Coqstuff.writeToCoq ic   ("Unfocus.") !id; 
+         id:=Coqstuff.fstid ic oc  !id; *)
+      (*   Coqstuff.writeToCoq ic   ("Focus "^(string_of_int (x+1))^".") !id; 
+           for i = 1 to 100 do
+           ignore(List.map  (fun a-> print_string (Processresults.printmessages a); flush_all ()) (Coqstuff.getmessages ic oc []));
+
+           done;
+           id:=Coqstuff.fstid ic oc  !id;
+           print_int x; flush_all () *)
 
 
-       );
+    ));
   (* let addListToNotebook  list = 
-  remove_book notebook ();
-  List.map (fun x-> 
+     remove_book notebook ();
+     List.map (fun x-> 
       let text = x in
       let label = GMisc.label ~text:("Goal " ) () in
       let frame = GBin.frame ~label:"" ~width:100 ~height:75 ~border_width:10
@@ -716,36 +903,36 @@ for i = 1 to 100 do
       ~border_width:2 
       ~packing:frame#add () in
 
-let cols = new GTree.column_list in
-let col_name = cols#add string in 
-let data = List.map Processresults.print_goal x.hyps  in
+     let cols = new GTree.column_list in
+     let col_name = cols#add string in 
+     let data = List.map Processresults.print_goal x.hyps  in
       let create_model data =
-  
-  let store = GTree.list_store cols in
-  let fill (name) =
-    let iter = store#append () in
-    store#set ~row:iter ~column:col_name name;
-   
-  in
-  List.iter fill data;
-  store in 
 
-let create_view ~model ~packing () =
-  let view = GTree.view ~model ~packing () in
+     let store = GTree.list_store cols in
+     let fill (name) =
+     let iter = store#append () in
+     store#set ~row:iter ~column:col_name name;
 
-  (* Column #1: col_name is string column *)
-  let col = GTree.view_column 
+     in
+     List.iter fill data;
+     store in 
+
+     let create_view ~model ~packing () =
+     let view = GTree.view ~model ~packing () in
+
+     (* Column #1: col_name is string column *)
+     let col = GTree.view_column 
       ~renderer:(GTree.cell_renderer_text [], ["text", col_name]) () in
-  ignore (view#append_column col);
+     ignore (view#append_column col);
 
-  (* Column #2: col_age is int column *)
-  
-
-  view in
+     (* Column #2: col_age is int column *)
 
 
-  let model = create_model data in
-  let view = create_view ~model ~packing:scroll#add () in
+     view in
+
+
+     let model = create_model data in
+     let view = create_view ~model ~packing:scroll#add () in
 
       (* GText.view ~editable:false  ~packing:frame#add () in
       view#buffer#set_text text; *)
@@ -765,55 +952,55 @@ let create_view ~model ~packing () =
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row1#add () in
   let win10 = GText.view 
       ~packing:scroll10#add_with_viewport () in 
-(*   win10#buffer#set_text "SearchPattern (_->_).";
- *)
+  (*   win10#buffer#set_text "SearchPattern (_->_).";
+  *)
   win10#misc#modify_base [(`NORMAL, `NAME "lightyellow")];
   let con = win10#misc#create_pango_context#font_description in
   win10#misc#modify_font_by_name "System 14";
 
-  win10#connect#paste_clipboard ~callback:(fun x->  (* this marks the fact that the user has pasted something in win10*)
+  ignore(win10#connect#paste_clipboard ~callback:(fun x->  (* this marks the fact that the user has pasted something in win10*)
+  
+  
+        let postxt = (GData.clipboard (Gdk.Atom.intern "CLIPBOARD"))#text in
+        let txt = match postxt with 
+          |Some a -> a
+          |None ->"none" in 
+        logs :=  (PASTED (gettime (), txt))::!logs;
+        Printf.printf "\nI pasted \n %s\n%s\n\n\n\n"
+          (win10#buffer#get_text ()) txt ;flush_all ()));
 
-
-    let postxt = (GData.clipboard (Gdk.Atom.intern "CLIPBOARD"))#text in
-    let txt = match postxt with 
-    |Some a -> a
-    |None ->"none" in 
-    logs :=  (PASTED (gettime (), txt))::!logs;
-    Printf.printf "\nI pasted \n %s\n%s\n\n\n\n"
-    (win10#buffer#get_text ()) txt ;flush_all ());
-    
   Printf.printf " the pango= %s" (Pango.Font.to_string con);flush_all ();
   let row3 = GPack.hbox ~border_width:5 ~height:50 ~homogeneous:true ~packing:vbox#pack () in
-let table =GPack.hbox    ~packing:row3#pack () in
+  let table =GPack.hbox    ~packing:row3#pack () in
+
+
+  let images =[("∨",1,1); ("∧",2,1); ("→",3,1); ("∀",4,1); 
+               ("∃", 5, 1); ("¬", 6, 1); ("↔", 7,1); ("≠", 8,1);
+               ("∈", 9, 1); ("∩", 10,1); ("∪", 11,1); ("⊆", 12,1);
+               (" ∅ ", 13,1); ("∁",14, 1); ("∖",15,1 )
+
+
+              ] in
+  ignore(List.map 
+      (fun (a,i,j) -> 
+         let button =GButton.button  ~label:a ~packing:table#add () in
+         button#set_border_width 2;
+         button#set_relief `NONE;
   
+         (*  table#attach ~left:i ~top:j (button)#coerce; *)
+         ignore(button#connect#clicked 
+                  ~callback:(fun x ->
+                      (* let stop = win10#buffer#get_iter `INSERT in *)
+                      win10#buffer#insert a;
+                      win10#misc#grab_focus ()
+                    ))) images );
 
-let images =[("∨",1,1); ("∧",2,1); ("→",3,1); ("∀",4,1); 
-    ("∃", 5, 1); ("¬", 6, 1); ("↔", 7,1); ("≠", 8,1);
-    ("∈", 9, 1); ("∩", 10,1); ("∪", 11,1); ("⊆", 12,1);
-    (" ∅ ", 13,1); ("∁",14, 1); ("∖",15,1 )
-
-
-] in
-List.map 
-  (fun (a,i,j) -> 
-    let button =GButton.button  ~label:a ~packing:table#add () in
-    button#set_border_width 2;
-    button#set_relief `NONE;
-     
-   (*  table#attach ~left:i ~top:j (button)#coerce; *)
-    ignore(button#connect#clicked 
-    ~callback:(fun x ->
-    let stop = win10#buffer#get_iter `INSERT in
-    win10#buffer#insert a;
-     win10#misc#grab_focus ()
-  ))) images ;
-  
   let file_ok_sel filew () =
     let file=filew#filename in
     try 
       let line =  if Coqstuff.isWin () then Commands.load_file1 file
-      else Commands.load_file file in  (* read line from in_channel and discard \n *)
-   
+        else Commands.load_file file in  (* read line from in_channel and discard \n *)
+
       win10#buffer#insert line; (* write on the underlying device now *)
       filew#destroy ()                 (* close the input channel *) 
 
@@ -872,7 +1059,7 @@ List.map
 
     );
 
-ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
+  ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
       let filew = GWindow.file_selection ~title:"File selection" ~border_width:10
           ~filename:"yourname.mrk" () in
 
@@ -883,7 +1070,7 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
       ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
           let file=filew#filename in
           let treelist = List.rev ( !current_tree::!listoftrees )in
-         saveformarking file (List.map (fun a -> Treestuff.maptree Processresults.print_goals a) treelist); 
+          saveformarking file (List.map (fun a -> Treestuff.maptree Processresults.print_goals a) treelist); 
           filew#destroy ()
         ));
 
@@ -899,16 +1086,16 @@ ignore( factory#add_item "Save for marking" ~key:_M ~callback: ( fun () ->
 
     );
 
-ignore( factory#add_item "Update" ~key:_M ~callback: ( fun () ->
-      
-Unix.execv (Filename.current_dir_name^"/update")[||] ()
+  ignore( factory#add_item "Update" ~key:_M ~callback: ( fun () ->
+
+      Unix.execv (Filename.current_dir_name^"/update")[||] 
 
     ));
 
-ignore( factory#add_item "Restart" ~key:_M ~callback: ( fun () ->
+  ignore( factory#add_item "Restart" ~key:_M ~callback: ( fun () ->
 
-Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|] 
-));
+      Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|] 
+    ));
 
 
   ignore( factory#add_item "Save latex" ~key:_L ~callback: ( fun () ->
@@ -921,7 +1108,7 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
       (* Connect the ok_button to file_ok_sel function *)
       ignore(filew#ok_button#connect#clicked ~callback:(fun () ->
           let file=filew#filename in
-         savelatex file mainobj listoftheorems;
+          savelatex file mainobj listoftheorems;
           filew#destroy ()
         ));
 
@@ -957,8 +1144,8 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
 
           let treelist = List.rev ( !current_tree::!listoftrees ) in
           saveformarking (file^".mrk") (List.map (fun a -> Treestuff.maptree Processresults.print_goals a)  treelist);
-         savelatex (file^".tex") mainobj listoftheorems;
-         savelogs (file^".log") (List.rev !logs);
+          savelatex (file^".tex") mainobj listoftheorems;
+          savelogs (file^".log") (List.rev !logs);
           filew#destroy ()
         ));
 
@@ -983,12 +1170,12 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
   let tactics_group = tacticsfactory#accel_group in
   let tactics_menu = tacticsfactory#add_submenu "Tactics" in
   ignore(List.map (fun x -> let y = (Processinputs.makevar (List.hd (List.tl x))) in
-             let factory = new GMenu.factory tactics_menu ~accel_group:tactics_group in
-             (* let ins = win10#buffer#get_iter `INSERT in *)
-             ignore( factory#add_item y  ~callback: (fun () -> win10#buffer#insert  y ;
-             logs :=  (DROP (gettime (), y))::!logs;   )))
+                    let factory = new GMenu.factory tactics_menu ~accel_group:tactics_group in
+                    (* let ins = win10#buffer#get_iter `INSERT in *)
+                    ignore( factory#add_item y  ~callback: (fun () -> win10#buffer#insert  y ;
+                                                             logs :=  (DROP (gettime (), y))::!logs;   )))
 
-    (listofcommands));
+           (listofcommands));
 
 
   (*right window*)
@@ -996,7 +1183,7 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
       ~hpolicy:`AUTOMATIC ~vpolicy:`AUTOMATIC ~packing:row1#add () in
   let win11 = GText.view 
       ~packing:scroll11#add () in
-       win11#misc#modify_font_by_name "System 14";
+  win11#misc#modify_font_by_name "System 14";
   win11#buffer#set_text "";
 
 
@@ -1020,15 +1207,15 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
   GToolbox.create_shortcuts 
     ~window:window ~shortcuts:[a2] 
     ~callback:(fun () -> 
-      let before = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
-       
+        let before = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
+
         runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
-      let after = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
-      let messages = (win11#buffer#get_text ()) in
-      logs :=  (CRUN (gettime (), before, after, messages ))::!logs;
+        let after = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
+        let messages = (win11#buffer#get_text ()) in
+        logs :=  (CRUN (gettime (), before, after, messages ))::!logs;
 
 
-      ());
+        ());
 
 
 
@@ -1044,39 +1231,39 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
 
          let justcommands = List.map (fun x ->  
              (Processinputs.makevar (List.hd (List.tl x)))) listofcommands in
-          completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands; 
-          GToolbox.popup_menu ~entries:(List.map 
-            (fun a -> `I (a, (fun () -> 
-              let stop = win10#buffer#get_iter `INSERT in
-              let start = win10#buffer#start_iter in(*  stop#backward_line in *)
-              win10#buffer#delete ~start ~stop;
-            win10#buffer#insert a;
-            win10#misc#grab_focus ()
+         completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands; 
+         GToolbox.popup_menu ~entries:(List.map 
+                                         (fun a -> `I (a, (fun () -> 
+                                              let stop = win10#buffer#get_iter `INSERT in
+                                              let start = win10#buffer#start_iter in(*  stop#backward_line in *)
+                                              win10#buffer#delete ~start ~stop;
+                                              win10#buffer#insert a;
+                                              win10#misc#grab_focus ()
 
-          ) )) !completionlist)
-             ~button:0 ~time:(Int32.of_int 0) ); 
+                                            ) )) !completionlist)
+           ~button:0 ~time:(Int32.of_int 0) ); 
 
 
 
-         (* if !completionlist = [] then
-           completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands; 
-            GToolbox.popup_menu ~entries:(List.map 
-            (fun a -> `I (a, (fun () -> 
-              let stop = win10#buffer#get_iter `INSERT in
-              let start = stop#backward_sentence_start in
-              win10#buffer#delete ~start ~stop;
-            win10#buffer#insert a) )) completionlist)
-             ~button:0 ~time:(Int32.of_int 0) 
+      (* if !completionlist = [] then
+         completionlist := List.filter (fun x->  Pcre.pmatch ~rex:(Pcre.regexp xx) x) justcommands; 
+         GToolbox.popup_menu ~entries:(List.map 
+         (fun a -> `I (a, (fun () -> 
+           let stop = win10#buffer#get_iter `INSERT in
+           let start = stop#backward_sentence_start in
+           win10#buffer#delete ~start ~stop;
+         win10#buffer#insert a) )) completionlist)
+          ~button:0 ~time:(Int32.of_int 0) 
          else (
-          let stop = win10#buffer#get_iter `INSERT in
-        let start = stop#backward_sentence_start in
-        win10#buffer#delete ~start ~stop;
-           win10#buffer#insert  (List.nth !completionlist (!completionindex mod (List.length !completionlist))); 
-           let before = win10#buffer#get_text () in
-           logs :=  (ESC (gettime (), before))::!logs;
-           completionindex:=(1 + !completionindex) mod  (List.length !completionlist)))
-      else 
-        completionlist:=[]; *)
+         let stop = win10#buffer#get_iter `INSERT in
+         let start = stop#backward_sentence_start in
+         win10#buffer#delete ~start ~stop;
+         win10#buffer#insert  (List.nth !completionlist (!completionindex mod (List.length !completionlist))); 
+         let before = win10#buffer#get_text () in
+         logs :=  (ESC (gettime (), before))::!logs;
+         completionindex:=(1 + !completionindex) mod  (List.length !completionlist)))
+         else 
+         completionlist:=[]; *)
 
       false
     end in
@@ -1085,67 +1272,67 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
 
   let buttonrun = GButton.button ~label:"run!" 
       ~packing:row2#add () in
-      buttonrun#set_border_width 2;
+  buttonrun#set_border_width 2;
   ignore (buttonrun#connect#clicked ~callback:(fun () -> 
       let before = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
-       
-        runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
+
+      runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
       let after = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
       let messages = (win11#buffer#get_text ()) in
       logs :=  (RUN (gettime (), before, after, messages ))::!logs;
       ()););
   let buttonundo = GButton.button ~label:"undo!"
       ~packing:row2#add () in
-      buttonundo#set_border_width 2;
+  buttonundo#set_border_width 2;
   ignore(buttonundo#connect#clicked ~callback: (fun () ->
-    let before = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
-       
+      let before = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
+
       completionindex:=0; 
       completionlist:=[];
 
-      let stop = win00#buffer#end_iter in
-      let start = stop#backward_line in
-(*       let last = win00#buffer#get_text ~start ~stop () in
- *)      let last=get_last_line (win00#buffer#get_text ()) in 
-          let thefirst = String.trim (get_first_lines (win00#buffer#get_text ())) in 
-          print_string ("the last is: "^last ^ "\n the first is :"^thefirst); flush_all ();
- win00#buffer#set_text thefirst;
- (* (String.trim (get_first_lines (win00#buffer#get_text ()))); *)
- 
-(*    win00#buffer#delete ~start ~stop;
-(*  *)      print_string ("the string is"^(String.trim last)^"ha"); flush_all ();
- *)      if (String.trim last) ="" then ()
+      (* let stop = win00#buffer#end_iter in *)
+      (* let start = stop#backward_line in *)
+      (*       let last = win00#buffer#get_text ~start ~stop () in
+      *)      let last=get_last_line (win00#buffer#get_text ()) in 
+      let thefirst = String.trim (get_first_lines (win00#buffer#get_text ())) in 
+      print_string ("the last is: "^last ^ "\n the first is :"^thefirst); flush_all ();
+      win00#buffer#set_text thefirst;
+      (* (String.trim (get_first_lines (win00#buffer#get_text ()))); *)
+
+      (*    win00#buffer#delete ~start ~stop;
+            (*  *)      print_string ("the string is"^(String.trim last)^"ha"); flush_all ();
+      *)      if (String.trim last) ="" then ()
       else
         win10#buffer#set_text  ((String.trim last)^"\n"^(win10#buffer#get_text ()));
       let after = (win00#buffer#get_text ())^"\n***********\n"^(win10#buffer#get_text ()) in
       let messages = (win11#buffer#get_text ()) in
       logs :=  (UNDO (gettime (), before, after, messages ))::!logs;
       id := 
-      (if win00#buffer#get_text () = "" then
-       "35"
-      else    
+        (if win00#buffer#get_text () = "" then
+           "35"
+         else    
 
-      (* let first=get_first_lines (win00#buffer#get_text ()) in 
-      win00#buffer#set_text first; *)
-      
-      
+           (* let first=get_first_lines (win00#buffer#get_text ()) in 
+              win00#buffer#set_text first; *)
 
-      match !mainobj with
-     
 
-        h::t::l->
-        print_string "htl \n ";flush_all();
-        (* let newid = Coqstuff.fstid  ic oc !id in *)
-        let gls = t.goals in
-        Printf.printf "the gls is %i \n" (List.length gls);flush_all ();
 
-        current_head := if (gls = []) then Processresults.emptygoal else List.hd gls ;
-        current_tree := Treestuff.removetree !current_head !current_tree;
-       
-        mainobj:=t::l;
-        t.state_id
-     
-      (* 
+           match !mainobj with
+
+
+             h::t::l->
+             print_string "htl \n ";flush_all();
+             (* let newid = Coqstuff.fstid  ic oc !id in *)
+             let gls = t.goals in
+             Printf.printf "the gls is %i \n" (List.length gls);flush_all ();
+
+             current_head := if (gls = []) then Processresults.emptygoal else List.hd gls ;
+             current_tree := Treestuff.removetree !current_head !current_tree;
+
+             mainobj:=t::l;
+             t.state_id
+
+           (* 
         let x = Coqstuff.reallyread ic oc  !id true in
 
         let possible_goal = Processresults.get_a_goal x in
@@ -1153,101 +1340,101 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
                    [] -> Coqstuff.soupgoal ic oc ()
                    |_ -> possible_goal
                   in
-        
-        
+
+
         mainobj:=t::l;
         ignore(addListToNotebook notebook (Processresults.processoutput  y) win10); () *)
-      |t::[] -> 
+           |t::[] -> 
 
-        ( print_string " te ";flush_all();
-          mainobj:=[];
-          match !listoftheorems with
-          []-> "35"
-          |h::t ->(listoftheorems:=t;
-            current_tree:= List.hd !listoftrees;
-            current_head := emptygoal;
-            listoftrees := List.tl !listoftrees ;
-           
+             ( print_string " te ";flush_all();
+               mainobj:=[];
+               match !listoftheorems with
+                 []-> "35"
+               |h::t ->(listoftheorems:=t;
+                        current_tree:= List.hd !listoftrees;
+                        current_head := emptygoal;
+                        listoftrees := List.tl !listoftrees ;
 
-           mainobj := h;
 
-          Printf.printf " the list is %i \n" (List.length !mainobj);flush_all ();
+                        mainobj := h;
 
-           (List.hd h).state_id))
-      |[] -> 
-          ( print_string "empt";flush_all();
-            !id
-            (* match !listoftheorems with
-          []-> "33"
-          |h::t->
-           (listoftheorems:=t;
+                        Printf.printf " the list is %i \n" (List.length !mainobj);flush_all ();
 
-           mainobj := List.tl h;
-          print_int (List.length !mainobj);flush_all ();
+                        (List.hd h).state_id))
+           |[] -> 
+             ( print_string "empt";flush_all();
+               !id
+               (* match !listoftheorems with
+                  []-> "33"
+                  |h::t->
+                  (listoftheorems:=t;
 
-           (List.hd h).state_id) *))
+                  mainobj := List.tl h;
+                  print_int (List.length !mainobj);flush_all ();
+
+                  (List.hd h).state_id) *))
 
         ); 
       Coqstuff.movebackto  ic !id;
-                        print_int (List.length !listoftheorems);flush_all ();
+     print_string ("back to"^(!id)); 
+      print_int (List.length !listoftheorems);flush_all ();
 
-     Printf.printf "i have an id of %s\n\n\n ------\n " !id;flush_all ();
-    (*   let x =Coqstuff.reallyread ic oc  !id true in
-      let possible_goal = Processresults.get_a_goal x in
-                   let y =  match  (Processresults.goallist possible_goal) with
-                   [] -> print_string "no";flush_all(); Coqstuff.soupgoal ic oc ()
-                   |_ -> possible_goal
+      (*   let x =Coqstuff.reallyread ic oc  !id true in
+           let possible_goal = Processresults.get_a_goal x in
+                     let y =  match  (Processresults.goallist possible_goal) with
+                     [] -> print_string "no";flush_all(); Coqstuff.soupgoal ic oc ()
+                     |_ -> possible_goal
 
 
-                 in *)
+                   in *)
 
-                 
-                 let y = Coqstuff.soupgoal ic oc () in 
+
+      let y = Coqstuff.soupgoal ic oc () in 
 
       (* let y =  Coqstuff.soupgoal ic oc () in  *)
-   (*  let x = Coqstuff.reallyread ic oc  !id false in
-      
+      (*  let x = Coqstuff.reallyread ic oc  !id false in
 
-        let possible_goal = Processresults.get_a_goal x in
-        let y =  match  (Processresults.goallist possible_goal) with
-                   [] -> Coqstuff.soupgoal ic oc ()
-                   |_ -> possible_goal
-                  in *)
+
+           let possible_goal = Processresults.get_a_goal x in
+           let y =  match  (Processresults.goallist possible_goal) with
+                      [] -> Coqstuff.soupgoal ic oc ()
+                      |_ -> possible_goal
+                     in *)
       ignore(addListToNotebook notebook (Processresults.processoutput  y) win10 win00); ()    
 
-      ));
+    ));
   (* undo Button *)
   (* tree Button *)
 
 
   let buttontree = GButton.button ~label:"draw tree!"
       ~packing:row2#add () in
-      buttontree#set_border_width 2;
+  buttontree#set_border_width 2;
   ignore (buttontree#connect#clicked ~callback:(fun () -> 
-      let d=Processresults.emptygoal in
-      let newlist = !mainobj::!listoftheorems in
+      (* let d=Processresults.emptygoal in *)
+      (* let newlist = !mainobj::!listoftheorems in *)
       let treelist = List.rev ( !current_tree::!listoftrees )in 
       ignore (List.map ( fun thm -> (* let rthm= List.rev thm in *)
           (*       List.map (fun x->  (List.map (fun a ->print_string (Processresults.print_goals a)) x.goals); print_string x.leaving_tactic) thm;flush_all (); 
           *)      let totaltree = thm in
           (*  match rthm with
 
-          h::[] -> let goal = match h.goals with []-> Processresults.emptygoal
-          |aha::atl -> aha in
-           LEAF {goal  with leaving_tactic = h.leaving_tactic} 
-        | h::tl -> 
+              h::[] -> let goal = match h.goals with []-> Processresults.emptygoal
+              |aha::atl -> aha in
+              LEAF {goal  with leaving_tactic = h.leaving_tactic} 
+              | h::tl -> 
 
-        let t = 
-        let goal = match h.goals with []-> Processresults.emptygoal
-          |aha::atl -> aha in
-           LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
-            Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in *)(*  (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d)  *)
+              let t = 
+              let goal = match h.goals with []-> Processresults.emptygoal
+              |aha::atl -> aha in
+              LEAF {goal  with leaving_tactic = h.leaving_tactic}  in 
+              Treestuff.tree_from_list_of_mains1 tl t  Processresults.emptygoal in *)(*  (List.rev (List.map (fun x->x.goals) thm)) (List.rev (List.map (fun x->(x.leaving_tactic, x.values)) thm)) d)  *)
 
           (* let listofstrings = (List.rev (List.map (fun x-> (List.map Processresults.print_goals x.goals)) !mainobj)) in
           *)
           (* let tree = Treestuff.tree_from_list listofstrings "done" in  *)
           let tree = Treestuff.maptree Processresults.print_goals totaltree in
-          
+
           (* Treestuff.print_tree print_string tree;flush_all (); *)
           print_string (Sexplib.Sexp.to_string (Treestuff.to_sexp Sexplib.Std.sexp_of_string tree));flush_all ();
           (* print_string (Latexstuff.latex totaltree); *)
@@ -1255,17 +1442,27 @@ Unix.execvp "/Applications/spatchcoq.app/Contents/MacOS/spmain" [|"spmain"|]
         ) treelist ); ()) );
 
 
-let textwin = GEdit.entry ~height:40 ~text:"?"  ~packing:row3#pack () in
+  let textwin = GEdit.entry ~height:40 ~text:"?"  ~packing:row3#pack () in
 
-let buttontree = GButton.button ~label:"SearchPattern"
+  let buttontree = GButton.button ~label:"SearchPattern"
       ~packing:row3#pack () in
-      buttontree#set_border_width 1;
+  buttontree#set_border_width 1;
   ignore (buttontree#connect#clicked ~callback:(fun () -> 
-    let txt = win10#buffer#get_text () in
-    win10#buffer#set_text ("SearchPattern ("^textwin#text^").\n"^txt);
-runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook;  
+      let txt = win10#buffer#get_text () in
+      if (coqvar <"8.8") then 
+        (win10#buffer#set_text ("SearchPattern ("^textwin#text^").\n"^txt);
+         runcommand ic oc win00 win10 win11 mainobj listoftheorems notebook; )
+      else ( id:=(Coqstuff.fstid8 ic oc  !id);
+              let xx = "Search ("^(textwin#text)^")." in
+              let st = Coqstuff.query ic oc xx !id in
+              win11#buffer#set_text st;
+id:=(Coqstuff.fstid8 ic oc  !id)
+(* id:=(Coqstuff.fstid ic oc  !id);
+let str =String.concat "\n ---------- \n" (Coqstuff.searchpattern  ic oc (textwin#text)) in 
+             print_string str ; flush_all ();
+             win11#buffer#set_text str *)) 
 
-    () ));
+    ));
   (* Display the windows and enter Gtk+ main loop *)
 
   window#add_accel_group accel_group;

@@ -108,8 +108,9 @@ let rec print x = match x with
   | Not(Var e1)          -> "not "^(e1)
   | Not(e)               -> "not ("^(print e)^")"
 
-  | Equals( e1, e2) -> (print e1)^" = "^(print e2)
 
+  | Equals( e1, e2) -> (print e1)^" = "^(print e2)
+  | Parant(e) ->"("^(print e)^")"
   | And(e1,e2)          -> 
       let a = match e1 with Var x -> print e1 
       |_ ->"("^(print e1)^")" in
@@ -122,9 +123,16 @@ let rec print x = match x with
       let b= match e2 with Var x -> print e2 
       |_ ->"("^(print e2)^")" in 
      a^" ∨ "^b
+| Setminus(e1,e2)->
+let a = match e1 with Var x -> print e1 
+      |_ ->"("^(print e1)^")" in
+      let b= match e2 with Var x -> print e2 
+      |_ ->"("^(print e2)^")" in 
+     a^" \\ "^b
 
   |Exists(e1 , e2) -> "∃ "^(print e1)^", "^(print e2)
   |Forall(e1 , e2) -> "∀ "^(print e1)^", "^(print e2)
+  |List([])->"" 
   |List(e1::e2) -> (* match e1 with Var x  -> *) (print e1)^" "^(String.concat " " (List.map print e2))
   (* | List( _ )  -> (print e1)^" "^(String.concat " " (List.map print e2))
  

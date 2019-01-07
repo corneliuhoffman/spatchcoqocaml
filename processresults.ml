@@ -83,7 +83,7 @@ let processoutput x =
     g;;
 
 let printmessages x =
-  let clean st = Printf.sprintf "%s" "\n"^(Str.global_replace (Str.regexp "<_>") "\n-------\n" st ) in
+  (* let clean st = Printf.sprintf "%s" "\n"^(Str.global_replace (Str.regexp "<_>") "\n-------\n" st ) in *)
   let ll =List.map (select "richpp") (to_list (x$$"message")) in 
 
   let newlist=List.map (function a -> List.map (String.concat "") (List.map texts (to_list a))) ll in

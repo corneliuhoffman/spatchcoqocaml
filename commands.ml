@@ -27,7 +27,7 @@ let load_file1 f =
   let ic = open_in f in
   let n = in_channel_length ic in
   let s = Bytes.create n in
- input ic s 0 n;
+ ignore(input ic s 0 n);
 
  let changelist = [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
                                ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >") ;("∈", "iin");
@@ -39,12 +39,13 @@ let load_file1 f =
   let s1 = (Processinputs.replacelist  (Bytes.to_string s) changelist ) in
 
 
-print_string (Glib.Convert.locale_to_utf8 "∈");flush_all ();
-  let slist = Str.split (Str.regexp "") s1 in
-  let valist =List.map (fun a ->print_string a;flush_all (); if (Glib.Utf8.validate a) then a else "?") slist in
+(* print_string (Glib.Convert.locale_to_utf8 "∈");flush_all ();
+ *)  
+ let slist = Str.split (Str.regexp "") s1 in
+  let valist =List.map (fun a -> if (Glib.Utf8.validate a) then a else "?") slist in
   let ss = String.concat "" valist in
-  print_string (snd  (Glib.Convert.get_charset ()));flush_all ();
-  (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
+(*   print_string (snd  (Glib.Convert.get_charset ()));flush_all ();
+ *)  (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
   (* String.concat "\n" (lines (`String s)) in
   if Utf8conv.is_windows1252 ss then
   (Printf.printf "\n --\n the text is\n %s \n ----" ss;flush_all())
@@ -57,16 +58,16 @@ let load_file f =
   let ic = open_in f in
   let n = in_channel_length ic in
   let s = Bytes.create n in
- input ic s 0 n;
+ ignore(input ic s 0 n);
   close_in ic;
   let s1 = (Processinputs.replacelist  (Bytes.to_string s) [("¬", "not"); ("∨", " \\/ ");  ("→", " -> "); ("∀", "forall "); 
                                ("∃", "exists ");  ("∧", "/\\ "); ("↔", "< - >")]) in
 
 
-  let slist = Str.split (Str.regexp "") s1 in
-  let valist =List.map (fun a ->print_string a;flush_all (); if (Glib.Utf8.validate a) then a else "?") slist in
-  let ss = String.concat "" valist in
-  print_string (snd  (Glib.Convert.get_charset ()));flush_all ();
+  (* let slist = Str.split (Str.regexp "") s1 in *)
+  (* let valist =List.map (fun a ->flush_all (); if (Glib.Utf8.validate a) then a else "?") slist in *)
+  (* let ss = String.concat "" valist in *)
+  (* print_string (snd  (Glib.Convert.get_charset ()));flush_all (); *)
   (* Utf8conv.utf8_of_windows1252 ~undefined:(fun a -> "?") s in *)
   (* String.concat "\n" (lines (`String s)) in
   if Utf8conv.is_windows1252 ss then

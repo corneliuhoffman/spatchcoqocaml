@@ -96,7 +96,6 @@ you can use
 To exemplify this we first consider the following statement
 
 $$\forall x:U, P x \rightarrow \exists x:U, P x.$$
-
 Nothing simpler than that right? If a statement is true for all possible values then is of course true for some value. Except for the case where there are no elements of type $U$ at all. In that case the statement $\forall x:U, P x$ will be true but the statement $\exists x:U, P x$ will be false\footnote{
  Sounds confusing? Does it remind you of another confusing constructor? If you said "implies" then you were right. In fact implies is syntactic sugar  for a special case of forall. More precisely $P\rightarrow Q$ is the same thing as $\forall a:P, Q$, that is for the statement that if you know a proof for $P$ you get one for $Q$. We will not insist here, the interested reader can have a look at \cite{coqdart}}.
  

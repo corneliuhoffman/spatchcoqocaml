@@ -19,6 +19,9 @@ val isWin : unit -> bool
 val getmessages :
   out_channel ->
   in_channel ->  Soup.soup Soup.node list -> Soup.soup Soup.node list
+val getlisttext :
+  out_channel ->
+  in_channel ->  string  -> string 
 
 (** gets the messages as a soup mode list *)
 val mygoal : out_channel -> in_channel -> bytes -> bytes
@@ -27,6 +30,11 @@ val soupgoal : out_channel -> in_channel -> unit -> Soup.soup Soup.node
 (** this reads the goals form coq*)
 val readnow : out_channel -> in_channel -> string -> string
 (** not used *)
+
+val getok : string -> string*string
+
+val about : out_channel-> in_channel -> unit -> string
+
 val evars : out_channel -> unit -> unit
 (** sends the evars command to coq*)
 val status : out_channel -> unit -> unit
@@ -45,8 +53,12 @@ val movebackto : out_channel -> string -> unit
 val findstateid : out_channel -> in_channel -> string -> string
 (** helper function*)
 val fstid : out_channel -> in_channel -> string -> string
+val fstid8 : out_channel -> in_channel -> string -> string
+
 (**finds the state id after the string *)
 val reallyread :
   out_channel ->
   in_channel -> string -> bool -> Soup.soup Soup.node list
+val searchpattern : out_channel -> in_channel -> string-> string list
 
+val query : out_channel -> in_channel -> string-> string->string

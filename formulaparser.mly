@@ -51,6 +51,7 @@ open Ast
 
 %token NE
 %token IFF
+%token PLUSONE
 
 %token EOF
 
@@ -110,6 +111,7 @@ open Ast
 %left TIMES
 %right POW
 %nonassoc SUCC
+%nonassoc PLUSONE
 
 
 
@@ -139,7 +141,7 @@ prog:
 expr: 
   |EMPTYSET; { EmptySet }
   |EMPTYSET;b=ID { In( Var b, EmptySet) }
-
+  |e=expr; PLUSONE {Succ(e)}
 
   
 

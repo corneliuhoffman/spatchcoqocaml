@@ -356,74 +356,449 @@ Notation "A $\cup$ B":= (Union \_  A B)(at level 8).\\
 Notation "A $ \cap $ B" := (Intersection \_  A B) (at level 10).}
 
 
-We now define a function. To do so we use a new Coq concept, that of type classes. Typeclasses have first been introduced in Haskell in order to enable overloading of arithmetics operations. A function will be a type class that depends on 3 parameters: domain, codomain and rule. So far, except for the word Class  this is not that different from a definition. Next however we see a different Forman. The format for defining a a class will be:
-\inp{Class Id ( p1 : t1) $\cdots$ ( pn: tn) [: sort] := { f1 : u1; $\cdots$ fm : um }.}
+We now define a function. To do so we use a new Coq concept, that of of a Type Class. 
 
-The  $p$'s are called parameters and the $f$'s are called methods. In defining new concept, the preferred Coq choice is that the classes have as many parameters as possible. Here is the definition:
+\paragraph{\bf Short intro to Records and Classes}
+Records are macros to introduce new inductive types. They are similar to records in other programming languages. The standard form of a record is:
+
+
+\inp{Record Id [( p1 : t1) $\cdots$ ( pn: tn)] [: sort] := \{ f1 : u1; $\cdots$ fm : um \}.}
+
+The (optional) $p$'s are called parameters and the $f$'s are called methods. Some of the parameters can be defined to be optional. For example let us define a point in $\mathbb{N}^2$ as
+\inp{Record point:=\{x:nat; y:nat\}.}
+ You can now try to look at the type of point and print its details:
+
+
+\inp{Check point.}
+\mess{point
+     : Set}
+    So far so good, point is just a type. If we try to find out more:
+   
+    
+\inp{Search point.}
+We get more information:
+
+\mess{x: point $\rightarrow$ nat \\
+Build\_point: nat $\rightarrow$ nat $\rightarrow$ point\\
+y: point $\rightarrow$ nat}
+
+This means that we are offered two projection, x and y and a constructor Build\_point. For example:
+\inp{Check x.}
+
+will give the message
+\mess{x
+     : point → nat}
+In particular you need to be careful with the naming of the record methods as, for example, you cannot use $x$ anymore in this context.
+
+So we can make a point by writing:
+\inp{Definition a:= Build\_point  2 4.}
+or 
+\inp{Definition a:=\{| x := 2; y := 4 |\}} 
+
+and then we can use the x-component of $a$ as either $(x a)$ or as $a.(x)$.
+For example:
+\inp{Eval compute in (a.(x)+ (y a)).}
+will give 
+\mess{= 6
+     : nat}
+     
+In defining new concept, the preferred Coq choice is that the classes have as many parameters as possible and the sort is Prop (this is called unbundling). For example we can define the set of points above the main diagonal  two ways:
+
+\inp{Record above:=\{p:point; cond:p.(x)<p.(y)\}.}
+
+This has the advantage of named projection, however defining such a point is a bit strange:
+\inp{
+Definition a1:above.\\
+Apply result (Build\_above a).
+Rewrite goal using the definition of (x,y,a).\\
+This is trivial.
+Defined.}
+Note that this is another first, an interactive definition. We do not have an immediate proof of the cond a and so we do it interacively. The ending could have been Qed. like with other theorems but Defined makes it more transparent.
+
+
+The other choice  
+\inp{Record above1 (p:point):={cond1:p.(x)<p.(y)}.}
+
+
+The corresponding definition is slightly more natural:
+\inp{
+Definition a2:above1 a.\\
+Rewrite goal using the definition of above1.\\
+Rewrite goal using the definition of (x,y,a).\\
+This is trivial.
+Defined.}
+
+However we now lack the automatic projection p that the first definition offers. We can of course define it ourselves:
+\inp{Definition pt \{s:point\} (r:above1 s ):= s.}
+
+In this we take a point s (and declare it implicit) and the for r a structure of type (above1 s) (which is indeed a proposition) we define (pt r) to be s.
+
+We can check and compute:
+\inp{Check (pt a2.)}
+gives 
+\mess{pt a2
+     : point}
+
+and 
+\inp{Eval compute in (pt a2)}
+gives 
+\mess{   = \{| x := 2; y := 4  |\}
+     : point}
+However, if you try to prove something about a a record, for example if you want to prove the trivial statement that if $p$ is a point if type above1 then its x coordinate is smaller than it y coordinate.
+
+\inp{
+Lemma a \{p:point\} \{r:above1 p\}: (p.(x))< (p.(y)).\\
+Apply result cond1.\\
+This is trivial.} 
+
+Of course this is a baby example so it is not too complicate, nevertheless, gfor more complicated examples, Coq offers a better choice: Type Classes. These are inspired by Haskell's typeclasses and are actually just records + some syntactic goodies that allow for more compact writing. We will define the above1 slightly differently, by calling it a class.
+  \inp{Class above2 (p:point):={cond2:p.(x)<p.(y)}.}
+  
+There is no difference between the two aside from the command which is Class rather than record. Moreover, if we try to see what happened:
+  \inp{Print above2.}
+  we get 
+  \mess{Record above2 (p : point) : Prop := Build\_above2 \{ cond2 : x p $<$ y p \}}
+which is exactly the same thing we got for above1. SO what is the difference you ask? Here is how you write the previous Lemma  
+
+\inp{
+Lemma b `\{r:above2\}: (p.(x))< (p.(y)).\\
+Apply result cond2.
+Qed.}
+
+Note that we did not have to define the point in question, it was automatically defined by our constructio  $`\{r:above2\}$. This is called implicit generalisation and it will generalise all the variables that are needed (in this case just p) with the same names as in the class. We also save one line as the cond2 condition immediately solves the problem.
+
+One can argue that it is not such a big save but, again, this is a toy example. Often the structures we care about are dependent of many variables and might have many methods. The first example is a function:
+
+     
+\paragraph{\bf Functions}
+
+ A function will be a record that depends on 3 parameters: domain, codomain and rule. It will only have 2 methods, one that insures existence of an output for any input and the other that insures the uniqueness of this output.Here is the definition:
  \inp{
 Class func 
-\{U V :Type\}  (domain:Ensemble U)
-(codomain:Ensemble V)
+\{U V :Type\} \\
+(domain:Ensemble U)\\
+(codomain:Ensemble V)\\
 (rule:Ensemble (U*V)) :Type:=\\
 \{
-existence:forall x, \\ 
-x$\in$domain -> exists y, (y $\in$ codomain ) $\land$ (x,y) $\in$ rule;\\
+existence:forall x, 
+(x$\in$domain) -> exists y, (y $\in$ codomain ) $\land$ (x,y) $\in$ rule;\\
 uniqueness:forall x y z,\\  (x $\in$ domain) $\land$ (x, y) $\in$ rule  $\land$  (x, z) $\in$ rule  $\rightarrow$ y=z;\}.}
 
+
+Note that now a function depends of 5 parameters, U, V, domain, codomain. If we had used just a Record, in order to define the rule projection we need to specify that we are given U, V, D, cD, R (implicitly) and an explicit function r with domain D, codomain cD and rule R, and then then func\_rule r is R.
+
 \inp{
-Definition rule1 \{U V domain codomain rule\} \(r:@func U V domain codomain rule\):=rule.\\
-End funct.\\
-Import funct.}
+Definition func\_rule \{U V:Type\} \{D:Ensemble U\} \{cD:Ensemble V\} \{ R \} (r:func domain codomain rule ):=R.}
+
+using our Class definition we only need to do:
+\inp{Definition func\_rule `\{r:func\}:rule.}
+
+The same kind of savings will appear in Theorems and definitions.
+We define the other two projections:
+\inp{Definition func\_dom `(r:func) :=domain.
+Definition func\_codom `(r:func):=codomain.}
+We also give a notation to simplify things. $f[x]=y$ means exactly as expected, the fact that the application of the rule of f to x is y. In particular 
 \inp{
-Definition allnat: Ensemble nat:=fun x =>True.
-Definition ff:(Ensemble (nat*nat)) := fun z => match z with |(x , y)=>2*x=y end.
-Check func.
-Instance f:func  allnat allnat ff:={}.
-Rewrite goal using the definition of (In,ff).
-Rewrite goal using the definition of allnat.
-Fix an arbitrary element x.
-Assume (True ) then prove ( exists   y  :  nat,  y  ?  allnat  /\   (x,  y)  ?  ff ).
-Prove the existential claim is true for (2*x).
-This is trivial.
-Fix an arbitrary element x.
-Fix an arbitrary element y.
-Fix an arbitrary element z.
-Rewrite goal using the definition of (In, ff).
-Rewrite goal using the definition of allnat.
-Assume (True /\  ((2 * x = y) /\  (2 * x = z))) then prove (y = z).
-Eliminate the conjuction in hypothesis Hyp.
-Eliminate the conjuction in hypothesis H0.
-Replace z by (2 * x) in the goal.
-Replace y by (2 * x) in the goal.
-This follows from reflexivity.
-Defined.
-Check rule1.
-Definition allZ: Ensemble Z:=fun x =>True.
-Definition g:(Ensemble (Z*Z)) := fun z => match z with |(x , y)=>(3*x)%Z=y end.
-Check (Build_func _ _ _ _ _).
-Definition g1:Prop:= func allZ allZ g.
-Instance gg:func  allZ allZ g:={}.
-Fix an arbitrary element x.
-Assume (True ) then prove ( exists   y  :  Z,  y  ?  allZ  /\   (x,  y)  ? g  ).
-Rewrite goal using the definition of (In, g).
-Prove the existential claim is true for ((3*x)%Z).
-Rewrite goal using the definition of (In, allnat).
-This is trivial.
-Rewrite goal using the definition of (In, allnat).
-Rewrite goal using the definition of (In, g).
-Fix an arbitrary element x.
-Fix an arbitrary element y.
-Fix an arbitrary element z.
-Assume (True /\  (((3 * x)%Z = y) /\  ((3 * x)%Z = z))) then prove (y = z).
-Eliminate the conjuction in hypothesis Hyp.
-Eliminate the conjuction in hypothesis H0.
-Replace y by ((3*x)%Z) in the goal.
-Replace z by ((3 * x)%Z) in the goal.
-This is trivial.
-Defined.
-Check f.
-Print g1.
-About rule1.
-Check rule1  f.
- }
+Notation "f '[' x ']=' y":= (func\_rule f (x,y)) (at level 10).
+End funct.}
+
+Now let us prove the follwing better written version of uniqueness:
+\inp{Lemma aa `\{f : func\}: forall x y z ,x∈ (domain) $\rightarrow$ (f[x]=y ) $\land$ (f[x]=z) $\rightarrow$ y=z.}
+
+
+Note the resulting goal:
+
+\coq{U:Type\\
+V:Type\\
+domain:Ensemble U
+codomain:Ensemble V\\
+rule:Ensemble U*V
+f: func domain codomain rule}{(\forall  (x  :  U)  (y  z  :  V),  x   \in  domain  \rightarrow  f  [x  ]=  y  \land  f  [x  ]=  z  \rightarrow  y  =  z )}
+\inp{Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Fix an arbitrary element z.\\
+Assume (x $\in$ domain) then prove ( (f  [x  ]=  y)  $\land$  (f  [x  ]=  z)  $\rightarrow$  y  =  z ).\\
+Assume ((f  [x  ]=  y)  $\land$  (f  [x  ]=  z) ) then prove  (y  =  z).\\
+Apply result  ((uniqueness x)).\\
+Prove the conjunction in the goal by first proving (x∈domain) then (  (x,  y)  $\in$  rule $\land$  (x,  z)  $\in$  rule ).\\
+This follows from assumptions.\\
+This follows from assumptions.\\
+Qed.
+}
+We will now prove that the relation $f\in \mathbb{N}\times \mathbb{N}$ given by  $(x, y)\in f \leftrightarrow y =2x$ is indeed a function. The informal proof is quite trivial but the formal one take a bit of work:
+
+
+\inp{
+Definition allnat: Ensemble nat:=fun x =>True.\\
+Definition ff:(Ensemble (nat*nat)) := fun z => match z with |(x , y)=>2*x=y end.\\
+Definition f:func  allnat allnat ff.}
+
+We first eliminate the definition:
+
+\inp{
+Rewrite goal using the definition of @func.}
+
+
+this gives two different goals, the existence and uniqueness one.  The first is rather easy
+\inp{Rewrite goal using the definition of (In,ff, allnat).\\
+Fix an arbitrary element x.\\
+Assume (True ) then prove ( exists   y  :  nat,  y  $\in$  allnat  $\land$   (x,  y)  $\in$ ff ).\\
+Prove the existential claim is true for (2*x).\\
+This is trivial.}
+\inp{
+Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Fix an arbitrary element z.\\
+Rewrite goal using the definition of (In, ff,allnat).\\
+Assume (True $\land$  ((2 * x = y) $\land$  (2 * x = z))) then prove (y = z).\\
+Eliminate the conjuction in hypothesis Hyp.\\
+Eliminate the conjuction in hypothesis H0.\\
+Replace z by (2 * x) in the goal.\\
+Replace y by (2 * x) in the goal.\\
+This follows from reflexivity.\\
+Defined.}
+
+\warn{
+Note the syntax
+\inp{Rewrite goal using the definition of @func.}
+
+ This makes all implicit arguments explicit and helps spatchcoq guess the implicit arguments (in some ways it is the dual of `). Indeed, try
+ 
+\inp{Check func.}
+to get
+\mess{
+func\\
+     : Ensemble ?U $\rightarrow$ Ensemble ?V $\rightarrow$ Ensemble (?U * ?V) $\rightarrow$ Prop\\
+     
+     
+where\\
+?U : [ $\vdash$ Type] \\
+?V : [ $\vdash$ Type] }
+
+respectively 
+\inp{Check @func.}
+to get
+\mess{@func\\
+     : $\forall$ U V : Type, Ensemble U $\rightarrow$ Ensemble V $\rightarrow$ Ensemble (U * V) $\rightarrow$ Prop}
+
+The alternative to write @ is:
+
+\inp{Rewrite goal using the definition of (func  allnat allnat ff).}}
+
+
+
+
+ We shall prove that, on $Z$ the relation $f\subseteq \mathbb{Z}\times \mathbb{Z}$ given by $(x,y)\in f $ if $y^2=x$ is not a function because it fails uniqueness.
+
+
+\inp{Open Scope Z\_scope.\\
+Definition allZ: Ensemble Z:=fun x $\Rightarrow$ True.\\
+Definition fZ:(Ensemble (Z* Z)) := fun z $\Rightarrow$ match z with |(x , y) $\Rightarrow x=y^2$ end.\\
+Lemma notfun: not(func allZ allZ fZ).}
+Note that trying directly
+\inp{Rewrite goal using the definition of @func.}
+will not work so we first do:
+\inp{
+Rewrite goal using the definition of not.\\
+Assume (func allZ allZ fZ) then prove False.}
+
+And then: 
+\inp{
+Rewrite hypothesis Hyp using the definition of @func.}
+
+to obtain a goal that does not involve any function notations.
+\coq{existence0: \forall  x  :  Z,  x  \in  allZ  \rightarrow \exists  y  :  Z,  y  \in  allZ  \land  (x,  y)  \in  fZ\\
+uniqueness0: \forall  x  :  Z,  x  \in  allZ  \rightarrow  \exists  y  :  Z,  y  \in  allZ  \land  (x,  y)  \in fZ}{False}
+Next we prove that $-1\ne 1$ based  on the trivial fact that ($-1<1$) and the statement
+
+\mess{Z.lt\_neq
+     : $\forall n\  m : Z, n < m \rightarrow n \ne m$}
+\inp{
+Rewrite hypothesis uniqueness0 using the definition of (In, fZ,allZ).\\
+Claim (-1 = 1).\\
+Apply result (uniqueness0 1).\\
+This is trivial.\\
+Claim (-1$\ne$1).\\
+Apply result Z.lt\_neq.\\
+Rewrite goal using the definition of le.\\
+Apply result H0.\\
+This follows from assumptions.}
+We will stop here with the generalities about functions. In the next section we will assume that you already know how to prove that a relation is a function and redefine functions using the primitive notion of a function in Coq. Before that here are some practice questions. 
+
+\paragraph{\bf Exercises:}
+\begin{enumerate}
+\item Prove of disprove that the following relations are functions.
+\begin{enumerate}
+	\item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $y = 2x+1$.
+	\item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $y = x-1$.
+
+	\item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $x = y+1$. (do you see a difference from the previous one?)
+	\item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $x-y = 1$.(do you see a difference from the previous one?)
+	\item $f\subseteq \mathbb{Z}\times \mathbb{Z}$ given by $(x,y)\in f$ if $x-y = 1$.(do you see a difference from the previous one?)
+	 \item $f\subseteq \mathbb{Z}\times \mathbb{Z}$ given by $(x,y)\in f$ if $x = y+1$.
+	\item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $y = 2x+1$.
+	\item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $x = y^2$.
+	 \item $f\subseteq \mathbb{N}\times \mathbb{N}$ given by $(x,y)\in f$ if $y = x^2$.
+\end{enumerate}
+\item Prove that if f and g are functions and $codomain \ f\subseteq domain \ g$ then we can define a function $g\circ f $ whose domain is the domain of $f$ and codomain is the codomain of $g$.
+\end{enumerate}
+
+
+
   \subsection{Functions in Coq}\label{subsec:fuctions in coq}
+  
+  As mentioned in the last section, from now on we will assume that the reader is confident about what makes a relation a function and, for that reason, we will only functions. Moreover we will redefine functions using the function type formalism of Coq.
+  
+  Recall that a function from a type A to a type B is an element $f$ of type $A\rightarrow B$ which can be applied to an element $a:A$ to get an element $(f a):B$. The usual ($\lambda$-style description of a function is $$fun \ x \Rightarrow t$$ where $t$ is a formula that might depend of x but when x is replaced by an element $a:A$  (this is called $\beta$ reduction and it is  denoted by t[a/x]) we will get an element of type $B$( see \ref{sec:types}). We have seen many such examples in Section~\ref{sec:predicatecalculus} and  Chapter~\ref{ch:settheory}  where functions were always predicates, that is functions from a type to Prop. Nevertheless heer are some  examples.
+  
+  \begin{example}
+  	
+  	\begin{enumerate}\item any element of type $Ensemble\  U$ where $U$ is a type.
+  		\item Any proof of an implication $P \rightarrow Q$ where $P$ and $Q$ are propositions.
+  		
+
+  		\item the successor function:
+  		
+  		{Definition f:= fun x$\Rightarrow$ S \ x.}
+  		\item {Definition f:= fun x$\Rightarrow x^3=2*x$.}
+  		  	\end{enumerate}   	
+  \end{example}
+  
+  We now modify our previous definition of a function:
+ \inp{ Class func 
+\{U V :Type\} (domain:Ensemble U)(codomain:Ensemble V)\\
+(rule:U$\rightarrow$ V) :Type:=\\
+\{
+closure:forall x, 
+(x$\in$domain) $\rightarrow$ rule x $\in$ codomain;\}.}
+
+
+Note that the existence and uniqueness notions have been absorbed in the intrinsic definition of a function so we only need to check that an element of the domain is mapped to an element of the codomain. We also define the three projections and the notation:
+\inp{
+Definition func\_rule `(r:func):=rule.\\
+Definition func\_dom `(r:func) :=domain.\\
+Definition func\_codom `(r:func):=codomain.\\
+Notation "f '[' x ']' ":= (func\_rule f x) (at level 50).\\
+End funct.}
+
+Let us look at the previous proofs, we first prove the uniqueness that we proved lsat time:
+
+\inp{Import funct.\\ 
+Lemma aa `\{f : func\}: forall x y z, x $\in$ (domain) $\rightarrow$ (f [ x ] = y ) $\land$ (f [ x ] =z) $\rightarrow $ y=z.}
+The proof will turn out to be significantly more standard. We first do the standard logic tactics:
+\inp{
+Fix an arbitrary element x.\\
+Fix an arbitrary element y.\\
+Fix an arbitrary element z.\\
+Assume (x $\in$ domain) then prove ( (f  [x  ]=  y)  $\land$  (f  [x  ]=  z)  $\rightarrow$  y  =  z ).\\
+Assume ((f  [x  ]=  y)  $\land$  (f  [x  ]=  z) ) then prove  (y  =  z).\\
+Eliminate the conjuction in hypothesis Hyp0.}
+
+At this point we have 
+
+\coq{
+U:Type\\ 
+V:Type\\
+domain: Ensemble\ U\\
+codomain: Ensemble \ V\\
+rule: U \rightarrow V\\
+f: func \ domain \ codomain \ rule \\
+x:U\\
+y, z :V
+Hyp:x \in domain\\
+H: f[x]=y\\
+H0: f[x] =z
+}{y=z}
+
+and so if we rewrite the goal using $H$ the goal becomes H0,  an assumption. 
+\inp{
+Rewrite the goal using H.\\
+This follows from assumptions.\\
+Qed.}
+
+We prove that the function $f(x) = 2x$ is a function with domain $\mathbb{N}$ and codomain all the even naturla numbers. We first define the relevant sets:
+
+\inp{
+Definition allnat: Ensemble nat:=fun x $\Rightarrow$ True .\\
+Definition even: Ensemble nat:=fun x $\Rightarrow \exists $ y, x=2*y .\\
+Definition ff:= fun x $\Rightarrow$ 2*x.}
+And now we define/prove the statement:
+\inp{
+Definition f:func  allnat even ff.}
+As usual we start by some standard unfurling of definitions and logical steps.
+\inp{Rewrite goal using the definition of (func  allnat even ff).\\
+Rewrite goal using the definition of (In,ff, allnat).\\
+Fix an arbitrary element x.\\
+Assume True then prove (even (2 * x)).\\
+Rewrite goal using the definition of even.}
+
+To arrive at some rather trivial goal:
+\coq{x:nat\\ Hyp:True}{\exists y:nat, 2*x = 2*y}
+
+Which can be immediately proved.
+\inp{
+Prove the existential claim is true for x.\\
+This follows from reflexivity.\\
+Defined.}
+
+Given two functions $f:B\rightarrow C$ and $g:A\rightarrow B$ we define their compositions as a function 
+$$f \circ g: A \rightarrow C; \ f\circ g(x)= f(g (x)).  $$ 
+
+Here is the (somewhat elaborate definition in Spatchcoq:
+
+\inp{
+Definition comp
+ {U V W:Type} \\
+{ dom2: Ensemble U}
+{codom2:Ensemble V}
+{codom1:Ensemble W}
+{rule1:V->W}
+{rule2:U->V}\\
+(f1:func  codom2 codom1 rule1 ) \\
+(f2:func  dom2 codom2 rule2): \\
+func (func\_dom f2) (func\_codom f1) (fun x $\Rightarrow$ f1 [ f2 [x] ]).}
+ Of course this is a definition that needs a proof. we need to show that if $x \in A $ then $f \circ g (x) \in C$. 
+
+\inp{Rewrite goal using the definition of @func.
+Fix an arbitrary element x.
+Rewrite goal using the definition of (@func\_rule, @func\_dom, @func\_codom).\\
+Assume (x $\in$ dom2) then prove ((rule1 (rule2 x)) $\in$ codom1).\\
+Rewrite hypothesis f1 using the definition of @func.\\
+Apply result closure0.\\
+Rewrite hypothesis f2 using the definition of @func.\\
+Apply result closure1.\\
+This follows from assumptions.\\
+Defined.
+}
+
+
+
+Let us now define another function $g$ from eben numbers to $\mathbb{N}$ given by $f(x) =x/2$. The proof is similar to the previous one.
+
+\inp{Definition g:func   even allnat ff1.\\
+Rewrite goal using the definition of @func.\\
+Fix an arbitrary element x.\\
+Rewrite goal using the definition of (In, allnat, ff1)\\.
+Defined.}
+We can compute $f\circ g (2)$. 
+
+\inp{
+Eval compute in ( (comp f g) [2]).}
+to see that we get 2. IN fact we can prove this is always the case.
+
+\inp{Lemma a: forall x, (comp g f)[x]=x.\\
+Rewrite goal using the definition of ( @func\_rule).\\
+Rewrite goal using the definition of (ff, ff1).\\
+Fix an arbitrary element x.}
+
+We now look for a theorem:
+\inp{
+SearchPattern ((\_*\_/\_= \_)).\\
+Claim (2*x=x*2).\\
+This is trivial.\\
+Replace (2 * x) by (x * 2) in the goal.\\
+SearchPattern ((\_*\_/\_= \_)).\\
+Apply result Nat.div\_mul.\\
+This is trivial.\\
+Qed.}
+

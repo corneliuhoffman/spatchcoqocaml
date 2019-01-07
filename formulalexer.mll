@@ -35,6 +35,7 @@ let lists = (letter+ white?)*
 rule read = 
   parse
   | white { read lexbuf }
+  |".+1" {PLUSONE}
   | "S" {SUCC}
   |  "≠" {NE}
   | "^" {POW}
