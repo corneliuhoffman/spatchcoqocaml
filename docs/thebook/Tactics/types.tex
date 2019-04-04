@@ -1,8 +1,9 @@
-\chapter{Sets vs types}\label{chap:setsvstypes}
+\chapter{Brief description of sets and  types}\label{chap:setsvstypes}
 \cite{Nederpelt:2014aa}
 \cite{Girard:1989aa}
-\section{Types}\label{sec:types}
-This is a rather subtle section. It deals with a primitive notion in Automated Theorem Provers, the concept of type. Reading through the book you might have wondered about the occurrence of things like this:
+\section{INtro}\label{sec:types}
+
+This is a rather subtle section. It deals with some concepts of Calculus of Inductive Constructions, the logic behind Coq. In particular it deals (albeit briefly) with types. Reading through the book you might have wondered about the occurrence of things like this:
 
 \coq{P:Prop\\ Q:Prop\\ H:P->Q}{\cdots}
 
@@ -35,8 +36,7 @@ That means that aaa is a witness of the equality $2=1+1$ and that you can refer 
  For much of the book one can look at the notation $a:nat$ as a SpatchCoq version of $a\in \mathbb{N}$. This is not quite correct. In fact $a:U$ denotes the statement ``a is of type U''. In particular, the notation $Hyp:P\rightarrow Q$ and $P:Prop$ have the same kind of meaning. The first one means that Hyp is an object of the type $P\rightarrow Q$ i.e a witness of a proof of $P\rightarrow Q$ while the second means that $P$ is an object of type $Prop$.
 
 The point is that types are primitive objects in Coq (hence in SpatchCoq) and, more importantly, 
-
-{\bf \Large Types are not Sets!}
+\section{ Types are not Sets!}
 
 In Coq (and SpatchCoq) every object has a unique type. For example, 0 cannot represent both the natural number zero and the integer zero. The two objects are different and you need a conversion between them. try for example:
 \inp{Check 0.}
@@ -52,14 +52,242 @@ Now consider the following:
 you get ``Type: Type''!!!!! What does that even mean? It seems that Type is of type Type, surely this must be some sort of Russell paradox.
 
 This is in some sense, the crux of the matter. Modern type theory evolved out of an attempt, 
-by Russell himself, to resolve the paradoxes of Set Theory. This was surpassed in popularity by the ZF Axiomatic Set Theory and waited, half forgotten, for Computer Scientists to rediscover it. The type system of Coq(and SpatchCoq) is based 
+by Russell himself, to resolve the paradoxes of Set Theory. This was surpassed in popularity by the ZF Axiomatic Set Theory and waited, half forgotten, for Computer Scientists to rediscover it. The type system of Coq(and SpatchCoq) is based (as is the name of the software) on the work of Thierry Coquand on  the calculus of inductive constructions.
 
-In fact, the notation ``$Type : Type$'' is a small notational abuse. It really means that $Type_{0} : Type_{1}$ or, more generally $Type_{n} : Type_{n+1}$. This is exactly how Russell imagined types,  as an infinite series. At the bottom there are sets, that is types like nat or $\mathbb{Z}$ or bool or nat->nat. They are themselves types of type Set. The next layer is made of Set itself which of type Type$(_{0})$ is the type Prop. $Typ_{0}$ is itself an object which is of type $Type_{1}$ and so on. Note for example:
+In fact, the notation ``$Type : Type$'' is a small notational abuse. It really means that $Type_{0} : Type_{1}$ or, more generally $Type_{n} : Type_{n+1}$. This is exactly how Russell imagined types,  as an infinite series. At the bottom there are sets, that is types like nat or $\mathbb{Z}$ or bool or $nat \rightarrow nat$. They are themselves types of type Set. The next layer is made of Set itself which of type Type$(_{0})$ is the type Prop. $Typ_{0}$ is itself an object which is of type $Type_{1}$ and so on. Note for example:
 
 \inp{Check Type:Type} which produces:
 $Type : Type
      : Type$.
- There are also wonderfully confusing statements in type theory. For example, consider  two proofs of ``0=0'', the absolutely trivial one:
+     
+     
+ \section{Equality in Coq}    
+ 
+ We mentioned earlier that every element has a unique type. In particular zero could mean many different things. For example we have the natural number $0:nat$ and the  integer $0\%Z:Z$. Surely one should be able to see that $0\ne 0\%Z$ right? Let us try:
+ \inp{Lemma a: (0$\ne$ 0\%Z).}
+ 
+ This gives the confusing error:
+ 
+ \mess{Error:  The term ``''0\%Z" has type " Z " while it is expected to have type " nat ".}
+ 
+ Indeed you cannot even compare two element of different type. If we ask ourselves what ``='' means,
+ \inp{About ``=''.}
+ 
+ We get the strange looking answer:
+ \mess{$eq : \forall A : Type, A \rightarrow  A \rightarrow  Prop$}
+Further investigation (using ``Print eq.'')reveals the following:
+ \mess{Inductive eq (A : Type) (x : A) :$ A \rightarrow Prop :=  eq\_refl : x = x$}
+ 
+ In other words equality is a predicate that can only take as arguments things of the same type (in particular there is an implicit type hidden in the definition of ``=''). Moreover its definition seems to suggest that you can only prove that $x=x$. In some sense this is true. However here is a  rather trivial lemma:
+ 
+ 
+ \inp{Lemma equal1: 2+2+6*3= 5*4+2.\\
+This follows from reflexivity.\\
+Qed.}
+If we try to print the proof of the lemma 
+
+\inp{Print equal1.}
+
+We get that 
+\mess{equal1 = eq\_refl
+     : 2 + 2 + 6 * 3 = 5 * 4 + 2
+}
+ 
+This seems  to suggest that simplifying things is ok. 
+
+
+
+
+However, let us change this a bit and consider the following Lemma.\inp{
+Lemma z(n:nat):n=n+0.\\
+This follows from reflexivity.}
+
+\mess{In nested Ltac calls to "This follows from reflexivity" and 
+"reflexivity", last call failed.\\
+Error: In environment
+n : nat
+Unable to unify "n + 0" with "n".}
+
+Therefore even trivial simplifications are sometimes hard to prove. Nevertheless, we can use  the stronger tactic ``True by arithmetic properties.'' to prove this equality. 
+So what  equalities can we prove by reflexivity?  In fact if we look at the definition of the tactic ``reflexivity'' in the Coq manual we can see:
+
+``This tactic applies to a goal that has the form t=u. It checks that t and u are convertible and then solves the goal. It is equivalent to apply refl\_equal.''
+
+Therefore it seems that reflexivity only works  on $u=v$ when $u$ and $v$ are ``convertible''. This is described in more detail here \url{https://coq.inria.fr/refman/language/cic.html}. In  fact two terms are. ``intentionally equal'' (and their equality provable by reflexivity) if they can be obtained from one another after a finite  number of $\beta, \delta, \iota$ or $\zeta$ reductions. Here are brief descriptions of each of these:
+\begin{itemize}
+\item[{\bf$\beta$}]This rule reduces functional application. If you have an expression like that looks like $(fun x \Rightarrow x+1) 1$ then $\beta$ reduction changes it to $1+1$.
+\item[{\bf$\delta$}] This unfolds  transparent constants. For example if you had defined previous f as $(fun x \Rightarrow x+1)$ then $\delta$ reduction will change $f 1$ to $(fun x \Rightarrow x+1) 1$. Note that this is what happens when you use the tactic `Rewrite goal using the definition of VAR.'' but, in addition this tactic also applies $\beta$  and $\iota$ reduction.
+\item[{\bf$\iota$}] This reduces   matches and unfolds inductive definitions (but only of the unfolding allows for a match). 
+
+\end{itemize}
+We will exemplify with a rather involved yet easy example. We will show how  $0+x$ reduces to x. Recall that the definition of plus is
+\begin{verbatim}
+Nat.add = 
+fix add (n m : nat) {struct n} : nat :=
+  match n with
+  | 0 => m
+  | S p => S (add p m)
+  end
+  \end{verbatim}
+  
+  Suppose we try to simplify the expression $0+x$. We first apply $\delta$ reduction to get 
+  \begin{verbatim}
+   (fix add (n m : nat) {struct n} : nat :=
+   match n with
+   | 0 => m
+   | S p => S (add p m)
+   end) 0 x
+    \end{verbatim}
+  
+  Then $\iota$ reduction will change  the first step of recursion this to a horrible looking but non recursive function (note however that the second step stays recursive):
+ \begin{verbatim} 
+  (fun n m : nat =>
+ match n with
+ | 0 => m
+ | S p =>
+     S
+       ((fix add (n0 m0 : nat) {struct n0} : nat :=
+           match n0 with
+           | 0 => m0
+           | S p0 => S (add p0 m0)
+           end) p m)
+ end) 0 x
+ 
+  \end{verbatim}
+  
+  We can now apply $\beta$ reduction to get
+  
+  
+  \begin{verbatim}
+  match 0 with
+| 0 => x
+| S p =>
+    S
+      ((fix add (n m : nat) {struct n} : nat :=
+          match n with
+          | 0 => m
+          | S p0 => S (add p0 m)
+          end) p 1)
+end
+  \end{verbatim}
+  
+  Now $\iota$ reduction will find the first match and replace this whole expression by x.
+  
+  Luckily Coq is trained to do this automatically and so if you want to prove $0+x=x$ you only need to  use reflexivity. 
+  
+
+  At the same time however,  the expression $x+0$ does not reduce to $x$. This is because the ``inductive'' definition of plus takes the first variable as structural and so applying the iota reduction in this case will not work since there is no obvious matching choice for x. Indeed, $0+x=x$ by definition while in order to see that  $x+0=x$ we need to use induction.
+  
+    \subsubsection{Leibniz equality and rewriting or deeper down the rabbit hole}
+    
+ More accomplished logicians than me would as the natural question: What about Leibniz equality? Indeed Leibniz described equality between two objects as the lack of separation properties. In other words one can say that $a=b$ if b satisfies any property that $a$ does. In other words we can define 
+ \inp{Definition Leq (X:Type) (a b:X):= $\forall$  P X$\rightarrow $ Prop, P a $\rightarrow$ P b}
+ 
+ It is not too difficult to show that our earlier definition of equality is equivalent to Leq.
+ \inp{
+Lemma Leibnizeq (X:Type) (a b:X): Leq X a b $\leftrightarrow$ a= b.\\
+Rewrite goal using the definition of Leq.\\
+Prove both directions of ($\forall$ P : X $\rightarrow$ Prop, (P a) $\rightarrow$ (P b)) iff (a = b).\\
+Assume ($\forall$ P : X $\rightarrow$ Prop, (P a) $\rightarrow$ (P b)) then prove (a = b).\\
+Denote (fun x $\Rightarrow$ a = x) by P.\\
+Apply result Hyp.\\
+Rewrite the goal using HeqP.\\
+This follows from reflexivity.\\
+Assume (a = b) then prove ($\forall$ P : X $\leftarrow$ Prop, (P a) $\leftarrow$ (P b)).\\
+Fix an arbitrary element P.\\
+Replace a by b in the goal.\\
+Assume (P b) then prove (P b).\\
+This follows from assumptions.\\
+Qed.}
+
+Note that for the implication (Leq a b $\rightarrow$ a = b ) we just apply the Leibniz property to the predicate ``being equal to a''. We could have saved some space by not making the notation ``Denote (fun x $\Rightarrow$ a = x) by P.'' But directly doing ``Apply result (Hyp (eq a)).''  The proof of this is not based on any fancy Coq machinery. 
+
+The other implication is based on the use of ``replacement''. This is an essential method in mathematics and we rarely think about it.  Nevertheless this discussion is about the core of equality and so we must think a bit harder. Is rewriting  basically the same as Leibniz? In some sense it is. It all has to do with inductive part of the Calculus of Inductive Constructions. Recall the inductive definition of equality:
+  \begin{verbatim}
+  Inductive eq (A : Type) (x : A) :
+  A -> Prop := eq_refl : eq x  x
+  \end{verbatim}
+  
+  In Coq an inductive definition not only defines a property but it also creates and proves a few theorems. If you define an inductive object obj then the theorems are called obj\_ind respectively obj\_rect. For example in the case of eq
+ \inp{ Check eq\_ind.\\
+ Check eq\_rect.}
+ 
+ Produces 
+ \mess{eq\_ind\\
+     : $\forall$ (A : Type) (x : A) (P : A $\rightarrow$ Prop), P x $\rightarrow \forall$  y : A, x = y $\rightarrow$ P y \\
+      eq\_rect\\
+  : $\forall$ (A : Type) (x : A) (P : A $\rightarrow$ Type), P x $\rightarrow \forall  $ y : A, x = y $\rightarrow$ P y} 
+
+ The ind version is used to ``prove by induction'' and the rect version is used to ``construct recursively''. In particular note that eq\_ind is almost the same as Leibniz. Indeed we could have replaced the last four tactics in the proof by
+ \inp{
+ Apply result (eq\_ind a).\\
+This follows from assumptions.\\
+This follows by assumptions.\\
+Qed.}
+
+In fact the ``replacing tactics'',  ``Rewrite the goal using VAR.'' respectively ``Replace VAR by VAR in hypothesis VAR.'' and ``Replace VAR by VAR in the goal.'' are all sophisticated versions of matching  (and $\iota$ reduction) on the definition of eq.IN fact if ones does the two proofs above and then writes ``Print Leibnizeq'' the results are essentially the same. They both use eq\_ind but the rewrite version introduces some new notations that make things a bit harder to read.
+
+The rewrite proof:
+\mess{Leibnitzeq = \\
+ $\lambda$ (X : Type) (a b : X),\\
+conj ( $\lambda$ Hyp :  $\forall$ P : X  $\rightarrow$ Prop, P a  $\rightarrow$ P b, Hyp (eq a) eq\_refl)\\
+  ( $\lambda$ (Hyp : a = b) (P : X  $\rightarrow$ Prop) (Hyp0 : P a) (H:a = b:=Hyp),\\
+   eq\_ind a ( $\lambda$ b0 : X, P b0) Hyp0 b H)\\
+     :  $\forall$ (X : Type) (a b : X), Leq X a b $\leftrightarrow$ a = b}
+     
+     And the eq\_ind proof:
+  \mess{Leibnitzeq = \\
+ $\lambda$ (X : Type) (a b : X),\\
+conj ( $\lambda$ Hyp :  $\forall$ P : X  $\rightarrow$ Prop, P a  $\rightarrow$ P b, Hyp (eq a) eq\_refl)\\
+  ( $\lambda$ (Hyp : a = b) (P : X  $\rightarrow$ Prop) (Hyp0 : P a), eq\_ind a P Hyp0 b Hyp)\\
+     :  $\forall$ (X : Type) (a b : X), Leq X a b $\leftrightarrow$ a = b}   
+
+
+  \subsubsection{John Major equality}
+  
+  So what about $0:nat$ and $0\%Z: Z$? Can you tell that they are  not equal?  In fact you can. There is a concept called ``heterogeneous	equality'' defined as follows:
+  
+  \begin{verbatim}
+  Inductive JMeq (A : Type) (x : A) :
+   forall B : Type, B -> Prop := JMeq_refl : JMeq x  x
+  \end{verbatim}
+  
+  Recall the usual definition of equality:
+  \begin{verbatim}
+  Inductive eq (A : Type) (x : A) :
+  A -> Prop := eq_refl : eq x  x
+  \end{verbatim}
+  
+  The two look quite similar, it seems that you can still only prove $x=x$. Nevertheless the type of JMeq is:
+  
+  \begin{verbatim}
+  JMeq
+     : forall A : Type,  A -> forall B : Type, B -> Prop.
+  \end{verbatim}
+  In other words, JMeq allows you to check wether JMeq $a b$ holds even if $a$ and $b$ are of different types. JMeq a b will of course be  false unless the type of $a$ equals the type of $b$ and $a=b$. The name of the concept (as you can see from its notation) is John Major equality, a name invented by Conor McBride  because ``it widens aspirations without affecting	the practical outcome'', an apt metaphor for tory politics  in Britain . 
+  
+  This concept is well developed in Coq but, in this book,  we tried to avoid being drawn into such subtleties.
+  
+  \subsubsection{Functional equality}
+  
+   Let us complicate things further ever so slightly. Consider two f functions $f, g:\mathbb{N}\rightarrow \mathbb{N}, f(x)=x$ respectively $g(x)=x+0$. Surely these are equal. As before we might not just use reflexivity but arithmetic will do.
+\inp{
+Definition f:nat $\rightarrow$ nat:=fun\  x $\Rightarrow$  x.\\
+ Definition g:nat$\rightarrow$ nat:=fun x $\Rightarrow$ x+0.\\
+ Lemma z:f=g.\\
+ True by arithmetic properties.}
+
+Arithmetic seems to not be able to make any progress.
+
+ Since functions are primitive notions, functional equality is a subtle notion in Coq. In fact the very natural  statement that $f=g$ if $\forall x, f(x)=g(x)$ is independent of the logic of Coq and has to be entered as an axiom. (Note, I have not yet decide if to add this to Spatchcoq).
+\inp{Axiom fun\_ext : forall (A B : Type) (f g : A -> B),
+  (forall x : A, f x = g x) -> f = g.}
+A special case of this we have already seen in the Set theory section in which we had to employ the axiom Extensionality Ensembles.
+
+
+\subsubsection{Proof irrelevance}
+
+Note that in Coq proof are themselves objects and therefore can be compared. Of course you cannot compare proofs of different statement, a proof has the type of the statement it proves.  This creates  wonderfully confusing statements in type theory. For example, consider  two proofs of ``0=0'', the absolutely trivial one:
 \inp{Lemma a:0=0.\\
 This follows from reflexivity.\\
 Qed.}
@@ -72,21 +300,21 @@ This follows from reflexivity.\\
 Apply result eq\_add\_S.\\
 This follows from assumptions.
 Qed.}
-They do turn out to be the same proof? Let us look at the  module Eqdep\_dec and the lemma eq\_proofs\_unicity\_on: 
-
-Theorem eq\_proofs\_unicity\_on :$ \forall (y:A) (p1 p2:x = y), p1 = p2.$
+Are they  the same proof? Let us look at the  module Eqdep\_dec and the lemma eq\_proofs\_unicity\_on: 
+\mess{
+Theorem eq\_proofs\_unicity\_on :$ \forall (y:A) (p1 p2:x = y), p1 = p2.$}
 
 It seems to be saying that any two proofs of an equality are the same. Cool let us use it.
 \inp{
-Require Import Eqdep\_dec.
-Lemma c:a=b.
+Require Import Eqdep\_dec.\\
+Lemma c:a=b.\\
 Apply result eq\_proofs\_unicity\_on.}
 
 Surprisingly we get:
 
 \coq{ }{\forall y : nat, (0 = y) \lor (not (0 = y)))}
 
-Which is a bit noting, in fact, the theorem in the story is true if equality id decidable in the type $A$. Luckily in nat it is:
+Which is a bit strange. n fact, the theorem in the story is true if equality is decidable in the type $A$. Luckily in nat it is:
 \inp{
 Fix an arbitrary element y.\\
 Apply induction on y.\\
@@ -115,7 +343,7 @@ Lemma c :a=b.\\
 Apply result eq\_proofs\_unicity\_on.}
 Gives
 
-\coq{ }{(\forall (y : nat) \rightarrow nat, (f = y) \lor (not (f = y)))}
+\coq{ }{(\forall y : nat \rightarrow nat, (f = y) \lor (not (f = y)))}
 
 Which is not decidable so we can only prove it in classical logic and not in constructive logic. 
 
