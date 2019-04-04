@@ -71,6 +71,8 @@ let header ="
 \\newtheorem{Definition}{Definition}
 \\newtheorem{Inductive}{Inductive Definition}
 \\newtheorem{Variable}{Variable}
+\\newtheorem{Variables}{Variables}
+
 \\newtheorem{Notation}{Notation}
 \\newtheorem{Axiom}{Axiom}
  \\usepackage{tcolorbox}
